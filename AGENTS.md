@@ -13,7 +13,7 @@ Core principles:
 3. Top-level topic taxonomy must remain small and stable (max 10).
 4. Keyword taxonomy is controlled to prevent drift.
 5. English is canonical; OpenClaw ingestion requires paired Traditional Chinese translation in the same run.
-6. All assets for one entry live together in a page bundle to keep records portable.
+6. Prefer bundle-local assets for portability, except when copyright-safe mode requires external archival.
 
 ## 2. Directory Contract
 
@@ -31,6 +31,7 @@ Attachment rule:
 
 - Place attachment files in the same bundle folder as the entry `index.md`.
 - Refer to attachments by relative file name in front matter `attachments`.
+- Copyright-safe exception: for user-uploaded files with potential copyright risk, do not commit originals to this public repo; store externally and link via `archived_url`.
 
 ## 3. Required Entry Metadata
 
@@ -129,6 +130,12 @@ Expected outputs:
 - `content/zh-tw/items/<slug>/index.md`
 - Attachments under `content/en/items/<slug>/`
 - Optional proposals appended to `data/keyword_proposals.jsonl`
+
+Copyright-safe mode (for user-uploaded files, default for `[doc]` tasks):
+
+- Keep originals in Google Drive account `cclljj.agent@gmail.com`, folder `Ebook_Documents`.
+- Do not commit copyrighted originals into this public repository unless explicitly approved.
+- Record the share link in `optional_fields.archived_url` and/or `detailed_notes`.
 
 Source type mapping:
 

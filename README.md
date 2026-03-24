@@ -89,6 +89,7 @@ Mandatory policy:
 - create paired `en` and `zh-tw` entries for the same slug
 - do not create `zh-tw`-only entries
 - use only controlled `topics` and `keywords` IDs
+- for user-uploaded files with copyright risk, keep originals outside this public repo and use `archived_url` for traceability
 
 Workflow:
 
@@ -125,6 +126,12 @@ python scripts/ingest_item.py ingest \
   --run-checks \
   --git-push
 ```
+
+Copyright-safe mode:
+
+- Original uploaded files are retained in Google Drive (`cclljj.agent@gmail.com` / `Ebook_Documents`).
+- Public repository should contain metadata and notes only unless explicit approval is given to publish original files.
+- Store external reference in `optional_fields.archived_url` and/or `detailed_notes`.
 
 ## CI/CD and Deployment
 
