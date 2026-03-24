@@ -1,33 +1,36 @@
-# OaboutAI Knowledge Archive (Hugo)
+# OaboutAI Knowledge Archive
 
-This site is a static, agent-maintained knowledge archive for AI policy, AI governance, and AI safety resources.  
-It is designed for long-term curation: every entry uses strict structured metadata so future agents can ingest, validate, and maintain content with minimal ambiguity.
+[![CI](https://img.shields.io/github/actions/workflow/status/cclljj/OaboutAI/docs-site-ci.yml?branch=main&label=CI)](https://github.com/cclljj/OaboutAI/actions/workflows/docs-site-ci.yml)
+[![Demo Site](https://img.shields.io/badge/Demo-oaboutai.vercel.app-000?logo=vercel)](https://oaboutai.vercel.app/)
+[![Hugo](https://img.shields.io/badge/Hugo-0.152.2-ff4088?logo=hugo)](https://gohugo.io/)
+[![Content Policy](https://img.shields.io/badge/Content-Bilingual%20Required-1f6feb)](#openclaw-agent-ingestion)
 
-## Purpose
+Structured, machine-maintained knowledge archive for AI policy, AI governance, and AI safety materials.
 
-- Provide a reliable public archive of source materials (web pages, PDFs, YouTube clips, and other references).
-- Preserve traceability for each entry: source URL, source date, submission date, and attachment bundle.
-- Support fast browsing by newest first, topic, month, keyword, and full-text search.
-- Support multilingual publishing with English (`en`) as canonical and Traditional Chinese (`zh-tw`) as optional translation.
+Demo site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
-## Site Scope
+## Overview
 
-- Top-level topics are controlled and capped at 10 via `data/topics.json`.
-- Current topics:
-  - `ai-policy`
-  - `ai-governance`
-  - `ai-safety`
-- Keywords are controlled via `data/keywords.json`.
+This repository is optimized for predictable agent workflows:
 
-## Content Model
+- strict metadata schema for every entry
+- controlled topic and keyword vocabularies
+- bilingual publishing (`en` + `zh-tw`) for ingestion workflow
+- automated CI validation and Vercel production deployment
 
-Each entry is a Hugo page bundle:
+## Repository Structure
 
 - Canonical entry: `content/en/items/<slug>/index.md`
-- Optional translation: `content/zh-tw/items/<slug>/index.md`
-- Attachments: files in the same `<slug>/` folder
+- zh-TW translation: `content/zh-tw/items/<slug>/index.md`
+- Topic definitions: `data/topics.json`
+- Keyword definitions: `data/keywords.json`
+- Keyword proposal queue: `data/keyword_proposals.jsonl`
+- Agent ingestion tooling: `scripts/ingest_item.py`
+- Agent runbooks: `docs/openclaw_ingestion_workflow.md`, `docs/openclaw_system_prompt.md`
 
-Required metadata fields:
+## Content Contract
+
+Required front matter fields for each entry:
 
 - `title`
 - `source_url`
@@ -36,46 +39,60 @@ Required metadata fields:
 - `submission_date` (`YYYY-MM-DD`)
 - `executive_summary`
 - `detailed_notes`
-- `keywords` (must exist in `data/keywords.json`)
-- `topics` (must exist in `data/topics.json`)
+- `keywords` (IDs from `data/keywords.json`)
+- `topics` (IDs from `data/topics.json`)
 - `language` (`en|zh-tw`)
+
+Slug format:
+
+- `YYYYMMDD-short-kebab-title`
 
 ## Local Development
 
 Prerequisites:
 
-- Hugo Extended
-- Go (for Hugo Modules)
-- Python 3.10+ (for validation script)
+- Python 3.10+
+- Hugo Extended (or use `npx --yes hugo-bin`)
 
-Commands:
+Run validation:
 
 ```bash
 python scripts/validate_content.py
-hugo server -D
+```
+
+Run local server:
+
+```bash
+npx --yes hugo-bin server -D
 ```
 
 Production build:
 
 ```bash
-hugo --gc --minify
+rm -f data/keyword_proposals.jsonl
+npx --yes hugo-bin --gc --minify
 ```
 
-## OpenClaw Agent Ingestion (All Readable Formats)
+## OpenClaw Agent Ingestion
 
-For OpenClaw-based ingestion (URL, YouTube, PDF, DOC, DOCX, PPT, PPTX, MD, TXT, and other readable files), use:
+Supported source inputs:
 
-- `scripts/ingest_item.py` (prepare/ingest workflow)
-- `docs/openclaw_system_prompt.md` (system prompt you can paste into OpenClaw)
-- `docs/openclaw_ingestion_workflow.md` (step-by-step runbook + JSON spec skeleton)
+- URL / YouTube
+- PDF
+- DOC / DOCX
+- PPT / PPTX
+- MD / TXT
+- other readable local files
 
-Policy for this workflow:
+Mandatory policy:
 
-- Create paired entries for the same slug in both `en` and `zh-tw`.
-- Do not create `zh-tw`-only entries.
-- Use only controlled `topics` and `keywords` IDs from `data/topics.json` and `data/keywords.json`.
+- create paired `en` and `zh-tw` entries for the same slug
+- do not create `zh-tw`-only entries
+- use only controlled `topics` and `keywords` IDs
 
-Prepare draft spec:
+Workflow:
+
+1. Prepare draft
 
 ```bash
 python scripts/ingest_item.py prepare \
@@ -84,7 +101,7 @@ python scripts/ingest_item.py prepare \
   --output /tmp/oaboutai_draft.json
 ```
 
-Finalize spec and ingest:
+2. Dry-run ingest
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -92,7 +109,7 @@ python scripts/ingest_item.py ingest \
   --dry-run
 ```
 
-Write files and run checks:
+3. Write + checks
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -100,7 +117,7 @@ python scripts/ingest_item.py ingest \
   --run-checks
 ```
 
-Ingest and push directly to GitHub `main`:
+4. Optional direct push
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -109,33 +126,21 @@ python scripts/ingest_item.py ingest \
   --git-push
 ```
 
-## CI Quality Gate
+## CI/CD and Deployment
 
-GitHub Actions workflow: `.github/workflows/docs-site-ci.yml`
+Workflow file: `.github/workflows/docs-site-ci.yml`
 
-Checks:
+Pipeline behavior:
 
-1. Metadata/schema validation
-2. Topic/keyword controlled-vocabulary validation
-3. Hugo production build
-4. Build artifact presence check (`public/index.html`)
+1. Validate metadata and controlled vocabularies
+2. Run Hugo production build
+3. On `main` push, deploy to Vercel production
 
-## Deployment (Vercel OaboutAI)
+Vercel target:
 
-Deployment target:
+- Project: `oaboutai`
+- Production URL: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
-- Vercel project: `oaboutai` (display name: `OaboutAI`)
-- Production URL: `https://oaboutai.vercel.app`
-- Build command: `rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify`
-- Output directory: `public`
+Required GitHub secret:
 
-Recommended release flow:
-
-1. Open PR with content/site changes.
-2. CI must pass.
-3. Merge into `main`.
-4. GitHub Actions deploys to Vercel production automatically.
-
-Required GitHub secret for auto-deploy:
-
-- `VERCEL_TOKEN` (Vercel personal/team token with deploy permission)
+- `VERCEL_TOKEN` (token with deploy permission for target Vercel scope)
