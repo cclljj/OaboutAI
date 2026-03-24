@@ -28,8 +28,8 @@
     {{ $sorted := sort $items "Params.source_date" "desc" }}
     {{ range first 20 $sorted }}
       <article class="oa-entry">
-        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }} · {{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
+        <h3><a class="oa-recent-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p class="oa-meta">{{ i18n "sourceDate" }}: {{ .Params.source_date }} · {{ i18n "submittedOn" }}: {{ .Params.submission_date }}</p>
         <p>{{ .Params.executive_summary }}</p>
       </article>
     {{ else }}
