@@ -1,0 +1,35 @@
+[
+  {
+    "id": "ai-policy",
+    "title": {
+      "en": "AI Policy",
+      "zh-tw": "AI 政策"
+    },
+    "description": {
+      "en": "Laws, regulations, public-sector strategy, and cross-border policy signals for AI.",
+      "zh-tw": "AI 的法律、規範、政府策略與跨境政策動向。"
+    }
+  },
+  {
+    "id": "ai-governance",
+    "title": {
+      "en": "AI Governance",
+      "zh-tw": "AI 治理"
+    },
+    "description": {
+      "en": "Enterprise controls, accountability, risk ownership, and governance operating models.",
+      "zh-tw": "企業治理控制、責任歸屬、風險管理與治理作業模型。"
+    }
+  },
+  {
+    "id": "ai-safety",
+    "title": {
+      "en": "AI Safety",
+      "zh-tw": "AI 安全"
+    },
+    "description": {
+      "en": "Methods and evidence for reducing severe model failure and misuse risk.",
+      "zh-tw": "降低模型嚴重失效與誤用風險的方法與證據。"
+    }
+  }
+]

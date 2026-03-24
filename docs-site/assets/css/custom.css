@@ -1,0 +1,51 @@
+.oa-hero {
+  border: 1px solid #d9e0ea;
+  border-radius: 12px;
+  padding: 1.2rem;
+  background: linear-gradient(120deg, #f8fbff, #f4f8f0);
+}
+
+.oa-quick-links {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.oa-topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+
+.oa-topic-card {
+  border: 1px solid #d9e0ea;
+  border-radius: 10px;
+  padding: 0.9rem;
+  text-decoration: none;
+}
+
+.oa-entry {
+  border-bottom: 1px solid #e5e9ef;
+  padding: 0.8rem 0;
+}
+
+.oa-meta {
+  color: #5c6b7d;
+  font-size: 0.92rem;
+}
+
+.oa-metadata {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 0.4rem 0.8rem;
+}
+
+.oa-metadata dt {
+  font-weight: 600;
+}
+
+@media (max-width: 680px) {
+  .oa-metadata {
+    grid-template-columns: 1fr;
+  }
+}

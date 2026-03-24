@@ -1,0 +1,24 @@
+{{ define "main" }}
+<article>
+  <h1>{{ .Title }}</h1>
+  {{ .Content }}
+</article>
+
+{{ $topic := .Params.topic_key }}
+{{ $items := where site.RegularPages "Section" "items" }}
+{{ $matches := where $items "Params.topics" "intersect" (slice $topic) }}
+{{ $sorted := sort $matches "Params.submission_date" "desc" }}
+
+<section>
+  <h2>{{ i18n "entriesInTopic" }}</h2>
+  {{ range $sorted }}
+    <article class="oa-entry">
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }}</p>
+      <p>{{ .Params.executive_summary }}</p>
+    </article>
+  {{ else }}
+    <p>{{ i18n "noEntriesInTopic" }}</p>
+  {{ end }}
+</section>
+{{ end }}

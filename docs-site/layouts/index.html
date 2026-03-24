@@ -1,0 +1,38 @@
+{{ define "main" }}
+<section class="oa-hero">
+  <h1>{{ .Site.Title }}</h1>
+  <p>{{ .Site.Params.description }}</p>
+  <div class="oa-quick-links">
+    <a href="{{ "archive/monthly/" | relLangURL }}">{{ i18n "monthlyArchive" }}</a>
+    <a href="{{ "topics/" | relLangURL }}">{{ i18n "browseByTopic" }}</a>
+    <a href="{{ "items/" | relLangURL }}">{{ i18n "browseAllEntries" }}</a>
+  </div>
+</section>
+
+<section>
+  <h2>{{ i18n "topics" }}</h2>
+  <div class="oa-topic-grid">
+    {{ range .Site.Data.topics }}
+      <a class="oa-topic-card" href="{{ printf "topics/%s/" .id | relLangURL }}">
+        <h3>{{ index .title $.Site.Language.Lang | default .id }}</h3>
+        <p>{{ index .description $.Site.Language.Lang | default "" }}</p>
+      </a>
+    {{ end }}
+  </div>
+</section>
+
+<section>
+  <h2>{{ i18n "recentEntries" }}</h2>
+  {{ $items := where site.RegularPages "Section" "items" }}
+  {{ $sorted := sort $items "Params.submission_date" "desc" }}
+  {{ range first 20 $sorted }}
+    <article class="oa-entry">
+      <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+      <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }} · {{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
+      <p>{{ .Params.executive_summary }}</p>
+    </article>
+  {{ else }}
+    <p>{{ i18n "noEntriesYet" }}</p>
+  {{ end }}
+</section>
+{{ end }}

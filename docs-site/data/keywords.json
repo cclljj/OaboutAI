@@ -1,0 +1,52 @@
+[
+  {
+    "id": "regulation",
+    "label": { "en": "Regulation", "zh-tw": "法規" },
+    "aliases": ["law", "compliance law"]
+  },
+  {
+    "id": "risk-management",
+    "label": { "en": "Risk Management", "zh-tw": "風險管理" },
+    "aliases": ["risk control", "risk governance"]
+  },
+  {
+    "id": "model-evaluation",
+    "label": { "en": "Model Evaluation", "zh-tw": "模型評估" },
+    "aliases": ["eval", "benchmarking"]
+  },
+  {
+    "id": "red-teaming",
+    "label": { "en": "Red Teaming", "zh-tw": "紅隊測試" },
+    "aliases": ["adversarial testing"]
+  },
+  {
+    "id": "incident-reporting",
+    "label": { "en": "Incident Reporting", "zh-tw": "事故通報" },
+    "aliases": ["incident disclosure"]
+  },
+  {
+    "id": "audit",
+    "label": { "en": "Audit", "zh-tw": "稽核" },
+    "aliases": ["assurance"]
+  },
+  {
+    "id": "standards",
+    "label": { "en": "Standards", "zh-tw": "標準" },
+    "aliases": ["standardization"]
+  },
+  {
+    "id": "safety-cases",
+    "label": { "en": "Safety Cases", "zh-tw": "安全案例" },
+    "aliases": ["assurance cases"]
+  },
+  {
+    "id": "governance-framework",
+    "label": { "en": "Governance Framework", "zh-tw": "治理框架" },
+    "aliases": ["policy framework"]
+  },
+  {
+    "id": "public-consultation",
+    "label": { "en": "Public Consultation", "zh-tw": "公眾諮詢" },
+    "aliases": ["stakeholder consultation"]
+  }
+]

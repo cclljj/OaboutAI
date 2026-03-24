@@ -1,0 +1,4 @@
+Checklist:
+1. Claims and supporting evidence are explicitly linked.
+2. Residual risk and fallback controls are documented.
+3. Monitoring and update triggers are assigned to owners.

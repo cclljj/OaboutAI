@@ -1,0 +1,43 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+{{ .Content }}
+
+{{ $items := where site.RegularPages "Section" "items" }}
+{{ $sorted := sort $items "Params.submission_date" "desc" }}
+{{ $months := dict }}
+{{ range $sorted }}
+  {{ $raw := .Params.submission_date }}
+  {{ $monthKey := "" }}
+  {{ with $raw }}
+    {{ $monthKey = (time.AsTime .).Format "2006-01" }}
+  {{ end }}
+  {{ if and $monthKey (not (isset $months $monthKey)) }}
+    {{ $months = merge $months (dict $monthKey (slice)) }}
+  {{ end }}
+  {{ if $monthKey }}
+    {{ $monthItems := index $months $monthKey | default (slice) }}
+    {{ $months = merge $months (dict $monthKey ($monthItems | append .)) }}
+  {{ end }}
+{{ end }}
+
+{{ $monthKeys := slice }}
+{{ range $k, $_ := $months }}
+  {{ $monthKeys = $monthKeys | append $k }}
+{{ end }}
+{{ $monthKeys = sort $monthKeys "value" "desc" }}
+
+{{ range $monthKeys }}
+  {{ $month := . }}
+  <section>
+    <h2>{{ $month }}</h2>
+    {{ range index $months $month }}
+      <article class="oa-entry">
+        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }}</p>
+      </article>
+    {{ end }}
+  </section>
+{{ else }}
+  <p>{{ i18n "noEntriesYet" }}</p>
+{{ end }}
+{{ end }}

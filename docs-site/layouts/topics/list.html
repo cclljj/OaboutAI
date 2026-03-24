@@ -1,0 +1,11 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+<div class="oa-topic-grid">
+  {{ range .Pages.ByWeight }}
+    <a class="oa-topic-card" href="{{ .RelPermalink }}">
+      <h2>{{ .Title }}</h2>
+      <p>{{ .Summary }}</p>
+    </a>
+  {{ end }}
+</div>
+{{ end }}

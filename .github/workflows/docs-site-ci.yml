@@ -1,0 +1,46 @@
+name: docs-site-ci
+
+on:
+  push:
+    paths:
+      - "docs-site/**"
+      - ".github/workflows/docs-site-ci.yml"
+  pull_request:
+    paths:
+      - "docs-site/**"
+      - ".github/workflows/docs-site-ci.yml"
+
+jobs:
+  validate-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install validator dependency
+        run: pip install pyyaml
+
+      - name: Validate content metadata
+        run: python docs-site/scripts/validate_content.py
+
+      - name: Set up Go (for Hugo Modules)
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: "0.143.1"
+          extended: true
+
+      - name: Hugo build
+        run: hugo --source docs-site --gc --minify
+
+      - name: Verify build output
+        run: test -f docs-site/public/index.html

@@ -1,0 +1,34 @@
+- id: monthlyArchive
+  translation: Monthly Archive
+- id: browseByTopic
+  translation: Browse by Topic
+- id: browseAllEntries
+  translation: Browse All Entries
+- id: topics
+  translation: Topics
+- id: recentEntries
+  translation: Recent Entries
+- id: submittedOn
+  translation: Submitted on
+- id: sourceDate
+  translation: Source date
+- id: noEntriesYet
+  translation: No entries yet.
+- id: newestFirst
+  translation: Entries are ordered from newest to oldest.
+- id: sourceType
+  translation: Source type
+- id: sourceUrl
+  translation: Source URL
+- id: keywords
+  translation: Keywords
+- id: executiveSummary
+  translation: Executive Summary
+- id: detailedNotes
+  translation: Detailed Notes
+- id: attachments
+  translation: Attachments
+- id: entriesInTopic
+  translation: Entries in this topic
+- id: noEntriesInTopic
+  translation: No entries found for this topic.

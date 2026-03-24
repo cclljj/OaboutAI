@@ -1,0 +1,15 @@
+{{ define "main" }}
+<h1>{{ .Title }}</h1>
+<p>{{ i18n "newestFirst" }}</p>
+
+{{ $sorted := sort .Pages "Params.submission_date" "desc" }}
+{{ range $sorted }}
+  <article class="oa-entry">
+    <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+    <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }} · {{ i18n "sourceType" }} {{ .Params.source_type }}</p>
+    <p>{{ .Params.executive_summary }}</p>
+  </article>
+{{ else }}
+  <p>{{ i18n "noEntriesYet" }}</p>
+{{ end }}
+{{ end }}
