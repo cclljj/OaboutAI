@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="oa-shell">
-  <article>
-    <h1>{{ .Title }}</h1>
+  <article class="oa-intro-card">
+    <h1 class="oa-page-title">{{ .Title }}</h1>
     {{ .Content }}
   </article>
 
@@ -10,13 +10,15 @@
   {{ $matches := where $items "Params.topics" "intersect" (slice $topic) }}
   {{ $sorted := sort $matches "Params.source_date" "desc" }}
 
-  <section>
-    <h2>{{ i18n "entriesInTopic" }}</h2>
+  <section class="oa-section">
+    <h2 class="oa-section-title">{{ i18n "entriesInTopic" }}</h2>
     {{ range $sorted }}
-      <article class="oa-entry">
+      <article class="oa-entry-card">
         <h3><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        <p class="oa-meta">{{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
-        <p>{{ .Params.executive_summary }}</p>
+        <p class="oa-meta">
+          <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
+        </p>
+        <p class="oa-summary">{{ .Params.executive_summary }}</p>
       </article>
     {{ else }}
       <p>{{ i18n "noEntriesInTopic" }}</p>

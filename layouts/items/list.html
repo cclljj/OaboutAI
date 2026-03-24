@@ -1,14 +1,17 @@
 {{ define "main" }}
 <div class="oa-shell">
-  <h1>{{ .Title }}</h1>
-  <p>{{ i18n "newestFirst" }}</p>
+  <h1 class="oa-page-title">{{ .Title }}</h1>
+  <p class="oa-page-subtitle">{{ i18n "newestFirst" }}</p>
 
   {{ $sorted := sort .Pages "Params.source_date" "desc" }}
   {{ range $sorted }}
-    <article class="oa-entry">
-      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-      <p class="oa-meta">{{ i18n "sourceDate" }} {{ .Params.source_date }} · {{ i18n "sourceType" }} {{ .Params.source_type }}</p>
-      <p>{{ .Params.executive_summary }}</p>
+    <article class="oa-entry-card">
+      <h2><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <p class="oa-meta">
+        <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
+        <span class="oa-chip">{{ i18n "sourceType" }} {{ .Params.source_type }}</span>
+      </p>
+      <p class="oa-summary">{{ .Params.executive_summary }}</p>
     </article>
   {{ else }}
     <p>{{ i18n "noEntriesYet" }}</p>

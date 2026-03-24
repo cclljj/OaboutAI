@@ -1,8 +1,8 @@
 {{ define "main" }}
 <div class="oa-shell">
-  <article>
-    <h1>{{ .Title }}</h1>
-    <dl class="oa-metadata">
+  <article class="oa-single">
+    <h1 class="oa-page-title">{{ .Title }}</h1>
+    <dl class="oa-metadata oa-card">
       <dt>{{ i18n "sourceUrl" }}</dt>
       <dd><a href="{{ .Params.source_url }}" target="_blank" rel="noreferrer">{{ .Params.source_url }}</a></dd>
 
@@ -16,39 +16,52 @@
       <dd>{{ .Params.submission_date }}</dd>
 
       <dt>{{ i18n "topics" }}</dt>
-      <dd>
+      <dd class="oa-chip-wrap">
         {{ range .Params.topics }}
-          <a href="{{ printf "topics/%s/" . | relLangURL }}">{{ . }}</a>
+          <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ . }}</a>
         {{ end }}
       </dd>
 
       <dt>{{ i18n "keywords" }}</dt>
-      <dd>
+      <dd class="oa-chip-wrap">
         {{ range .Params.keywords }}
-          <a href="{{ printf "keywords/%s/" . | relLangURL }}">{{ . }}</a>
+          <a class="oa-chip oa-chip-link" href="{{ printf "keywords/%s/" . | relLangURL }}">{{ . }}</a>
         {{ end }}
       </dd>
     </dl>
 
-    <h2>{{ i18n "executiveSummary" }}</h2>
-    <p>{{ .Params.executive_summary }}</p>
+    <section class="oa-section oa-card">
+      <h2 class="oa-section-title">{{ i18n "executiveSummary" }}</h2>
+      <p>{{ .Params.executive_summary }}</p>
+    </section>
 
-    <h2>{{ i18n "detailedNotes" }}</h2>
-    <p>{{ .Params.detailed_notes }}</p>
-    {{ .Content }}
+    <section class="oa-section oa-card">
+      <h2 class="oa-section-title">{{ i18n "detailedNotes" }}</h2>
+      <p>{{ .Params.detailed_notes }}</p>
+    </section>
+
+    {{ $takeawayContent := replaceRE `(?s)^<h2[^>]*>.*?</h2>` "" .Content }}
+    {{ if gt (len ($takeawayContent | plainify | strings.TrimSpace)) 0 }}
+      <section class="oa-section oa-card">
+        <h2 class="oa-section-title">{{ i18n "takeAway" }}</h2>
+        <div class="oa-takeaway">{{ $takeawayContent | safeHTML }}</div>
+      </section>
+    {{ end }}
 
     {{ with .Params.attachments }}
-      <h2>{{ i18n "attachments" }}</h2>
-      <ul>
-        {{ range . }}
-          {{ $resource := $.Resources.GetMatch . }}
-          {{ if $resource }}
-            <li><a href="{{ $resource.RelPermalink }}">{{ . }}</a></li>
-          {{ else }}
-            <li>{{ . }}</li>
+      <section class="oa-section oa-card">
+        <h2 class="oa-section-title">{{ i18n "attachments" }}</h2>
+        <ul>
+          {{ range . }}
+            {{ $resource := $.Resources.GetMatch . }}
+            {{ if $resource }}
+              <li><a href="{{ $resource.RelPermalink }}">{{ . }}</a></li>
+            {{ else }}
+              <li>{{ . }}</li>
+            {{ end }}
           {{ end }}
-        {{ end }}
-      </ul>
+        </ul>
+      </section>
     {{ end }}
   </article>
 </div>

@@ -26,6 +26,8 @@
   translation: Executive Summary
 - id: detailedNotes
   translation: Detailed Notes
+- id: takeAway
+  translation: Take-away
 - id: attachments
   translation: Attachments
 - id: entriesInTopic

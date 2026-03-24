@@ -26,6 +26,8 @@
   translation: 執行摘要
 - id: detailedNotes
   translation: 詳細筆記
+- id: takeAway
+  translation: 重點摘要
 - id: attachments
   translation: 附件
 - id: entriesInTopic

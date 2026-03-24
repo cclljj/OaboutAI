@@ -1,36 +1,40 @@
 {{ define "main" }}
 <div class="oa-shell">
   <section class="oa-hero">
-    <h1>{{ .Site.Title }}</h1>
-    <p>{{ .Site.Params.description }}</p>
-    <div class="oa-quick-links">
-      <a href="{{ "archive/monthly/" | relLangURL }}">{{ i18n "monthlyArchive" }}</a>
-      <a href="{{ "topics/" | relLangURL }}">{{ i18n "browseByTopic" }}</a>
-      <a href="{{ "items/" | relLangURL }}">{{ i18n "browseAllEntries" }}</a>
+    <p class="oa-hero-eyebrow">AI Policy • Governance • Safety</p>
+    <h1 class="oa-hero-title">{{ .Site.Title }}</h1>
+    <p class="oa-hero-description">{{ .Site.Params.description }}</p>
+    <div class="oa-quick-links" aria-label="Primary navigation">
+      <a class="oa-btn oa-btn-primary" href="{{ "items/" | relLangURL }}">{{ i18n "browseAllEntries" }}</a>
+      <a class="oa-btn oa-btn-secondary" href="{{ "topics/" | relLangURL }}">{{ i18n "browseByTopic" }}</a>
+      <a class="oa-btn oa-btn-secondary" href="{{ "archive/monthly/" | relLangURL }}">{{ i18n "monthlyArchive" }}</a>
     </div>
   </section>
 
-  <section>
-    <h2>{{ i18n "topics" }}</h2>
+  <section class="oa-section">
+    <h2 class="oa-section-title">{{ i18n "topics" }}</h2>
     <div class="oa-topic-grid">
       {{ range .Site.Data.topics }}
         <a class="oa-topic-card" href="{{ printf "topics/%s/" .id | relLangURL }}">
-          <h3>{{ index .title $.Site.Language.Lang | default .id }}</h3>
-          <p>{{ index .description $.Site.Language.Lang | default "" }}</p>
+          <h3 class="oa-topic-title">{{ index .title $.Site.Language.Lang | default .id }}</h3>
+          <p class="oa-topic-description">{{ index .description $.Site.Language.Lang | default "" }}</p>
         </a>
       {{ end }}
     </div>
   </section>
 
-  <section>
-    <h2>{{ i18n "recentEntries" }}</h2>
+  <section class="oa-section">
+    <h2 class="oa-section-title">{{ i18n "recentEntries" }}</h2>
     {{ $items := where site.RegularPages "Section" "items" }}
     {{ $sorted := sort $items "Params.source_date" "desc" }}
     {{ range first 20 $sorted }}
-      <article class="oa-entry">
-        <h3><a class="oa-recent-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        <p class="oa-meta">{{ i18n "sourceDate" }}: {{ .Params.source_date }} · {{ i18n "submittedOn" }}: {{ .Params.submission_date }}</p>
-        <p>{{ .Params.executive_summary }}</p>
+      <article class="oa-entry-card">
+        <h3><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <p class="oa-meta">
+          <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
+          <span class="oa-chip">{{ i18n "submittedOn" }} {{ .Params.submission_date }}</span>
+        </p>
+        <p class="oa-summary">{{ .Params.executive_summary }}</p>
       </article>
     {{ else }}
       <p>{{ i18n "noEntriesYet" }}</p>

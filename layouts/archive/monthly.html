@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="oa-shell">
-  <h1>{{ .Title }}</h1>
-  {{ .Content }}
+  <h1 class="oa-page-title">{{ .Title }}</h1>
+  <div class="oa-page-subtitle">{{ .Content }}</div>
 
   {{ $items := where site.RegularPages "Section" "items" }}
   {{ $sorted := sort $items "Params.source_date" "desc" }}
@@ -29,12 +29,14 @@
 
   {{ range $monthKeys }}
     {{ $month := . }}
-    <section>
-      <h2>{{ $month }}</h2>
+    <section class="oa-section">
+      <h2 class="oa-month-heading">{{ $month }}</h2>
       {{ range index $months $month }}
-        <article class="oa-entry">
+        <article class="oa-entry-card">
           <h3><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-          <p class="oa-meta">{{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
+          <p class="oa-meta">
+            <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
+          </p>
         </article>
       {{ end }}
     </section>
