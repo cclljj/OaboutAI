@@ -2,6 +2,8 @@
   translation: 月份彙整
 - id: browseByTopic
   translation: 依主題瀏覽
+- id: browseByKeyword
+  translation: 依關鍵字瀏覽
 - id: browseAllEntries
   translation: 瀏覽所有條目
 - id: topics

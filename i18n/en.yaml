@@ -2,6 +2,8 @@
   translation: Monthly Archive
 - id: browseByTopic
   translation: Browse by Topic
+- id: browseByKeyword
+  translation: Browse by Keyword
 - id: browseAllEntries
   translation: Browse All Entries
 - id: topics
