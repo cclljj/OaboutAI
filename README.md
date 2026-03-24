@@ -61,6 +61,48 @@ Production build:
 hugo --gc --minify
 ```
 
+## OpenClaw Agent Ingestion (All Readable Formats)
+
+For OpenClaw-based ingestion (URL, YouTube, PDF, DOC, DOCX, PPT, PPTX, MD, TXT, and other readable files), use:
+
+- `scripts/ingest_item.py` (prepare/ingest workflow)
+- `docs/openclaw_system_prompt.md` (system prompt you can paste into OpenClaw)
+- `docs/openclaw_ingestion_workflow.md` (step-by-step runbook + JSON spec skeleton)
+
+Prepare draft spec:
+
+```bash
+python scripts/ingest_item.py prepare \
+  --source-input "<url-or-local-path>" \
+  --source-date "YYYY-MM-DD" \
+  --output /tmp/oaboutai_draft.json
+```
+
+Finalize spec and ingest:
+
+```bash
+python scripts/ingest_item.py ingest \
+  --spec-file /tmp/oaboutai_draft.json \
+  --dry-run
+```
+
+Write files and run checks:
+
+```bash
+python scripts/ingest_item.py ingest \
+  --spec-file /tmp/oaboutai_draft.json \
+  --run-checks
+```
+
+Ingest and push directly to GitHub `main`:
+
+```bash
+python scripts/ingest_item.py ingest \
+  --spec-file /tmp/oaboutai_draft.json \
+  --run-checks \
+  --git-push
+```
+
 ## CI Quality Gate
 
 GitHub Actions workflow: `.github/workflows/docs-site-ci.yml`
