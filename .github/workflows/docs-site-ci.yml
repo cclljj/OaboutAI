@@ -3,11 +3,27 @@ name: docs-site-ci
 on:
   push:
     paths:
-      - "docs-site/**"
+      - "archetypes/**"
+      - "assets/**"
+      - "content/**"
+      - "data/**"
+      - "i18n/**"
+      - "layouts/**"
+      - "scripts/**"
+      - "hugo.toml"
+      - "go.mod"
       - ".github/workflows/docs-site-ci.yml"
   pull_request:
     paths:
-      - "docs-site/**"
+      - "archetypes/**"
+      - "assets/**"
+      - "content/**"
+      - "data/**"
+      - "i18n/**"
+      - "layouts/**"
+      - "scripts/**"
+      - "hugo.toml"
+      - "go.mod"
       - ".github/workflows/docs-site-ci.yml"
 
 jobs:
@@ -26,7 +42,7 @@ jobs:
         run: pip install pyyaml
 
       - name: Validate content metadata
-        run: python docs-site/scripts/validate_content.py
+        run: python scripts/validate_content.py
 
       - name: Set up Go (for Hugo Modules)
         uses: actions/setup-go@v5
@@ -40,7 +56,7 @@ jobs:
           extended: true
 
       - name: Hugo build
-        run: hugo --source docs-site --gc --minify
+        run: hugo --gc --minify
 
       - name: Verify build output
-        run: test -f docs-site/public/index.html
+        run: test -f public/index.html

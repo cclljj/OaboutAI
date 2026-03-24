@@ -1,6 +1,6 @@
 # AGENTS.md - OaboutAI Hugo Knowledge Archive
 
-This document is the authoritative operating manual for agents that contribute to and maintain `docs-site/`.
+This document is the authoritative operating manual for agents that contribute to and maintain this repository root Hugo site.
 
 ## 1. Design Logic
 
@@ -103,9 +103,9 @@ Date semantics:
 5. Ensure `keywords` values exist in `data/keywords.json`.
 6. Add optional zh-TW translation only after canonical English exists.
 7. Run validator:
-   - `python docs-site/scripts/validate_content.py`
+   - `python scripts/validate_content.py`
 8. Build check:
-   - `hugo --source docs-site --gc --minify`
+   - `hugo --gc --minify`
 9. Open PR; CI must pass before merge.
 
 ## 8. Maintenance Workflow

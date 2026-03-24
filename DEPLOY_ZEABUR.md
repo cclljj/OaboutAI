@@ -1,4 +1,4 @@
-# Deploy `docs-site` to Zeabur (OaboutAI)
+# Deploy Hugo Site to Zeabur (OaboutAI)
 
 This guide configures the Hugo static site deployment for project `OaboutAI`.
 
@@ -7,11 +7,11 @@ This guide configures the Hugo static site deployment for project `OaboutAI`.
 - Project name: `OaboutAI`
 - Project ID: `699f276deae0acb0cfea33b0`
 - Service type: static website
-- Repository root directory: `docs-site/`
+- Repository root directory: `/` (repo root)
 
 ## Service Configuration
 
-Set the Zeabur service to build from the `docs-site/` directory.
+Set the Zeabur service to build from the repository root directory.
 
 Recommended build command:
 
@@ -27,8 +27,8 @@ public
 
 ## Prerequisites in Repo
 
-- `docs-site/hugo.toml` configured
-- `docs-site/go.mod` includes Hextra module
+- `hugo.toml` configured
+- `go.mod` includes Hextra module
 - Content validation workflow enabled in `.github/workflows/docs-site-ci.yml`
 
 ## CI/CD Flow
@@ -41,17 +41,17 @@ public
 ## Operational Checklist
 
 1. In Zeabur dashboard, confirm this service points to the same branch used for production merges.
-2. Confirm service root is `docs-site/` (not repository root).
+2. Confirm service root is repository root (`/`).
 3. Confirm build logs include successful Hugo module resolution (`github.com/imfing/hextra`).
 4. Verify site URL root returns HTTP 200 after deploy.
 
 ## Troubleshooting
 
 - Build fails with missing theme/module:
-  - verify `go.mod` exists in `docs-site/`
+  - verify `go.mod` exists in repository root
   - verify network access to Hugo module source
 - Service returns default/empty page:
-  - verify root directory is set to `docs-site/`
+  - verify root directory is set to repository root (`/`)
   - verify output directory is `public`
 - Content validation passes locally but fails in CI:
   - check keyword/topic IDs against `data/*.json`

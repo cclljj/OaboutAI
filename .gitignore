@@ -14,5 +14,5 @@ node_modules/
 .next/
 
 # Hugo
-docs-site/public/
-docs-site/resources/
+public/
+resources/

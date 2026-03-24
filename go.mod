@@ -1,4 +1,4 @@
-module github.com/cclljj/Stock_Markets/docs-site
+module github.com/cclljj/OaboutAI
 
 go 1.22
 

@@ -51,14 +51,14 @@ Prerequisites:
 Commands:
 
 ```bash
-python docs-site/scripts/validate_content.py
-hugo --source docs-site server -D
+python scripts/validate_content.py
+hugo server -D
 ```
 
 Production build:
 
 ```bash
-hugo --source docs-site --gc --minify
+hugo --gc --minify
 ```
 
 ## CI Quality Gate
@@ -70,7 +70,7 @@ Checks:
 1. Metadata/schema validation
 2. Topic/keyword controlled-vocabulary validation
 3. Hugo production build
-4. Build artifact presence check (`docs-site/public/index.html`)
+4. Build artifact presence check (`public/index.html`)
 
 ## Deployment (Zeabur OaboutAI)
 
@@ -78,7 +78,7 @@ Deployment target:
 
 - Zeabur project: `OaboutAI`
 - Project ID: `699f276deae0acb0cfea33b0`
-- Service root directory: `docs-site/`
+- Service root directory: repository root (`/`)
 - Output directory: `public`
 
 Recommended release flow:
@@ -88,4 +88,4 @@ Recommended release flow:
 3. Merge into deployment branch tracked by Zeabur.
 4. Zeabur Git auto-deploy builds and publishes the static site.
 
-Detailed deploy setup: see `docs-site/DEPLOY_ZEABUR.md`.
+Detailed deploy setup: see `DEPLOY_ZEABUR.md`.
