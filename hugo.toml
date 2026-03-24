@@ -68,6 +68,13 @@ enableGitInfo = false
     name = "Monthly Archive"
     pageRef = "/archive/monthly"
     weight = 50
+  [[menu.main]]
+    identifier = "language-switcher"
+    name = "Language"
+    weight = 60
+    [menu.main.params]
+      type = "language-switch"
+      label = true
 
 [languages]
   [languages.en]
