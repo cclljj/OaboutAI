@@ -342,6 +342,19 @@
 .oa-takeaway ul {
   margin: 0;
   padding-left: 1.2rem;
+  list-style: disc;
+  list-style-position: outside;
+}
+
+.oa-takeaway ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  list-style: decimal;
+  list-style-position: outside;
+}
+
+.oa-takeaway li {
+  display: list-item;
 }
 
 .oa-takeaway li + li {
