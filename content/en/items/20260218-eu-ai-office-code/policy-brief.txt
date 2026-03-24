@@ -1,2 +1,0 @@
-Internal extraction note for the EU AI Office draft code summary.
-Prepared for OaboutAI sample content in Hugo v1.
