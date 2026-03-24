@@ -72,20 +72,22 @@ Checks:
 3. Hugo production build
 4. Build artifact presence check (`public/index.html`)
 
-## Deployment (Zeabur OaboutAI)
+## Deployment (Vercel OaboutAI)
 
 Deployment target:
 
-- Zeabur project: `OaboutAI`
-- Project ID: `699f276deae0acb0cfea33b0`
-- Service root directory: repository root (`/`)
+- Vercel project: `oaboutai` (display name: `OaboutAI`)
+- Production URL: `https://oaboutai.vercel.app`
+- Build command: `rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify`
 - Output directory: `public`
 
 Recommended release flow:
 
 1. Open PR with content/site changes.
 2. CI must pass.
-3. Merge into deployment branch tracked by Zeabur.
-4. Zeabur Git auto-deploy builds and publishes the static site.
+3. Merge into `main`.
+4. GitHub Actions deploys to Vercel production automatically.
 
-Detailed deploy setup: see `DEPLOY_ZEABUR.md`.
+Required GitHub secret for auto-deploy:
+
+- `VERCEL_TOKEN` (Vercel personal/team token with deploy permission)

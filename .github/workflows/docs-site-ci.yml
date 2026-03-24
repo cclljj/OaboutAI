@@ -9,9 +9,10 @@ on:
       - "data/**"
       - "i18n/**"
       - "layouts/**"
+      - "themes/**"
       - "scripts/**"
       - "hugo.toml"
-      - "go.mod"
+      - "vercel.json"
       - ".github/workflows/docs-site-ci.yml"
   pull_request:
     paths:
@@ -21,9 +22,10 @@ on:
       - "data/**"
       - "i18n/**"
       - "layouts/**"
+      - "themes/**"
       - "scripts/**"
       - "hugo.toml"
-      - "go.mod"
+      - "vercel.json"
       - ".github/workflows/docs-site-ci.yml"
 
 jobs:
@@ -44,19 +46,51 @@ jobs:
       - name: Validate content metadata
         run: python scripts/validate_content.py
 
-      - name: Set up Go (for Hugo Modules)
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.22"
-
       - name: Set up Hugo
         uses: peaceiris/actions-hugo@v3
         with:
-          hugo-version: "0.143.1"
+          hugo-version: "0.152.2"
           extended: true
 
       - name: Hugo build
-        run: hugo --gc --minify
+        run: |
+          rm -f data/keyword_proposals.jsonl
+          hugo --gc --minify
 
       - name: Verify build output
         run: test -f public/index.html
+
+  deploy-vercel:
+    needs: validate-and-build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: team_RTKyG0Rcfpu4LYhgPpGRJqJK
+      VERCEL_PROJECT_ID: prj_1e1JptyR4OdLQ7653OBGl40QL1nc
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check required Vercel token
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "Missing GitHub secret: VERCEL_TOKEN"
+            exit 1
+          fi
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Vercel artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Vercel Production
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
