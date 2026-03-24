@@ -12,7 +12,7 @@ Core principles:
 2. Metadata is a strict contract, not optional documentation.
 3. Top-level topic taxonomy must remain small and stable (max 10).
 4. Keyword taxonomy is controlled to prevent drift.
-5. English is canonical; Traditional Chinese is an optional translation layer.
+5. English is canonical; OpenClaw ingestion requires paired Traditional Chinese translation in the same run.
 6. All assets for one entry live together in a page bundle to keep records portable.
 
 ## 2. Directory Contract
@@ -78,7 +78,7 @@ Optional fields:
 ## 5. Language Policy
 
 - English (`en`) is mandatory canonical content for every entry.
-- Traditional Chinese (`zh-tw`) entries are optional translations.
+- OpenClaw ingestion requires paired Traditional Chinese (`zh-tw`) content for the same slug.
 - Never create zh-TW-only entries without an English canonical entry.
 
 ## 6. Slug and Date Rules
@@ -94,19 +94,53 @@ Date semantics:
 - `submission_date`: date the entry was added to this archive.
 - Both must be absolute dates in ISO format (`YYYY-MM-DD`).
 
-## 7. Authoring Workflow (Agent Procedure)
+## 7. OpenClaw Workflow (Authoritative)
 
-1. Pick canonical language entry path under `content/en/items/<slug>/`.
-2. Add `index.md` with all required fields.
-3. Add attachment files to same folder when available.
-4. Ensure `topics` values exist in `data/topics.json`.
-5. Ensure `keywords` values exist in `data/keywords.json`.
-6. Add optional zh-TW translation only after canonical English exists.
-7. Run validator:
-   - `python scripts/validate_content.py`
-8. Build check:
-   - `hugo --gc --minify`
-9. Open PR; CI must pass before merge.
+When task scope matches URL/YouTube/PDF/DOC/DOCX/PPT/PPTX/MD/TXT/other readable sources, agents must follow this workflow.
+
+References:
+
+- `docs/openclaw_ingestion_workflow.md`
+- `docs/openclaw_system_prompt.md`
+- `scripts/ingest_item.py`
+
+Procedure:
+
+1. Prepare draft spec:
+   - `python scripts/ingest_item.py prepare --source-input "<url-or-local-path>" --source-date "YYYY-MM-DD" --output /tmp/oaboutai_draft.json`
+2. Complete bilingual fields in draft spec:
+   - `title.en` / `title.zh-tw`
+   - `executive_summary.en` / `executive_summary.zh-tw`
+   - `detailed_notes.en` / `detailed_notes.zh-tw`
+   - `keywords`, `topics`, `source_date`
+3. Validate without writing:
+   - `python scripts/ingest_item.py ingest --spec-file /tmp/oaboutai_draft.json --dry-run`
+4. Write files and run checks:
+   - `python scripts/ingest_item.py ingest --spec-file /tmp/oaboutai_draft.json --run-checks`
+5. Build guard (required before push):
+   - `rm -f data/keyword_proposals.jsonl`
+   - `npx --yes hugo-bin --gc --minify`
+6. Push path (if requested):
+   - `python scripts/ingest_item.py ingest --spec-file /tmp/oaboutai_draft.json --run-checks --git-push`
+
+Expected outputs:
+
+- `content/en/items/<slug>/index.md`
+- `content/zh-tw/items/<slug>/index.md`
+- Attachments under `content/en/items/<slug>/`
+- Optional proposals appended to `data/keyword_proposals.jsonl`
+
+Source type mapping:
+
+- YouTube URL -> `youtube`
+- Non-YouTube URL -> `webpage`
+- `.pdf` -> `pdf`
+- Other readable files (`.doc/.docx/.ppt/.pptx/.md/.txt/...`) -> `other`
+
+Git push convention:
+
+- Branch: `main`
+- Commit message format: `content: add <slug> (<source_type>)`
 
 ## 8. Maintenance Workflow
 

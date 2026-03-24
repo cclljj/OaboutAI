@@ -69,6 +69,12 @@ For OpenClaw-based ingestion (URL, YouTube, PDF, DOC, DOCX, PPT, PPTX, MD, TXT, 
 - `docs/openclaw_system_prompt.md` (system prompt you can paste into OpenClaw)
 - `docs/openclaw_ingestion_workflow.md` (step-by-step runbook + JSON spec skeleton)
 
+Policy for this workflow:
+
+- Create paired entries for the same slug in both `en` and `zh-tw`.
+- Do not create `zh-tw`-only entries.
+- Use only controlled `topics` and `keywords` IDs from `data/topics.json` and `data/keywords.json`.
+
 Prepare draft spec:
 
 ```bash
