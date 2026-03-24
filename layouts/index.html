@@ -25,7 +25,7 @@
   <section>
     <h2>{{ i18n "recentEntries" }}</h2>
     {{ $items := where site.RegularPages "Section" "items" }}
-    {{ $sorted := sort $items "Params.submission_date" "desc" }}
+    {{ $sorted := sort $items "Params.source_date" "desc" }}
     {{ range first 20 $sorted }}
       <article class="oa-entry">
         <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>

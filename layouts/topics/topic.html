@@ -8,14 +8,14 @@
   {{ $topic := .Params.topic_key }}
   {{ $items := where site.RegularPages "Section" "items" }}
   {{ $matches := where $items "Params.topics" "intersect" (slice $topic) }}
-  {{ $sorted := sort $matches "Params.submission_date" "desc" }}
+  {{ $sorted := sort $matches "Params.source_date" "desc" }}
 
   <section>
     <h2>{{ i18n "entriesInTopic" }}</h2>
     {{ range $sorted }}
       <article class="oa-entry">
         <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }}</p>
+        <p class="oa-meta">{{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
         <p>{{ .Params.executive_summary }}</p>
       </article>
     {{ else }}

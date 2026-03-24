@@ -4,10 +4,10 @@
   {{ .Content }}
 
   {{ $items := where site.RegularPages "Section" "items" }}
-  {{ $sorted := sort $items "Params.submission_date" "desc" }}
+  {{ $sorted := sort $items "Params.source_date" "desc" }}
   {{ $months := dict }}
   {{ range $sorted }}
-    {{ $raw := .Params.submission_date }}
+    {{ $raw := .Params.source_date }}
     {{ $monthKey := "" }}
     {{ with $raw }}
       {{ $monthKey = (time.AsTime .).Format "2006-01" }}
@@ -34,7 +34,7 @@
       {{ range index $months $month }}
         <article class="oa-entry">
           <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-          <p class="oa-meta">{{ i18n "submittedOn" }} {{ .Params.submission_date }}</p>
+          <p class="oa-meta">{{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
         </article>
       {{ end }}
     </section>

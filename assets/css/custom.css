@@ -42,6 +42,12 @@
   background: linear-gradient(120deg, #f8fbff, #f4f8f0);
 }
 
+.oa-hero h1 {
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-weight: 900;
+  color: #001f3f;
+}
+
 .oa-quick-links {
   display: flex;
   gap: 1rem;
