@@ -35,7 +35,7 @@
 ## 5) 附件規則
 - 若為一般可公開來源，可依需要將附件放到 `content/en/items/<slug>/`。
 - 若為使用者上傳且可能涉及版權之檔案：
-  - 原檔保留在 Google Drive（權限控管）
+  - 原檔保留在 Google Drive（`cclljj.agent@gmail.com` / `Ebook_Documents`，權限控管）
   - 不把原檔提交到公開 repo
   - 在條目中填入 Google Drive 分享連結（`optional_fields.archived_url` 或 `detailed_notes`）
 - `attachments` 只填相對檔名

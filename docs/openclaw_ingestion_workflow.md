@@ -40,7 +40,7 @@ Optional:
 - `optional_fields`: `authors`, `publisher`, `archived_url`, `duration`
 
 Copyright-safe mode for uploaded files (default for `[doc]`):
-- Keep original uploaded files in Google Drive.
+- Keep original uploaded files in Google Drive account `cclljj.agent@gmail.com`, folder `Ebook_Documents`.
 - Do **not** commit copyrighted originals into this public repo unless explicitly approved.
 - Put Google Drive share URL in `optional_fields.archived_url` and/or mention it in `detailed_notes`.
 
