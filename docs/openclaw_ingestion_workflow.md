@@ -39,6 +39,11 @@ Optional:
 - `keyword_proposals`: list of objects with `term` + `rationale`
 - `optional_fields`: `authors`, `publisher`, `archived_url`, `duration`
 
+Copyright-safe mode for uploaded files (default for `[doc]`):
+- Keep original uploaded files in Google Drive.
+- Do **not** commit copyrighted originals into this public repo unless explicitly approved.
+- Put Google Drive share URL in `optional_fields.archived_url` and/or mention it in `detailed_notes`.
+
 ## Step 3: Ingest + Validate + Build (+ optional Push)
 Dry-run validation without writing files:
 ```bash

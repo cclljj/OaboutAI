@@ -33,7 +33,11 @@
 - 不得在 entry 發明新 keyword id
 
 ## 5) 附件規則
-- 來源是本地檔案時，將原檔（或可重現轉存檔）放到 `content/en/items/<slug>/`
+- 若為一般可公開來源，可依需要將附件放到 `content/en/items/<slug>/`。
+- 若為使用者上傳且可能涉及版權之檔案：
+  - 原檔保留在 Google Drive（權限控管）
+  - 不把原檔提交到公開 repo
+  - 在條目中填入 Google Drive 分享連結（`optional_fields.archived_url` 或 `detailed_notes`）
 - `attachments` 只填相對檔名
 - 檔名需安全化（小寫、連字號、保留副檔名）
 
