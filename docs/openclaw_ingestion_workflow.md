@@ -54,6 +54,12 @@ python scripts/ingest_item.py ingest \
   --run-checks
 ```
 
+Manual pre-push build guard (recommended, mirrors CI/Vercel):
+```bash
+rm -f data/keyword_proposals.jsonl
+npx --yes hugo-bin --gc --minify
+```
+
 Push directly to GitHub main:
 ```bash
 python scripts/ingest_item.py ingest \
@@ -64,9 +70,15 @@ python scripts/ingest_item.py ingest \
 
 ## Expected Outputs
 - `content/en/items/<slug>/index.md`
-- `content/zh-tw/items/<slug>/index.md`
+- `content/zh-tw/items/<slug>/index.md` (required; no English-only entries)
 - Attachments in `content/en/items/<slug>/`
 - Appended lines in `data/keyword_proposals.jsonl` when provided
+
+## Fixed Quality Gate (must pass before push)
+1. English + zh-tw both exist for the same slug.
+2. `keywords`/`topics` only use existing ids in `data/keywords.json` and `data/topics.json`.
+3. `python scripts/validate_content.py` passes.
+4. `rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify` passes.
 
 ## Example Spec Skeleton
 ```json

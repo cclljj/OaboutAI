@@ -43,7 +43,8 @@
 
 ## 7) 完成門檻
 - `python scripts/validate_content.py` 必須通過
-- `hugo --gc --minify` 必須通過
+- 建置前先執行 `rm -f data/keyword_proposals.jsonl`
+- 再執行 `npx --yes hugo-bin --gc --minify` 並通過
 - 失敗先修復再重跑，不可跳過
 
 ## 8) GitHub Push 規則
@@ -53,6 +54,7 @@
 - `git add`（新建條目與 `data/keyword_proposals.jsonl`）
 - `git commit`
 - `git push origin main`
+- 若 HTTPS interactive auth 失敗，使用 SSH host alias（例如 `github.com-oaboutai`）推送。
 
 ## 9) 建議執行方式（搭配 scripts/ingest_item.py）
 1. `python scripts/ingest_item.py prepare --source-input <...> --source-date <YYYY-MM-DD> --output /tmp/draft.json`
