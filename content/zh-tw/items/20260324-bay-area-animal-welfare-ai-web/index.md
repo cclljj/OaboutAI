@@ -5,6 +5,7 @@ source_url: "https://www.technologyreview.com/2026/03/23/1134491/the-bay-areas-a
 source_type: "webpage"
 source_date: "2026-03-23"
 submission_date: "2026-03-24"
+doc_id: "DOC-20260324-002"
 executive_summary: "MIT Technology Review 報導，灣區倡議者正嘗試把動物福利價值納入未來 AI 系統，並討論當高階 AI 影響社會決策時的治理意涵。"
 detailed_notes: "文章聚焦 Sentient Futures Summit 的討論：包含以基準測試評估 LLM 對動物福利的推理、用 AI 工具擴張倡議效率，以及 AI 產業資本流向公益的可能性。內容也呈現有效利他主義在政策影響、價值代表性與 AI 可能具感受能力等議題上的爭議。"
 keywords: ["governance-framework", "risk-management", "public-consultation"]
