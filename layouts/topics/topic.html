@@ -14,7 +14,7 @@
     <h2>{{ i18n "entriesInTopic" }}</h2>
     {{ range $sorted }}
       <article class="oa-entry">
-        <h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <h3><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
         <p class="oa-meta">{{ i18n "sourceDate" }} {{ .Params.source_date }}</p>
         <p>{{ .Params.executive_summary }}</p>
       </article>
