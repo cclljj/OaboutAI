@@ -1,8 +1,5 @@
 name: docs-site-ci
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
-
 on:
   push:
     paths:
@@ -36,10 +33,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -49,11 +46,12 @@ jobs:
       - name: Validate content metadata
         run: python scripts/validate_content.py
 
-      - name: Set up Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: "0.152.2"
-          extended: true
+      - name: Install Hugo Extended
+        run: |
+          HUGO_VERSION="0.152.2"
+          curl -fsSL -o /tmp/hugo.deb "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb"
+          sudo dpkg -i /tmp/hugo.deb
+          hugo version
 
       - name: Hugo build
         run: |
@@ -72,7 +70,7 @@ jobs:
       VERCEL_PROJECT_ID: prj_1e1JptyR4OdLQ7653OBGl40QL1nc
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check required Vercel token
         run: |
@@ -82,9 +80,9 @@ jobs:
           fi
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
