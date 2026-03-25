@@ -3,64 +3,73 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/cclljj/OaboutAI/docs-site-ci.yml?branch=main&label=CI)](https://github.com/cclljj/OaboutAI/actions/workflows/docs-site-ci.yml)
 [![Demo Site](https://img.shields.io/badge/Demo-oaboutai.vercel.app-000?logo=vercel)](https://oaboutai.vercel.app/)
 [![Hugo](https://img.shields.io/badge/Hugo-0.152.2-ff4088?logo=hugo)](https://gohugo.io/)
-[![Content Policy](https://img.shields.io/badge/Content-Bilingual%20Required-1f6feb)](#openclaw-agent-ingestion)
 
-Structured, machine-maintained knowledge archive for AI policy, AI governance, and AI safety materials.
+A bilingual, machine-maintained Hugo knowledge archive focused on:
+- AI Policy
+- AI Governance
+- AI Safety
 
-Demo site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
+Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
-## Overview
+## What This Repository Does
 
-This repository is optimized for predictable agent workflows:
+This project is optimized for predictable agent and human collaboration:
+- Strict content metadata contract (schema-first publishing)
+- Controlled vocabularies for topics and keywords
+- EN canonical + zh-TW paired translation workflow
+- CI quality gates before deploy
+- Vercel production deployment on `main`
 
-- strict metadata schema for every entry
-- controlled topic and keyword vocabularies
-- bilingual publishing (`en` + `zh-tw`) for ingestion workflow
-- automated CI validation and Vercel production deployment
+## Site Features
 
-## Repository Structure
+- Home (`/`) with Recent entries
+- Topic browsing (`/topics/ai-policy/`, `/topics/ai-governance/`, `/topics/ai-safety/`)
+- Taxonomy browsing by:
+  - Keywords (`/keywords/`)
+  - Types (`/types/`)
+  - Archive (`/archive/monthly/`)
+- Search (`/search/`, `/zh-tw/search/`) over key metadata + content body
+- URL-synced sorting and pagination controls on browsing pages
 
-- Canonical entry: `content/en/items/<slug>/index.md`
-- zh-TW translation: `content/zh-tw/items/<slug>/index.md`
-- Topic definitions: `data/topics.json`
-- Keyword definitions: `data/keywords.json`
-- Keyword proposal queue: `data/keyword_proposals.jsonl`
-- Agent ingestion tooling: `scripts/ingest_item.py`
-- Agent runbooks: `docs/openclaw_ingestion_workflow.md`, `docs/openclaw_system_prompt.md`
+## Tech Stack
 
-## Browse & Search
+- Static site generator: Hugo + Hextra theme
+- Content format: Markdown bundles + YAML front matter
+- Validation tooling: Python scripts (`scripts/validate_content.py`, `scripts/ingest_item.py`)
+- CI/CD: GitHub Actions (`.github/workflows/docs-site-ci.yml`)
+- Hosting: Vercel
 
-Recent and topic pages support URL-synced sorting:
+## Repository Map
 
-- `sort_by=source_date|submission_date`
-- `sort_order=desc|asc`
-- default: `sort_by=source_date&sort_order=desc`
+- Content:
+  - `content/en/items/<slug>/index.md`
+  - `content/zh-tw/items/<slug>/index.md`
+  - `content/<lang>/topics/*.md`
+  - `content/<lang>/archive/monthly.md`
+- Taxonomy data:
+  - `data/topics.json`
+  - `data/keywords.json`
+  - `data/keyword_proposals.jsonl`
+- Rendering templates:
+  - `layouts/index.html`
+  - `layouts/topics/topic.html`
+  - `layouts/term.html`
+  - `layouts/archive/monthly.html`
+- Tooling:
+  - `scripts/ingest_item.py`
+  - `scripts/validate_content.py`
+  - `scripts/auto_resolve_content_issues.py`
+- Workflow docs:
+  - `docs/openclaw_ingestion_workflow.md`
+  - `docs/openclaw_system_prompt.md`
 
-Examples:
+## Content Contract (Required Fields)
 
-- `/` (Recent default)
-- `/?sort_by=submission_date&sort_order=asc`
-- `/topics/ai-policy/?sort_by=submission_date&sort_order=desc`
-
-Full-text search page:
-
-- EN: `/search/`
-- zh-TW: `/zh-tw/search/`
-
-Search indexes both English and Traditional Chinese item entries and matches:
-
-- `title`
-- `executive_summary`
-- `detailed_notes`
-- entry body content
-
-## Content Contract
-
-Required front matter fields for each entry:
-
+Each item `index.md` must include:
 - `title`
 - `source_url`
 - `source_type` (`webpage|pdf|youtube|other`)
+- `types` (single-item array equal to `source_type`)
 - `source_date` (`YYYY-MM-DD`)
 - `submission_date` (`YYYY-MM-DD`)
 - `executive_summary`
@@ -70,56 +79,11 @@ Required front matter fields for each entry:
 - `language` (`en|zh-tw`)
 
 Slug format:
-
 - `YYYYMMDD-short-kebab-title`
 
-## Local Development
+## Agent Ingestion Workflow (OpenClaw)
 
-Prerequisites:
-
-- Python 3.10+
-- Hugo Extended (or use `npx --yes hugo-bin`)
-
-Run validation:
-
-```bash
-python scripts/validate_content.py
-```
-
-Run local server:
-
-```bash
-npx --yes hugo-bin server -D
-```
-
-Production build:
-
-```bash
-rm -f data/keyword_proposals.jsonl
-npx --yes hugo-bin --gc --minify
-```
-
-## OpenClaw Agent Ingestion
-
-Supported source inputs:
-
-- URL / YouTube
-- PDF
-- DOC / DOCX
-- PPT / PPTX
-- MD / TXT
-- other readable local files
-
-Mandatory policy:
-
-- create paired `en` and `zh-tw` entries for the same slug
-- do not create `zh-tw`-only entries
-- use only controlled `topics` and `keywords` IDs
-- for user-uploaded files with copyright risk, keep originals outside this public repo and use `archived_url` for traceability
-
-Workflow:
-
-1. Prepare draft
+1. Prepare draft spec:
 
 ```bash
 python scripts/ingest_item.py prepare \
@@ -128,7 +92,9 @@ python scripts/ingest_item.py prepare \
   --output /tmp/oaboutai_draft.json
 ```
 
-2. Dry-run ingest
+2. Complete bilingual fields in draft (`en` + `zh-tw`) and finalize keywords/topics.
+
+3. Dry-run:
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -136,7 +102,7 @@ python scripts/ingest_item.py ingest \
   --dry-run
 ```
 
-3. Write + checks
+4. Write and run checks:
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -144,7 +110,7 @@ python scripts/ingest_item.py ingest \
   --run-checks
 ```
 
-4. Optional direct push
+Optional direct push:
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -153,27 +119,55 @@ python scripts/ingest_item.py ingest \
   --git-push
 ```
 
-Copyright-safe mode:
+## Local Development
 
-- Original uploaded files are retained in Google Drive (`cclljj.agent@gmail.com` / `Ebook_Documents`).
-- Public repository should contain metadata and notes only unless explicit approval is given to publish original files.
-- Store external reference in `optional_fields.archived_url` and/or `detailed_notes`.
+Prerequisites:
+- Python 3.10+
+- Node.js (for `npx` workflows)
+- Hugo Extended (or `npx --yes hugo-bin`)
 
-## CI/CD and Deployment
+Validate content:
 
-Workflow file: `.github/workflows/docs-site-ci.yml`
+```bash
+python scripts/validate_content.py
+```
 
-Pipeline behavior:
+Run local preview:
 
-1. Validate metadata and controlled vocabularies
-2. Run Hugo production build
-3. On `main` push, deploy to Vercel production
+```bash
+npx --yes hugo-bin server -D
+```
 
-Vercel target:
+Production build (mirror CI behavior):
 
-- Project: `oaboutai`
-- Production URL: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
+```bash
+rm -f data/keyword_proposals.jsonl
+npx --yes hugo-bin --gc --minify
+```
 
-Required GitHub secret:
+## CI/CD Pipeline
 
-- `VERCEL_TOKEN` (token with deploy permission for target Vercel scope)
+Workflow: `.github/workflows/docs-site-ci.yml`
+
+Pipeline stages:
+1. Auto-resolve common metadata issues (`scripts/auto_resolve_content_issues.py`)
+2. Validate content metadata (`scripts/validate_content.py`)
+3. Hugo build
+4. Verify output
+5. Deploy to Vercel on `main`
+
+Required secret:
+- `VERCEL_TOKEN`
+
+## Installation Guide
+
+For a complete setup guide, see:
+- [INSTALL.md](INSTALL.md)
+
+## Contributing Notes
+
+- Keep keyword/topic IDs controlled (no ad-hoc IDs in entries)
+- Preserve EN/zh-TW pairing for ingested entries
+- Keep attachments inside the EN bundle directory when used
+- Run validation + build guard before push
+- Do not bypass CI for content updates
