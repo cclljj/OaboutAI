@@ -9,6 +9,7 @@ enableGitInfo = false
 [taxonomies]
   topic = "topics"
   keyword = "keywords"
+  source_type = "types"
 
 [outputs]
   home = ["HTML", "RSS"]
@@ -39,6 +40,9 @@ enableGitInfo = false
     name = "Topics"
     url = "/topics/"
   [[params.navbar.links]]
+    name = "Types"
+    url = "/types/"
+  [[params.navbar.links]]
     name = "Monthly Archive"
     url = "/archive/monthly/"
 
@@ -63,6 +67,11 @@ enableGitInfo = false
     name = "AI Safety"
     pageRef = "/topics/ai-safety"
     weight = 40
+  [[menu.main]]
+    identifier = "types"
+    name = "Types"
+    pageRef = "/types"
+    weight = 45
   [[menu.main]]
     identifier = "archive"
     name = "Monthly Archive"

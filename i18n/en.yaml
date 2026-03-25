@@ -4,10 +4,14 @@
   translation: Browse by Topic
 - id: browseByKeyword
   translation: Browse by Keyword
+- id: browseByType
+  translation: Browse by Type
 - id: browseAllEntries
   translation: Browse All Entries
 - id: topics
   translation: Topics
+- id: types
+  translation: Types
 - id: recentEntries
   translation: Recent Entries
 - id: submittedOn

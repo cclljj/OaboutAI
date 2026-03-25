@@ -4,10 +4,14 @@
   translation: 依主題瀏覽
 - id: browseByKeyword
   translation: 依關鍵字瀏覽
+- id: browseByType
+  translation: 依類型瀏覽
 - id: browseAllEntries
   translation: 瀏覽所有條目
 - id: topics
   translation: 主題
+- id: types
+  translation: 類型
 - id: recentEntries
   translation: 最新條目
 - id: submittedOn

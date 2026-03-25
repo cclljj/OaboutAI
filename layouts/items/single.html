@@ -7,7 +7,7 @@
       <dd><a href="{{ .Params.source_url }}" target="_blank" rel="noreferrer">{{ .Params.source_url }}</a></dd>
 
       <dt>{{ i18n "sourceType" }}</dt>
-      <dd>{{ .Params.source_type }}</dd>
+      <dd><a class="oa-chip oa-chip-link" href="{{ printf "types/%s/" .Params.source_type | relLangURL }}">{{ .Params.source_type }}</a></dd>
 
       <dt>{{ i18n "sourceDate" }}</dt>
       <dd>{{ .Params.source_date }}</dd>
