@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Establishes AI data security as an end-to-end discipline spanning ingestion, context construction, tool exchange, telemetry, and retention.
-- Uses DSGAI taxonomy to support assessment, prioritization, and control design for enterprise GenAI deployments.
-- Highlights operational controls: AI-DSPM, least-privilege agent/tool access, validation guardrails, and data-governance enforcement.
-- Useful as a baseline checklist for security, compliance, and platform teams deploying agentic AI.
+- The report focuses on GenAI-specific data risk surfaces across the full lifecycle.
+- It treats prompt/context pathways as security-critical data channels.
+- Data leakage is analyzed as both accidental and adversarial failure mode.
+- Retrieval and memory components are highlighted as high-risk interfaces.
+- Risk mitigation emphasizes least data, least privilege, and isolation controls.
+- Secure pipeline architecture is positioned as primary prevention strategy.
+- Runtime monitoring is required to detect emergent leakage behaviors.
+- The guidance supports red-teaming targeted at data exfiltration vectors.
+- Policy controls should be tied to technical guardrails and audit evidence.
+- The document is practical for converting risk taxonomy into engineering controls.

@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Proposed move goes beyond querying models on classified data toward model adaptation/fine-tuning on classified corpora.
-- Security upside is potentially improved relevance for defense-specific tasks and intelligence workflows.
-- Core risks include latent retention of sensitive content and unauthorized cross-compartment exposure.
-- Governance implications include secure compute architecture, access-control rigor, contractor oversight, and red-team verification before deployment.
+- The proposal marks a shift from classified inference to classified-data training.
+- Capability gains are paired with heightened leakage and control risks.
+- Model memorization and latent disclosure risk become central concerns.
+- High-assurance environment segregation is a baseline requirement.
+- Contractor access and handling controls are governance-critical.
+- Pre-deployment red-teaming is needed for classified leakage vectors.
+- Auditability across training-to-deployment lifecycle is essential.
+- Contract terms must define liability and remediation obligations.
+- Policy design must balance national-security urgency with safeguards.
+- The case supports formal secure-training governance standards.

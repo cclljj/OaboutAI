@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Proposes three pathways for telecom providers: protect core connectivity, expand via AI-managed services, and build sovereign-resilience positioning.
-- Frames telecom AI opportunity as both infrastructure play (compute, energy, reliability) and service-orchestration play.
-- Recommends prioritization frameworks to sequence initiatives by value, feasibility, and market context.
-- Highlights organizational prerequisites: AI-capable operating model, workforce reskilling, and ecosystem alignment.
+- The paper expands telecom’s role from transport to AI value creation.
+- Edge infrastructure is presented as a major AI deployment advantage.
+- Operator reliability capabilities can become AI service differentiators.
+- Telecom-enterprise trust relationships are treated as strategic assets.
+- AI value-chain participation requires new capability investments.
+- Interoperability standards are crucial for ecosystem scaling.
+- Security governance must adapt as networks host AI workloads.
+- Data-governance boundaries become more complex in edge contexts.
+- Cross-industry partnerships are positioned as central growth paths.
+- The report suggests telecom strategy should integrate AI-native operating models.
