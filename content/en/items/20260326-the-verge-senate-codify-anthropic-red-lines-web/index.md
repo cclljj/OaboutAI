@@ -1,6 +1,6 @@
 ---
 title: "Senate Democrats Move to Codify AI Red Lines on Autonomous Weapons and Mass Surveillance (The Verge)"
-date: 2026-03-26
+date: 2026-03-26T00:00:00+08:00
 source_url: "https://www.theverge.com/policy/900341/senator-schiff-anthropic-autonomous-weapons-mass-surveillance"
 source_type: "webpage"
 types: ["webpage"]

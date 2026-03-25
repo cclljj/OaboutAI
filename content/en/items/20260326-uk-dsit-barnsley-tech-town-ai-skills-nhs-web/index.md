@@ -1,6 +1,6 @@
 ---
 title: "UK DSIT Expands Barnsley Tech Town: NHS Productivity and AI Skills Development (GOV.UK)"
-date: 2026-03-26
+date: 2026-03-26T00:00:00+08:00
 source_url: "https://www.gov.uk/government/news/faster-care-for-patients-less-admin-for-nhs-staff-and-new-ai-skills-for-key-industries-as-barnsley-tech-town-takes-next-big-step"
 source_type: "webpage"
 types: ["webpage"]

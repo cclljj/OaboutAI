@@ -1,6 +1,6 @@
 ---
 title: "英國 DSIT 推進 Barnsley Tech Town：以 NHS 減負與 AI 技能建設促進落地（GOV.UK）"
-date: 2026-03-26
+date: 2026-03-26T00:00:00+08:00
 source_url: "https://www.gov.uk/government/news/faster-care-for-patients-less-admin-for-nhs-staff-and-new-ai-skills-for-key-industries-as-barnsley-tech-town-takes-next-big-step"
 source_type: "webpage"
 types: ["webpage"]
