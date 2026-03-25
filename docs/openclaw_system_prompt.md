@@ -71,3 +71,7 @@
 - 變更檔案路徑（en/zh-tw/attachments/proposals）
 - 驗證與 build 結果
 - push 結果（branch + commit SHA）
+
+## 11) 可搜尋性要求
+- `executive_summary` 與 `detailed_notes` 必須包含可檢索的實體名詞（機構、法規、框架、技術術語）。
+- 不可只寫過度抽象句；內容會直接進入站內全文檢索索引。

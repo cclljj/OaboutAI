@@ -28,6 +28,32 @@ This repository is optimized for predictable agent workflows:
 - Agent ingestion tooling: `scripts/ingest_item.py`
 - Agent runbooks: `docs/openclaw_ingestion_workflow.md`, `docs/openclaw_system_prompt.md`
 
+## Browse & Search
+
+Recent and topic pages support URL-synced sorting:
+
+- `sort_by=source_date|submission_date`
+- `sort_order=desc|asc`
+- default: `sort_by=source_date&sort_order=desc`
+
+Examples:
+
+- `/` (Recent default)
+- `/?sort_by=submission_date&sort_order=asc`
+- `/topics/ai-policy/?sort_by=submission_date&sort_order=desc`
+
+Full-text search page:
+
+- EN: `/search/`
+- zh-TW: `/zh-tw/search/`
+
+Search indexes both English and Traditional Chinese item entries and matches:
+
+- `title`
+- `executive_summary`
+- `detailed_notes`
+- entry body content
+
 ## Content Contract
 
 Required front matter fields for each entry:

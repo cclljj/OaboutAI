@@ -39,6 +39,10 @@ Optional:
 - `keyword_proposals`: list of objects with `term` + `rationale`
 - `optional_fields`: `authors`, `publisher`, `archived_url`, `duration`
 
+Searchability guidance:
+- `executive_summary` and `detailed_notes` should use concrete terminology from the source.
+- Avoid placeholder wording; these fields are indexed by the site full-text search.
+
 Copyright-safe mode for uploaded files (default for `[doc]`):
 - Keep original uploaded files in Google Drive account `cclljj.agent@gmail.com`, folder `Ebook_Documents`.
 - Do **not** commit copyrighted originals into this public repo unless explicitly approved.

@@ -69,6 +69,11 @@ enableGitInfo = false
     pageRef = "/archive/monthly"
     weight = 50
   [[menu.main]]
+    identifier = "menuSearch"
+    name = "Search"
+    pageRef = "/search"
+    weight = 55
+  [[menu.main]]
     identifier = "language-switcher"
     name = "Language"
     weight = 60

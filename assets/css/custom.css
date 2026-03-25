@@ -281,6 +281,72 @@
   font-weight: 560;
 }
 
+.oa-sort-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.82rem;
+}
+
+.oa-sort-label {
+  font-size: 0.84rem;
+  font-weight: 640;
+  color: #26445b;
+}
+
+.oa-sort-select {
+  min-height: 2rem;
+  border: 1px solid #c7dcec;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f425e;
+  padding: 0.24rem 0.52rem;
+  font-size: 0.84rem;
+}
+
+.oa-search-page {
+  display: grid;
+  gap: 0.92rem;
+}
+
+.oa-search-input-wrap {
+  background: var(--oa-surface);
+  border: 1px solid var(--oa-border);
+  border-radius: var(--oa-radius-md);
+  box-shadow: var(--oa-shadow-sm);
+  padding: 0.8rem;
+}
+
+.oa-search-input {
+  width: 100%;
+  min-height: 2.5rem;
+  border: 1px solid #c5d9e8;
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  color: #173550;
+  background: #fff;
+}
+
+.oa-search-status {
+  color: var(--oa-text-subtle);
+  font-size: 0.9rem;
+}
+
+.oa-search-results > * + * {
+  margin-top: 0.78rem;
+}
+
+.oa-search-result-title {
+  display: inline-block;
+  font-size: 1.02rem;
+}
+
+.oa-search-result-snippet {
+  margin-top: 0.48rem;
+  color: #294760;
+}
+
 .oa-month-heading {
   position: sticky;
   top: 0.7rem;
@@ -410,5 +476,10 @@
 
   .oa-month-heading {
     position: static;
+  }
+
+  .oa-sort-controls {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

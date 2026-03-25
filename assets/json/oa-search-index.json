@@ -1,0 +1,21 @@
+{{- $records := slice -}}
+{{- range .Site.Sites -}}
+  {{- $lang := .Language.Lang -}}
+  {{- $langLabel := .Language.LanguageName | default $lang -}}
+  {{- $items := where .RegularPages "Section" "items" -}}
+  {{- range $items -}}
+    {{- $record := dict
+      "title" .Title
+      "url" .RelPermalink
+      "lang" $lang
+      "language_label" $langLabel
+      "source_date" (.Params.source_date | default "")
+      "submission_date" (.Params.submission_date | default "")
+      "executive_summary" (.Params.executive_summary | default "")
+      "detailed_notes" (.Params.detailed_notes | default "")
+      "content" (.Content | plainify | htmlUnescape | strings.TrimSpace)
+    -}}
+    {{- $records = $records | append $record -}}
+  {{- end -}}
+{{- end -}}
+{{- $records | jsonify -}}

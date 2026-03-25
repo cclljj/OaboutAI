@@ -36,3 +36,23 @@
   translation: Entries in this topic
 - id: noEntriesInTopic
   translation: No entries found for this topic.
+- id: menuSearch
+  translation: Search
+- id: sortBy
+  translation: Sort by
+- id: sortOrder
+  translation: Order
+- id: sortNewestFirst
+  translation: Newest to oldest
+- id: sortOldestFirst
+  translation: Oldest to newest
+- id: searchPlaceholderLong
+  translation: Search all entries (EN + zh-TW)...
+- id: searchTypeToStart
+  translation: Start typing to search.
+- id: searchNoResults
+  translation: No matching entries found.
+- id: searchResultsCount
+  translation: "%d results found"
+- id: searchResultLanguage
+  translation: Language

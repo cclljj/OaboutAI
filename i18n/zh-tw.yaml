@@ -36,3 +36,23 @@
   translation: 此主題的條目
 - id: noEntriesInTopic
   translation: 此主題目前無條目。
+- id: menuSearch
+  translation: 搜尋
+- id: sortBy
+  translation: 排序欄位
+- id: sortOrder
+  translation: 排序方向
+- id: sortNewestFirst
+  translation: 由近至遠
+- id: sortOldestFirst
+  translation: 由遠至近
+- id: searchPlaceholderLong
+  translation: 搜尋全部條目（EN + zh-TW）...
+- id: searchTypeToStart
+  translation: 請輸入關鍵字開始搜尋。
+- id: searchNoResults
+  translation: 找不到符合的條目。
+- id: searchResultsCount
+  translation: 共找到 %d 筆結果
+- id: searchResultLanguage
+  translation: 語言

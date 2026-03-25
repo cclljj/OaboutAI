@@ -12,17 +12,32 @@
 
   <section class="oa-section">
     <h2 class="oa-section-title">{{ i18n "entriesInTopic" }}</h2>
-    {{ range $sorted }}
-      <article class="oa-entry-card">
-        <h3><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+    <div class="oa-sort-controls" data-oa-sort-controls>
+      <label class="oa-sort-label" for="oa-sort-by">{{ i18n "sortBy" }}</label>
+      <select id="oa-sort-by" class="oa-sort-select" data-oa-sort-by>
+        <option value="source_date">{{ i18n "sourceDate" }}</option>
+        <option value="submission_date">{{ i18n "submittedOn" }}</option>
+      </select>
+      <label class="oa-sort-label" for="oa-sort-order">{{ i18n "sortOrder" }}</label>
+      <select id="oa-sort-order" class="oa-sort-select" data-oa-sort-order>
+        <option value="desc">{{ i18n "sortNewestFirst" }}</option>
+        <option value="asc">{{ i18n "sortOldestFirst" }}</option>
+      </select>
+    </div>
+    <div class="oa-entry-list" data-oa-sort-list>
+    {{ range $idx, $entry := $sorted }}
+      <article class="oa-entry-card" data-source-date="{{ $entry.Params.source_date }}" data-submission-date="{{ $entry.Params.submission_date }}" data-sort-index="{{ $idx }}">
+        <h3><a class="oa-entry-title" href="{{ $entry.RelPermalink }}">{{ $entry.Title }}</a></h3>
         <p class="oa-meta">
-          <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
+          <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
+          <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
         </p>
-        <p class="oa-summary">{{ .Params.executive_summary }}</p>
+        <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
       </article>
     {{ else }}
       <p>{{ i18n "noEntriesInTopic" }}</p>
     {{ end }}
+    </div>
   </section>
 </div>
 {{ end }}

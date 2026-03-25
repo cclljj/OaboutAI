@@ -1,2 +1,8 @@
-{{ $style := resources.Get "css/custom.css" | resources.Minify | resources.Fingerprint }}
-<link rel="stylesheet" href="{{ $style.RelPermalink }}" integrity="{{ $style.Data.Integrity }}">
+{{- $sortScript := resources.Get "js/oa-sort-controls.js" -}}
+{{- $searchScript := resources.Get "js/oa-search-page.js" -}}
+{{- if hugo.IsProduction -}}
+  {{- $sortScript = $sortScript | minify | fingerprint -}}
+  {{- $searchScript = $searchScript | minify | fingerprint -}}
+{{- end -}}
+<script defer src="{{ $sortScript.RelPermalink }}" {{ with $sortScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
+<script defer src="{{ $searchScript.RelPermalink }}" {{ with $searchScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
