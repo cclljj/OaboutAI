@@ -335,6 +335,31 @@
   font-weight: 600;
 }
 
+.oa-footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.7rem;
+}
+
+.oa-footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #2a495f !important;
+  text-decoration: none;
+}
+
+.oa-footer-link:hover {
+  color: var(--oa-accent) !important;
+}
+
+.oa-footer-icon {
+  display: inline-block;
+}
+
 .oa-search-page {
   display: grid;
   gap: 0.92rem;

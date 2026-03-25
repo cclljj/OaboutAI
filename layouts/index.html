@@ -28,6 +28,10 @@
     <h2 class="oa-section-title">{{ i18n "recentEntries" }}</h2>
     {{ $items := where site.RegularPages "Section" "items" }}
     {{ $sorted := sort $items "Params.source_date" "desc" }}
+    {{ $topicLabels := dict }}
+    {{ range site.Data.topics }}
+      {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
+    {{ end }}
     <div class="oa-sort-controls" data-oa-sort-controls>
       <label class="oa-sort-label" for="oa-sort-by">{{ i18n "sortBy" }}</label>
       <select id="oa-sort-by" class="oa-sort-select" data-oa-sort-by>
@@ -54,6 +58,10 @@
         <p class="oa-meta">
           <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
           <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
+          <span class="oa-chip">{{ i18n "sourceType" }} {{ $entry.Params.source_type }}</span>
+          {{ range $entry.Params.topics }}
+            <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ index $topicLabels . | default . }}</a>
+          {{ end }}
         </p>
         <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
       </article>

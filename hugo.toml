@@ -40,10 +40,13 @@ enableGitInfo = false
     name = "Topics"
     url = "/topics/"
   [[params.navbar.links]]
+    name = "Keywords"
+    url = "/keywords/"
+  [[params.navbar.links]]
     name = "Types"
     url = "/types/"
   [[params.navbar.links]]
-    name = "Monthly Archive"
+    name = "Archive"
     url = "/archive/monthly/"
 
 [menu]
@@ -68,13 +71,18 @@ enableGitInfo = false
     pageRef = "/topics/ai-safety"
     weight = 40
   [[menu.main]]
+    identifier = "keywords"
+    name = "Keywords"
+    pageRef = "/keywords"
+    weight = 45
+  [[menu.main]]
     identifier = "types"
     name = "Types"
     pageRef = "/types"
-    weight = 45
+    weight = 46
   [[menu.main]]
     identifier = "archive"
-    name = "Monthly Archive"
+    name = "Archive"
     pageRef = "/archive/monthly"
     weight = 50
   [[menu.main]]

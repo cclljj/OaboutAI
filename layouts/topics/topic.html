@@ -9,6 +9,10 @@
   {{ $items := where site.RegularPages "Section" "items" }}
   {{ $matches := where $items "Params.topics" "intersect" (slice $topic) }}
   {{ $sorted := sort $matches "Params.source_date" "desc" }}
+  {{ $topicLabels := dict }}
+  {{ range site.Data.topics }}
+    {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
+  {{ end }}
 
   <section class="oa-section">
     <h2 class="oa-section-title">{{ i18n "entriesInTopic" }}</h2>
@@ -38,6 +42,10 @@
         <p class="oa-meta">
           <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
           <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
+          <span class="oa-chip">{{ i18n "sourceType" }} {{ $entry.Params.source_type }}</span>
+          {{ range $entry.Params.topics }}
+            <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ index $topicLabels . | default . }}</a>
+          {{ end }}
         </p>
         <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
       </article>
