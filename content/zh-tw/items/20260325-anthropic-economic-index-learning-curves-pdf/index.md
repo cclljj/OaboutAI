@@ -4,7 +4,7 @@ date: 2026-03-25
 source_url: "https://drive.google.com/file/d/1o0Z-YWUub0Vu23T5uyzDQO2ceNqddx3P/view?usp=drivesdk"
 source_type: "pdf"
 types: ["pdf"]
-source_date: "2026-03-24"
+source_date: "2025-09-15"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-004"
 executive_summary: "Anthropic 最新經濟指數顯示 Claude 使用正持續擴散與多樣化；同時，高資歷使用者有更高成功率與更佳任務—模型匹配，意味 AI 生產力紅利可能因學習曲線而被不均勻分配。"

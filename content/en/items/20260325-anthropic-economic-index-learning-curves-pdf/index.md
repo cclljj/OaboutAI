@@ -4,7 +4,7 @@ date: 2026-03-25
 source_url: "https://drive.google.com/file/d/1o0Z-YWUub0Vu23T5uyzDQO2ceNqddx3P/view?usp=drivesdk"
 source_type: "pdf"
 types: ["pdf"]
-source_date: "2026-03-24"
+source_date: "2025-09-15"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-004"
 executive_summary: "Anthropic’s latest Economic Index report finds broader and more diverse AI adoption, while also showing that experienced users achieve measurably better outcomes—suggesting learning-by-doing may meaningfully shape who captures AI productivity gains."
