@@ -1,7 +1,7 @@
 ---
 title: "Anthropic Economic Index: Learning Curves (March 2026)"
 date: 2026-03-25
-source_url: "https://drive.google.com/file/d/1mJpkzLZDKpAPIYNQ0Cdg3u_bZWcuY2If/view?usp=drivesdk"
+source_url: "https://drive.google.com/file/d/1oficjj7r1Daou61Eq_2wBRSi-KzFXhKu/view?usp=drivesdk"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2026-03-24"
@@ -12,7 +12,7 @@ detailed_notes: "This report extends Anthropic’s Economic Index framework by a
 keywords: ["economic-impact", "adoption-curve", "productivity", "workforce-development", "learning-by-doing"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "en"
-attachments: ["Anthropic-Economic-Index-Learning-Curves-2026-03-24.pdf"]
+attachments: ["Anthropic-Economic-Index-Learning-Curves-2026-03-24.pdf", "Anthropic-Economic-Index-Learning-Curves-2026-03-24-reupload-20260325.pdf"]
 ---
 
 ## Detailed Notes
