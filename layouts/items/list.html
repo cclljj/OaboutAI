@@ -9,7 +9,7 @@
       <h2><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
       <p class="oa-meta">
         <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
-        <span class="oa-chip">{{ i18n "sourceType" }} {{ .Params.source_type }}</span>
+        <span class="oa-chip">{{ .Params.source_type }}</span>
       </p>
       <p class="oa-summary">{{ .Params.executive_summary }}</p>
     </article>
