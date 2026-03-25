@@ -12,7 +12,7 @@ detailed_notes: "這份報告延伸 Anthropic Economic Index 的分析框架，�
 keywords: ["economic-impact", "adoption-curve", "productivity", "workforce-development", "learning-by-doing"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "zh-tw"
-attachments: ["4053bf3440c0c85b8852052770c5b4cf882689c3---a13b03c6-6bcc-487f-b67f-f58711b1996c.pdf"]
+attachments: ["Anthropic-Economic-Index-Learning-Curves-2026-03-24.pdf"]
 ---
 
 ## 詳細筆記

@@ -12,7 +12,7 @@ detailed_notes: "這份報告的關鍵貢獻，是把 AI 擴散從總量敘事�
 keywords: ["economic-impact", "geographic-inequality", "enterprise-adoption", "automation", "diffusion"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "zh-tw"
-attachments: ["Economic-Index---d82fbfea-1583-4c98-a123-c0ed0d12d379.pdf", "Economic-Index---960c7c8b-bd84-4915-bbe5-2a1cf81033f2.pdf"]
+attachments: ["Anthropic-Economic-Index-Uneven-Geographic-Enterprise-Adoption-2025-09-15.pdf"]
 ---
 
 ## 詳細筆記
