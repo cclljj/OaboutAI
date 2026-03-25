@@ -1,7 +1,7 @@
 ---
 title: "Anthropic Economic Index：Learning Curves（2026 年 3 月）"
 date: 2026-03-25
-source_url: "telegram-upload://4053bf3440c0c85b8852052770c5b4cf882689c3---a13b03c6-6bcc-487f-b67f-f58711b1996c.pdf"
+source_url: "https://drive.google.com/file/d/1mJpkzLZDKpAPIYNQ0Cdg3u_bZWcuY2If/view?usp=drivesdk"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2026-03-24"
