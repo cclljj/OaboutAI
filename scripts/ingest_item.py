@@ -325,6 +325,7 @@ def build_front_matter(
         "date": date_value,
         "source_url": source_url,
         "source_type": source_type,
+        "types": [source_type],
         "source_date": source_date,
         "submission_date": submission_date,
         "executive_summary": executive_summary,

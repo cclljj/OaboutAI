@@ -15,6 +15,7 @@ REQUIRED_FIELDS = {
     "title",
     "source_url",
     "source_type",
+    "types",
     "source_date",
     "submission_date",
     "executive_summary",
@@ -95,6 +96,10 @@ def main() -> int:
 
         if fm["source_type"] not in ALLOWED_SOURCE_TYPES:
             errors.append(f"{rel}: `source_type` must be one of {sorted(ALLOWED_SOURCE_TYPES)}")
+        if not isinstance(fm["types"], list) or len(fm["types"]) != 1:
+            errors.append(f"{rel}: `types` must be an array with exactly one value")
+        elif fm["types"][0] != fm["source_type"]:
+            errors.append(f"{rel}: `types[0]` must equal `source_type`")
         if fm["language"] not in ALLOWED_LANGS:
             errors.append(f"{rel}: `language` must be one of {sorted(ALLOWED_LANGS)}")
         if fm["language"] != lang:
