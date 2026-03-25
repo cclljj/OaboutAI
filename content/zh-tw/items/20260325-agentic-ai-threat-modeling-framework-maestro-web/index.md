@@ -8,7 +8,7 @@ submission_date: "2026-03-25"
 doc_id: "DOC-20260325-001"
 executive_summary: "Cloud Security Alliance 提出的 MAESTRO 以七層代理式 AI 架構為核心，補上傳統威脅建模在自主性、跨層攻擊鏈與 AI 特有風險上的缺口，並強調持續監控與風險優先治理。"
 detailed_notes: "文章比較 STRIDE、PASTA、LINDDUN、OCTAVE、Trike、VAST 後指出其對對抗式機器學習、多代理互動、供應鏈與目標偏移等風險覆蓋不足。MAESTRO 提供分層威脅清單、跨層威脅分析與落地流程，協助團隊在設計到運維全生命週期中進行可稽核的安全治理。"
-keywords: ["agentic-ai", "threat-modeling", "adversarial-ml", "risk-management", "security-architecture"]
+keywords: ["risk-management", "red-teaming", "governance-framework", "standards"]
 topics: ["ai-safety", "ai-governance", "ai-policy"]
 language: "zh-tw"
 attachments: []

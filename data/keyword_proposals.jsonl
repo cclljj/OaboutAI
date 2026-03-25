@@ -1,1 +1,5 @@
 
+{"term":"agentic-ai","rationale":"Frequent concept in current corpus; currently mapped to governance-framework as closest proxy but lacks precise keyword for autonomous multi-step agent systems."}
+{"term":"threat-modeling","rationale":"Common security methodology in AI safety/governance entries; currently approximated by risk-management but deserves explicit taxonomy slot."}
+{"term":"adversarial-ml","rationale":"Important technical risk category; currently approximated by red-teaming, but scope is broader than testing practice."}
+{"term":"security-architecture","rationale":"Recurring concept in system-level controls and assurance; currently approximated by standards/governance-framework."}

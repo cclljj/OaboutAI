@@ -8,7 +8,7 @@ submission_date: "2026-03-25"
 doc_id: "DOC-20260325-001"
 executive_summary: "Cloud Security Alliance’s MAESTRO framework extends traditional threat modeling with AI-native controls, mapping risks across a seven-layer agentic architecture and emphasizing cross-layer attack paths, continuous monitoring, and risk-prioritized mitigation."
 detailed_notes: "The article compares STRIDE/PASTA/LINDDUN/OCTAVE/Trike/VAST and argues they do not fully capture autonomy, adversarial ML, multi-agent interaction, and supply-chain dynamics. MAESTRO introduces layer-specific threat catalogs (foundation model to agent ecosystem), cross-layer threat analysis, and operational guidance for assessment, mitigation planning, and ongoing adaptation."
-keywords: ["agentic-ai", "threat-modeling", "adversarial-ml", "risk-management", "security-architecture"]
+keywords: ["risk-management", "red-teaming", "governance-framework", "standards"]
 topics: ["ai-safety", "ai-governance", "ai-policy"]
 language: "en"
 attachments: []
