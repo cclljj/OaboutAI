@@ -53,9 +53,9 @@
     const meta = document.createElement("p");
     meta.className = "oa-meta";
     const chips = [
-      `${labels.language} ${record.language_label || record.lang}`,
       `${labels.sourceDate} ${record.source_date || "-"}`,
-      `${labels.submissionDate} ${record.submission_date || "-"}`
+      `${labels.submissionDate} ${record.submission_date || "-"}`,
+      `${record.source_type || "-"}`
     ];
     for (const chipText of chips) {
       const chip = document.createElement("span");
@@ -63,6 +63,17 @@
       chip.textContent = chipText;
       meta.appendChild(chip);
     }
+    for (const topic of record.topics || []) {
+      const chipLink = document.createElement("a");
+      chipLink.className = "oa-chip oa-chip-link";
+      chipLink.href = topic.url;
+      chipLink.textContent = topic.label || topic.id;
+      meta.appendChild(chipLink);
+    }
+    const langChip = document.createElement("span");
+    langChip.className = "oa-chip";
+    langChip.textContent = `${labels.language} ${record.language_label || record.lang}`;
+    meta.appendChild(langChip);
     article.appendChild(meta);
 
     const snippet = document.createElement("p");
