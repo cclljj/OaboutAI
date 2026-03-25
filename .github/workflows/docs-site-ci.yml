@@ -43,6 +43,9 @@ jobs:
       - name: Install validator dependency
         run: pip install pyyaml
 
+      - name: Auto-resolve common metadata issues
+        run: python scripts/auto_resolve_content_issues.py
+
       - name: Validate content metadata
         run: python scripts/validate_content.py
 
