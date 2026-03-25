@@ -3,6 +3,7 @@ title: "英國《著作權與人工智慧》報告與影響評估"
 date: 2026-03-24
 source_url: "https://www.gov.uk/government/publications/report-and-impact-assessment-on-copyright-and-artificial-intelligence"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-18"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-024"

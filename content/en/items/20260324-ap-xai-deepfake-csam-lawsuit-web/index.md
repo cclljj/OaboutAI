@@ -3,6 +3,7 @@ title: "Tennessee teens sue Elon Musk's xAI over deepfake sexual images"
 date: 2026-03-24
 source_url: "https://apnews.com/article/musk-xai-grok-child-sexual-abuse-59e58fa581e4f53138738e8936b7c59f"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-24"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-016"

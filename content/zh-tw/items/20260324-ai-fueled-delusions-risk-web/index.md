@@ -3,6 +3,7 @@ title: "關於 AI 誘發妄想最難回答的問題"
 date: 2026-03-24
 source_url: "https://www.technologyreview.com/2026/03/23/1134527/the-hardest-question-to-answer-about-ai-fueled-delusions/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-23"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-003"

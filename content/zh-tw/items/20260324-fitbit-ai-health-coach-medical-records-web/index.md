@@ -3,6 +3,7 @@ title: "Fitbit AI 健康教練將可讀取醫療紀錄"
 date: 2026-03-24
 source_url: "https://www.theverge.com/ai-artificial-intelligence/897250/fitbits-ai-health-coach-reads-medical-records"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-24"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-019"

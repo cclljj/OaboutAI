@@ -3,6 +3,7 @@ title: "AI for Science 戰略：英國大學聯合聲明"
 date: 2026-03-24
 source_url: "https://www.gov.uk/government/publications/ai-for-science-strategy-uk-universities-joint-statement/ai-for-science-strategy-uk-universities-joint-statement"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-011"

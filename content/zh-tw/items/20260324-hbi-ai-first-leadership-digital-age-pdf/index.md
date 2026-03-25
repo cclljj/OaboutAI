@@ -3,6 +3,7 @@ title: "數位時代致勝：為何 AI-First 領導力不可或缺"
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1LiIDsXGF2yD-TUPgOOfDddDwA6YacGPL/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2025-01-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-008"

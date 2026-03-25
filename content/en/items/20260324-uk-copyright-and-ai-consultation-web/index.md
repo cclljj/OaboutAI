@@ -3,6 +3,7 @@ title: "Copyright and Artificial Intelligence (UK Government Consultation)"
 date: 2026-03-24
 source_url: "https://www.gov.uk/government/consultations/copyright-and-artificial-intelligence"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-19"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-021"

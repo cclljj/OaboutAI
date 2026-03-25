@@ -3,6 +3,7 @@ title: "灣區動物福利運動希望把 AI 納入倡議"
 date: 2026-03-24
 source_url: "https://www.technologyreview.com/2026/03/23/1134491/the-bay-areas-animal-welfare-movement-wants-to-recruit-ai/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-23"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-002"

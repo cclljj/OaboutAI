@@ -3,6 +3,7 @@ title: "電信業者在 AI 價值鏈中的策略角色（WEF, 2026）"
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1UYfRUPm3a3wzozTI-eKHx8ladUE5bs8v/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2026-03-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-010"

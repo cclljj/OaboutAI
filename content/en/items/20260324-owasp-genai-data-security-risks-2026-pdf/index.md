@@ -3,6 +3,7 @@ title: "OWASP GenAI Data Security Risks and Mitigations 2026 (v1.0)"
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1754y9YgR7gkFIjAeCc66QzxATcFtD6DW/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2026-03-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-009"

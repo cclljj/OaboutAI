@@ -3,6 +3,7 @@ title: "Microsoft outlines agentic AI security strategy with new Defender, Entra
 date: 2026-03-24
 source_url: "https://siliconangle.com/2026/03/22/microsoft-outlines-agentic-ai-security-strategy-new-defender-entra-purview-capabilities/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-22"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-012"

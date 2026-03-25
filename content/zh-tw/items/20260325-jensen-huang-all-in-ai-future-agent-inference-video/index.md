@@ -3,6 +3,7 @@ title: "Jensen Huang 談 NVIDIA 的 AI 路線圖、代理式工作負載與全�
 date: 2026-03-25
 source_url: "https://youtu.be/gwW8GKwHB3I?si=cctcISvBvsjOy9cr"
 source_type: "youtube"
+types: ["youtube"]
 source_date: "2026-03-25"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-003"

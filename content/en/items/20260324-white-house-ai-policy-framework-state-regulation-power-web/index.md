@@ -3,6 +3,7 @@ title: "White House releases AI policy framework focused on state regulations, p
 date: 2026-03-24
 source_url: "https://siliconangle.com/2026/03/20/white-house-releases-ai-policy-framework-focused-state-regulations-power-generation/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-20"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-014"

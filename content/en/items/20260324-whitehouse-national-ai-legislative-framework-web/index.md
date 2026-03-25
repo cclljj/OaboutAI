@@ -3,6 +3,7 @@ title: "President Donald J. Trump Unveils National AI Legislative Framework"
 date: 2026-03-24
 source_url: "https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-20"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-007"

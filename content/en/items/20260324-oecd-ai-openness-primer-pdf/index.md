@@ -3,6 +3,7 @@ title: "AI Openness: A Primer for Policymakers (OECD, 2025)"
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1r6NlcXAGYpTRAAyWY2AWPeQCgm4rItiv/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2025-08-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-006"

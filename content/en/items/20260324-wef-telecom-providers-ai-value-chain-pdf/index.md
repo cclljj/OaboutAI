@@ -3,6 +3,7 @@ title: "The Strategic Role of Telecom Providers Across the AI Value Chain (WEF, 
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1UYfRUPm3a3wzozTI-eKHx8ladUE5bs8v/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2026-03-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-010"

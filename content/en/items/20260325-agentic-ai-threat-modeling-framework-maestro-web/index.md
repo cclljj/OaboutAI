@@ -3,6 +3,7 @@ title: "CSA proposes MAESTRO, a seven-layer threat modeling framework for Agenti
 date: 2026-03-25
 source_url: "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2025-02-06"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-001"

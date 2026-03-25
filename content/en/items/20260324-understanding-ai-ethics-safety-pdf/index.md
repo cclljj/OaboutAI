@@ -3,6 +3,7 @@ title: "Understanding Artificial Intelligence Ethics and Safety (2019)"
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1hQUsPyPcT7k_771m9iQy-3JPFXxNeIUA/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2019-01-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-004"

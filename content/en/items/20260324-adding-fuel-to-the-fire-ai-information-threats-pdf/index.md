@@ -3,6 +3,7 @@ title: "Adding Fuel to the Fire: AI Information Threats and Crisis Events (2026)
 date: 2026-03-24
 source_url: "https://drive.google.com/file/d/1tl85sV3OFiuM9tC5lkhKvi8s_TNOmmlb/view?usp=drivesdk"
 source_type: "pdf"
+types: ["pdf"]
 source_date: "2026-02-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-005"

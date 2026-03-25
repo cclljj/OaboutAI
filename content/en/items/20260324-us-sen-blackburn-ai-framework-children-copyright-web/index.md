@@ -3,6 +3,7 @@ title: "US Sen. Blackburn proposes AI framework to protect children, copyrights"
 date: 2026-03-24
 source_url: "https://iapp.org/news/a/us-sen-blackburn-proposes-ai-framework-to-protect-children-copyrights"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-18"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-020"

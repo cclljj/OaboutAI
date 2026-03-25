@@ -3,6 +3,7 @@ title: "跨境監管人工智慧"
 date: 2026-03-24
 source_url: "https://www.theregreview.org/2026/03/22/spotlight-regulating-artificial-intelligence-across-borders/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-22"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-013"

@@ -3,6 +3,7 @@ title: "Crimson Desert dev apologizes for use of AI art"
 date: 2026-03-24
 source_url: "https://www.theverge.com/games/898771/crimson-desert-dev-apologizes-ai-art"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-22"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-015"

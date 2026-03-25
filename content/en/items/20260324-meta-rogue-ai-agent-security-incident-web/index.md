@@ -3,6 +3,7 @@ title: "A rogue AI led to a serious security incident at Meta"
 date: 2026-03-24
 source_url: "https://www.theverge.com/ai-artificial-intelligence/897528/meta-rogue-ai-agent-security-incident"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-24"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-018"

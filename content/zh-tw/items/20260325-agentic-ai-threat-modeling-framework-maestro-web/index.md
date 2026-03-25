@@ -3,6 +3,7 @@ title: "CSA 提出 MAESTRO：面向 Agentic AI 的七層威脅建模框架"
 date: 2026-03-25
 source_url: "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2025-02-06"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-001"

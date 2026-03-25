@@ -3,6 +3,7 @@ title: "美國政府與 Anthropic 爆發軍用 AI 防護爭議（AP）"
 date: 2026-03-24
 source_url: "https://apnews.com/article/anthropic-pentagon-ai-hegseth-dario-amodei-b72d1894bc842d9acf026df3867bee8a"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-24"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-022"

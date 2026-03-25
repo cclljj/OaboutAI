@@ -3,6 +3,7 @@ title: "Jensen Huang on NVIDIA, AI infrastructure, and the future of work (Lex F
 date: 2026-03-25
 source_url: "https://youtu.be/vif8NQcjVf0?si=7FD0fVaoM20xz8oE"
 source_type: "youtube"
+types: ["youtube"]
 source_date: "2026-03-25"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-002"

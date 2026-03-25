@@ -3,6 +3,7 @@ title: "White House releases national AI framework (Reuters)"
 date: 2026-03-24
 source_url: "https://www.reuters.com/world/us/white-house-releases-national-ai-framework-2026-03-20/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-20"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-017"

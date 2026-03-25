@@ -3,6 +3,7 @@ title: "The Pentagon is planning for AI companies to train on classified data, d
 date: 2026-03-24
 source_url: "https://www.technologyreview.com/2026/03/17/1134351/the-pentagon-is-planning-for-ai-companies-to-train-on-classified-data-defense-official-says/"
 source_type: "webpage"
+types: ["webpage"]
 source_date: "2026-03-17"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-023"
