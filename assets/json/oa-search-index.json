@@ -2,8 +2,20 @@
 {{- range .Site.Sites -}}
   {{- $lang := .Language.Lang -}}
   {{- $langLabel := .Language.LanguageName | default $lang -}}
+  {{- $topicLabels := dict -}}
+  {{- range .Data.topics -}}
+    {{- $topicLabels = merge $topicLabels (dict .id (index .title $lang | default .id)) -}}
+  {{- end -}}
   {{- $items := where .RegularPages "Section" "items" -}}
   {{- range $items -}}
+    {{- $topicRefs := slice -}}
+    {{- range (.Params.topics | default (slice)) -}}
+      {{- $topicRefs = $topicRefs | append (dict
+        "id" .
+        "label" (index $topicLabels . | default .)
+        "url" (printf "topics/%s/" . | relLangURL)
+      ) -}}
+    {{- end -}}
     {{- $record := dict
       "title" .Title
       "url" .RelPermalink
@@ -11,6 +23,8 @@
       "language_label" $langLabel
       "source_date" (.Params.source_date | default "")
       "submission_date" (.Params.submission_date | default "")
+      "source_type" (.Params.source_type | default "")
+      "topics" $topicRefs
       "executive_summary" (.Params.executive_summary | default "")
       "detailed_notes" (.Params.detailed_notes | default "")
       "content" (.Content | plainify | htmlUnescape | strings.TrimSpace)
