@@ -89,6 +89,9 @@ jobs:
       - name: Pull Vercel project settings
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
 
+      - name: Remove transient keyword proposal queue before Vercel build
+        run: rm -f data/keyword_proposals.jsonl
+
       - name: Build Vercel artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
