@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Aligns universities with DSIT’s strategic direction on AI-enabled scientific transformation.
-- Highlights institutional commitments: AI skills training, conversion pathways, fellowships, and support for research technical professionals.
-- Identifies systemic enablers: interdisciplinary incentives, durable technical career tracks, industry partnerships, and common data standards.
-- Signals readiness for joint implementation and continued policy co-ordination with government.
+- The statement emphasizes coordinated execution across institutions.
+- AI-for-science is framed as a competitiveness and capacity agenda.
+- Talent development is treated as foundational infrastructure.
+- Interdisciplinary collaboration is positioned as a core delivery mechanism.
+- Government-academia-industry alignment is repeatedly highlighted.
+- Shared standards can reduce cross-institution friction.
+- Funding continuity will shape long-term outcome quality.
+- Operational metrics are needed to track real implementation progress.
+- Policy success depends on translating commitments into reproducible programs.
+- The piece supports ecosystem governance rather than isolated initiatives.

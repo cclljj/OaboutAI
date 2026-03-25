@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Draft aligns with U.S. federal momentum toward a unified AI policy framework.
-- Child protection elements include duty-of-care expectations and chatbot-related safeguards.
-- Copyright and provenance mechanisms emphasize transparency and authenticity of AI-generated content.
-- Stakeholder reactions highlight tension between preemption, constitutional concerns, enforcement burden, and innovation goals.
+- The draft is framed as a federal coordination response to patchwork governance.
+- Child safety and copyright are treated as coupled policy domains.
+- Preemption scope is a central legal and political tension.
+- Duty-of-care concepts are moving closer to operational compliance language.
+- Provenance and labeling obligations are framed as accountability tools.
+- Implementation feasibility remains a critical open question.
+- Enforcement design will determine whether obligations have practical impact.
+- Platforms may face higher documentation and audit expectations.
+- The proposal implies broader lifecycle governance for generative systems.
+- Early preparation requires legal, policy, and technical alignment.

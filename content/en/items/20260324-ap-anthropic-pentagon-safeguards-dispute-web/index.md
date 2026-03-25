@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- AP describes an escalation from private negotiation to public confrontation over acceptable military-use guardrails.
-- Government response reportedly includes agency-wide phase-out directives and supply-chain risk treatment.
-- Anthropic’s position emphasizes limits on domestic mass surveillance and fully autonomous weaponization.
-- Broader policy significance: procurement governance, legal due process, and harmonization of safety constraints across AI vendors.
+- The article frames the episode as a governance dispute, not merely a product disagreement.
+- Safety red lines for military-context AI use emerge as the central fault line.
+- Procurement design appears underprepared for rapid, high-risk AI integration.
+- Contractual ambiguity can convert technical disagreements into legal confrontation.
+- National-security urgency can pressure agencies to seek broader model latitude.
+- Vendor trust can degrade quickly when oversight expectations diverge.
+- Cross-agency consistency is critical to avoid fragmented risk interpretation.
+- Independent review pathways are implied as a stabilizing mechanism.
+- Incident transparency and post-dispute accountability remain policy gaps.
+- The case supports standardized baseline clauses for defense AI contracts.

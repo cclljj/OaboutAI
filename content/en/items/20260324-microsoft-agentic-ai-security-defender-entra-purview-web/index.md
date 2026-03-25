@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Microsoft frames agentic-AI security as a full-stack architecture problem, not isolated tooling updates.
-- New controls focus on governance visibility, shadow-AI discovery, identity resilience, and prompt-injection/data-leakage risk reduction.
-- Security operations are moving toward AI-assisted triage and response via expanded Security Copilot and Sentinel capabilities.
-- The strategy suggests enterprise security baselines for AI agents will increasingly converge on centralized control planes plus adaptive, policy-driven defenses.
+- The announcement frames agentic AI security as full-stack governance.
+- Identity, data, and SOC layers are treated as coupled controls.
+- Control-plane visibility is emphasized over siloed point defenses.
+- Agent workflows expand attack surfaces beyond traditional app boundaries.
+- Prompt/tool/data pathways require policy-aware enforcement.
+- Operational AI security now depends on cross-product interoperability.
+- Continuous monitoring is positioned as a baseline, not an add-on.
+- Shadow AI discovery and governance are recurring enterprise concerns.
+- SOC automation is increasingly tied to AI-assisted triage and response.
+- The strategy supports centralized policy with adaptive runtime controls.

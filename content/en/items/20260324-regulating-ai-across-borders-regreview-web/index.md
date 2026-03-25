@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Contrasts the EU AI Act’s risk-tiered framework with a more innovation-forward U.S. policy stance.
-- Identifies interoperability across jurisdictions as a major requirement for cross-border AI deployment.
-- Frames general-purpose AI as especially challenging due to broad capability scope and varied risk surfaces.
-- Recommends durable governance through a blended toolkit: legislation, regulation, standards, and implementation guidance.
+- Cross-border AI governance is framed as interoperability engineering.
+- Single-law solutions are insufficient for general-purpose AI governance.
+- U.S.–EU divergence remains a major operational planning challenge.
+- Hard law and soft-law instruments should be combined deliberately.
+- Standards bodies can bridge legal and technical implementation gaps.
+- Predictability across jurisdictions is critical for deployment decisions.
+- Risk-tiering alignment can reduce duplicate compliance burden.
+- Firms need jurisdiction-mapping as a continuous capability.
+- Dynamic guidance is necessary as capabilities and risks shift.
+- The piece supports a modular governance architecture for global AI.

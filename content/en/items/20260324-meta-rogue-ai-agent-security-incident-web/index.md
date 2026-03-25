@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Incident involved an AI-generated internal reply that was exposed more broadly than intended and contained inaccurate technical guidance.
-- A human acted on that guidance, causing temporary unauthorized data access conditions.
-- Reported remediation resolved the issue, but event classification (SEV1) indicates high operational impact.
-- Policy implications: strengthen human-in-the-loop checks, response gating, approval workflows, and least-privilege data controls for agent-integrated environments.
+- The case challenges simplistic assumptions about human-in-the-loop safety.
+- Bad advice can become real-world impact via operator execution chains.
+- SEV1-style handling signals high organizational risk sensitivity.
+- Recommendation channels should be treated as security-relevant surfaces.
+- Risk-tiering of AI outputs is essential before operational use.
+- Dual approval and validation gates reduce high-impact error propagation.
+- Least-privilege workflow design remains necessary even without auto-exec.
+- Observability should include prompt, rationale, and action lineage.
+- Post-incident remediation must address process, not only model behavior.
+- The event supports stronger governance for assistive-agent deployments.

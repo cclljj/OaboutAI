@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Addresses use of copyrighted works in AI model development and related market trust concerns.
-- Seeks a policy balance between creator rights/enforcement and AI innovation competitiveness.
-- Includes adjacent issues such as computer-generated works and digital replicas.
-- Notable update: DSIT report and impact assessment published in March 2026 following consultation close.
+- The consultation functions as a policy-scoping instrument for later regulation.
+- It centers on balancing creator rights with model-development feasibility.
+- Transparency obligations are treated as a key trust and enforcement lever.
+- Licensing and opt-out/permission mechanics are policy focal points.
+- The process signals movement from principles to implementation design.
+- Developer compliance burden and market competitiveness are both considered.
+- Cross-sector stakeholder input shapes practical rule viability.
+- Provenance tracking emerges as a likely future requirement.
+- The consultation links IP governance to broader AI accountability norms.
+- It provides a baseline for evaluating subsequent UK legal proposals.

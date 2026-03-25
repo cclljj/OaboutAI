@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Feature will allow linking records such as labs, medications, and visit history into Fitbit AI coaching.
-- Product claim emphasizes personalized wellness support while retaining non-medical-device positioning.
-- Planned secure sharing capabilities (links/QR) extend data-distribution surface and governance complexity.
-- Regulatory and privacy implications are significant for health-adjacent AI systems handling high-sensitivity personal data.
+- The feature expands wellness AI into higher-sensitivity data territory.
+- Linking records and wearable data increases personalization potential.
+- Data-rights design becomes central once medical information is connected.
+- Consent lifecycle management is a core governance requirement.
+- Purpose limitation is critical to prevent secondary-use creep.
+- Non-diagnostic positioning does not remove safety responsibilities.
+- User-facing transparency must match the sensitivity of recommendations.
+- Sharing workflows (links/QR) create additional privacy attack surfaces.
+- Audit trails are needed for accountability and incident response.
+- The case exemplifies convergence of consumer AI and health governance.

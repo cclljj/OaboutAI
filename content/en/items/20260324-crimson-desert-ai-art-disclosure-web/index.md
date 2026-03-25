@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Developer statement confirms AI-generated art was used and should have been replaced before final release.
-- Company announced a comprehensive audit to identify and replace remaining AI-generated assets.
-- Public apology emphasized both content inclusion and disclosure failure.
-- Case highlights governance needs for asset provenance, disclosure policy, and release QA controls in creative pipelines.
+- The controversy centers on disclosure integrity, not only asset usage.
+- Late-stage correction cannot fully undo trust erosion.
+- Provenance tracking should be embedded in content pipelines.
+- Release gates must include AI-origin verification checks.
+- Public disclosure standards need to be explicit and consistent.
+- Cross-team accountability (art, QA, legal, comms) is required.
+- Residual AI assets in final builds create repeat risk cycles.
+- Community trust has become a governance metric.
+- Remediation needs both technical cleanup and communication repair.
+- The case supports formal AI-asset policy for creative studios.

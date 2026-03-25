@@ -17,7 +17,13 @@ attachments: []
 
 ## Detailed Notes
 
-- Emphasizes national-standard policy over state-by-state fragmentation to reduce compliance burden.
-- Pairs AI growth goals with infrastructure acceleration, especially energy supply co-located with data centers.
-- Includes consumer-protection elements (e.g., child safety controls) while seeking to avoid broad liability regimes.
-- Signals legislative follow-through with Congress as the next implementation step.
+- The framework links policy design with infrastructure execution realities.
+- State-by-state divergence is framed as a deployment tax.
+- Federal harmonization is positioned as a competitiveness lever.
+- Power and permitting capacity are treated as first-order AI constraints.
+- Child-safety and social-risk controls remain part of the policy package.
+- Compliance architecture should anticipate multi-level legal interaction.
+- Infrastructure planning must be integrated into AI product strategy.
+- Regulatory clarity can improve investment and rollout predictability.
+- Energy bottlenecks can nullify policy ambitions if left unresolved.
+- The piece supports governance models combining law, operations, and grid planning.
