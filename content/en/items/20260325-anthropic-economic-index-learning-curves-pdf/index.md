@@ -12,7 +12,7 @@ detailed_notes: "This report extends Anthropic’s Economic Index framework by a
 keywords: ["economic-impact", "adoption-curve", "productivity", "workforce-development", "learning-by-doing"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "en"
-attachments: ["Economic-Index---d82fbfea-1583-4c98-a123-c0ed0d12d379.pdf"]
+attachments: ["Economic-Index---d82fbfea-1583-4c98-a123-c0ed0d12d379.pdf", "Economic-Index---960c7c8b-bd84-4915-bbe5-2a1cf81033f2.pdf"]
 ---
 
 ## Detailed Notes
