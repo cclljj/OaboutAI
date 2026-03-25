@@ -3,3 +3,10 @@
 {"term":"threat-modeling","rationale":"Common security methodology in AI safety/governance entries; currently approximated by risk-management but deserves explicit taxonomy slot."}
 {"term":"adversarial-ml","rationale":"Important technical risk category; currently approximated by red-teaming, but scope is broader than testing practice."}
 {"term":"security-architecture","rationale":"Recurring concept in system-level controls and assurance; currently approximated by standards/governance-framework."}
+{"term":"ai-infrastructure","rationale":"High-frequency concept in current entries about compute/networking/data-center systems; currently approximated by governance-framework/standards."}
+{"term":"future-of-work","rationale":"Cross-cutting labor and productivity transformation theme in AI policy/governance discussions; currently approximated by governance-framework."}
+{"term":"geopolitics","rationale":"Frequent policy context around export controls, market access, and strategic diffusion; currently approximated by regulation/public-consultation."}
+{"term":"inference-economics","rationale":"Emerging concept around token-unit economics and system-level throughput efficiency; currently approximated by risk-management/standards."}
+{"term":"accelerated-computing","rationale":"Core technical term in NVIDIA and AI systems content; currently approximated by standards."}
+{"term":"leadership","rationale":"Recurring organizational decision-making theme in AI deployment and transformation content; currently approximated by governance-framework."}
+{"term":"supply-chain","rationale":"Important resilience and manufacturing topic in AI infrastructure policy/governance content; currently approximated by risk-management/standards."}
