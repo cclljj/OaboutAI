@@ -5,43 +5,54 @@
 
   {{ $items := where site.RegularPages "Section" "items" }}
   {{ $sorted := sort $items "Params.source_date" "desc" }}
-  {{ $months := dict }}
-  {{ range $sorted }}
-    {{ $raw := .Params.source_date }}
-    {{ $monthKey := "" }}
-    {{ with $raw }}
-      {{ $monthKey = (time.AsTime .).Format "2006-01" }}
-    {{ end }}
-    {{ if and $monthKey (not (isset $months $monthKey)) }}
-      {{ $months = merge $months (dict $monthKey (slice)) }}
-    {{ end }}
-    {{ if $monthKey }}
-      {{ $monthItems := index $months $monthKey | default (slice) }}
-      {{ $months = merge $months (dict $monthKey ($monthItems | append .)) }}
-    {{ end }}
+  {{ $topicLabels := dict }}
+  {{ range site.Data.topics }}
+    {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
   {{ end }}
 
-  {{ $monthKeys := slice }}
-  {{ range $k, $_ := $months }}
-    {{ $monthKeys = $monthKeys | append $k }}
-  {{ end }}
-  {{ $monthKeys = sort $monthKeys "value" "desc" }}
+  <div class="oa-sort-controls" data-oa-sort-controls>
+    <label class="oa-sort-label" for="oa-sort-by">{{ i18n "sortBy" }}</label>
+    <select id="oa-sort-by" class="oa-sort-select" data-oa-sort-by>
+      <option value="source_date">{{ i18n "sourceDate" }}</option>
+      <option value="submission_date">{{ i18n "submittedOn" }}</option>
+    </select>
+    <label class="oa-sort-label" for="oa-sort-order">{{ i18n "sortOrder" }}</label>
+    <select id="oa-sort-order" class="oa-sort-select" data-oa-sort-order>
+      <option value="desc">{{ i18n "sortNewestFirst" }}</option>
+      <option value="asc">{{ i18n "sortOldestFirst" }}</option>
+    </select>
+    <label class="oa-sort-label" for="oa-page-size">{{ i18n "itemsPerPage" }}</label>
+    <select id="oa-page-size" class="oa-sort-select" data-oa-page-size>
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
 
-  {{ range $monthKeys }}
-    {{ $month := . }}
-    <section class="oa-section">
-      <h2 class="oa-month-heading">{{ $month }}</h2>
-      {{ range index $months $month }}
-        <article class="oa-entry-card">
-          <h3><a class="oa-entry-title" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-          <p class="oa-meta">
-            <span class="oa-chip">{{ i18n "sourceDate" }} {{ .Params.source_date }}</span>
-          </p>
-        </article>
-      {{ end }}
-    </section>
-  {{ else }}
-    <p>{{ i18n "noEntriesYet" }}</p>
-  {{ end }}
- </div>
+  <div class="oa-entry-list" data-oa-sort-list>
+    {{ range $idx, $entry := $sorted }}
+      <article class="oa-entry-card" data-source-date="{{ $entry.Params.source_date }}" data-submission-date="{{ $entry.Params.submission_date }}" data-sort-index="{{ $idx }}">
+        <h3><a class="oa-entry-title" href="{{ $entry.RelPermalink }}">{{ $entry.Title }}</a></h3>
+        <p class="oa-meta">
+          <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
+          <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
+          <span class="oa-chip">{{ $entry.Params.source_type }}</span>
+          {{ range $entry.Params.topics }}
+            <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ index $topicLabels . | default . }}</a>
+          {{ end }}
+        </p>
+        <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
+      </article>
+    {{ else }}
+      <p>{{ i18n "noEntriesYet" }}</p>
+    {{ end }}
+  </div>
+
+  <div class="oa-pagination" data-oa-pagination>
+    <button class="oa-page-btn" type="button" data-oa-page-prev>{{ i18n "previousPage" }}</button>
+    <span class="oa-page-status" data-oa-page-status data-template="{{ i18n "pageStatus" }}"></span>
+    <button class="oa-page-btn" type="button" data-oa-page-next>{{ i18n "nextPage" }}</button>
+  </div>
+</div>
 {{ end }}
