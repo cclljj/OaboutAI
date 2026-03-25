@@ -305,6 +305,36 @@
   font-size: 0.84rem;
 }
 
+.oa-pagination {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.oa-page-btn {
+  border: 1px solid #c7dcec;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f425e;
+  padding: 0.28rem 0.72rem;
+  min-height: 2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.oa-page-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.oa-page-status {
+  color: #315067;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
 .oa-search-page {
   display: grid;
   gap: 0.92rem;

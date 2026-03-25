@@ -46,6 +46,14 @@
   translation: 由近至遠
 - id: sortOldestFirst
   translation: 由遠至近
+- id: itemsPerPage
+  translation: 每頁筆數
+- id: previousPage
+  translation: 上一頁
+- id: nextPage
+  translation: 下一頁
+- id: pageStatus
+  translation: 第 %d / %d 頁
 - id: searchPlaceholderLong
   translation: 搜尋全部條目（EN + zh-TW）...
 - id: searchTypeToStart

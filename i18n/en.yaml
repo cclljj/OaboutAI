@@ -46,6 +46,14 @@
   translation: Newest to oldest
 - id: sortOldestFirst
   translation: Oldest to newest
+- id: itemsPerPage
+  translation: Per page
+- id: previousPage
+  translation: Previous
+- id: nextPage
+  translation: Next
+- id: pageStatus
+  translation: Page %d of %d
 - id: searchPlaceholderLong
   translation: Search all entries (EN + zh-TW)...
 - id: searchTypeToStart

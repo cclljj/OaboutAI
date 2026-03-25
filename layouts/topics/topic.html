@@ -23,6 +23,13 @@
         <option value="desc">{{ i18n "sortNewestFirst" }}</option>
         <option value="asc">{{ i18n "sortOldestFirst" }}</option>
       </select>
+      <label class="oa-sort-label" for="oa-page-size">{{ i18n "itemsPerPage" }}</label>
+      <select id="oa-page-size" class="oa-sort-select" data-oa-page-size>
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
     </div>
     <div class="oa-entry-list" data-oa-sort-list>
     {{ range $idx, $entry := $sorted }}
@@ -37,6 +44,11 @@
     {{ else }}
       <p>{{ i18n "noEntriesInTopic" }}</p>
     {{ end }}
+    </div>
+    <div class="oa-pagination" data-oa-pagination>
+      <button class="oa-page-btn" type="button" data-oa-page-prev>{{ i18n "previousPage" }}</button>
+      <span class="oa-page-status" data-oa-page-status data-template="{{ i18n "pageStatus" }}"></span>
+      <button class="oa-page-btn" type="button" data-oa-page-next>{{ i18n "nextPage" }}</button>
     </div>
   </section>
 </div>
