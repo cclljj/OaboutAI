@@ -1,10 +1,10 @@
 ---
 title: "Anthropic Economic Index：Learning Curves（2026 年 3 月）"
 date: 2026-03-25
-source_url: "https://drive.google.com/file/d/1o0Z-YWUub0Vu23T5uyzDQO2ceNqddx3P/view?usp=drivesdk"
+source_url: "https://drive.google.com/file/d/1mJpkzLZDKpAPIYNQ0Cdg3u_bZWcuY2If/view?usp=drivesdk"
 source_type: "pdf"
 types: ["pdf"]
-source_date: "2025-09-15"
+source_date: "2026-03-24"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-004"
 executive_summary: "Anthropic 最新經濟指數顯示 Claude 使用正持續擴散與多樣化；同時，高資歷使用者有更高成功率與更佳任務—模型匹配，意味 AI 生產力紅利可能因學習曲線而被不均勻分配。"
@@ -12,7 +12,7 @@ detailed_notes: "這份報告延伸 Anthropic Economic Index 的分析框架，�
 keywords: ["economic-impact", "adoption-curve", "productivity", "workforce-development", "learning-by-doing"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "zh-tw"
-attachments: ["Economic-Index---d82fbfea-1583-4c98-a123-c0ed0d12d379.pdf", "Economic-Index---960c7c8b-bd84-4915-bbe5-2a1cf81033f2.pdf"]
+attachments: ["4053bf3440c0c85b8852052770c5b4cf882689c3---a13b03c6-6bcc-487f-b67f-f58711b1996c.pdf"]
 ---
 
 ## 詳細筆記
