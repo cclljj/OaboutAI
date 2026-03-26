@@ -4,7 +4,7 @@ date: 2026-03-27T00:00:00+08:00
 source_url: "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_723"
 source_type: "webpage"
 types: ["webpage"]
-source_date: "2026-02-27"
+source_date: "2026-03-26"
 submission_date: "2026-03-27"
 doc_id: "DOC-20260327-003"
 executive_summary: "歐盟執委會對 Snapchat 啟動 DSA 正式調查程序，聚焦兒少安全、隱私與資安義務落實情況，反映歐盟對平台推薦系統與風險治理責任的執法強度正持續上升。"

@@ -4,7 +4,7 @@ date: 2026-03-27T00:00:00+08:00
 source_url: "https://ec.europa.eu/commission/presscorner/detail/en/ip_26_723"
 source_type: "webpage"
 types: ["webpage"]
-source_date: "2026-02-27"
+source_date: "2026-03-26"
 submission_date: "2026-03-27"
 doc_id: "DOC-20260327-003"
 executive_summary: "The European Commission opened formal proceedings to assess whether Snapchat meets child safety, privacy, and security obligations under the Digital Services Act (DSA), reinforcing stricter accountability expectations for recommender systems and platform risk controls affecting minors."
