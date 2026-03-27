@@ -1,12 +1,22 @@
 {{ define "main" }}
 <div class="oa-shell">
   <h1>{{ .Title }}</h1>
-  <div class="oa-topic-grid">
-    {{ range .Pages.ByWeight }}
-      <a class="oa-topic-card" href="{{ .RelPermalink }}">
-        <h2>{{ .Title }}</h2>
-        <p>{{ .Summary }}</p>
-      </a>
+  {{ $topicLabels := dict }}
+  {{ $items := where site.RegularPages "Section" "items" }}
+  {{ range site.Data.topics }}
+    {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
+  {{ end }}
+
+  <div class="hx:grid hx:grid-cols-1 hx:md:grid-cols-2 hx:lg:grid-cols-3 hx:xl:grid-cols-4 hx:gap-4">
+    {{ range site.Data.topics }}
+      {{ $topicID := .id }}
+      {{ $matches := where $items "Params.topics" "intersect" (slice $topicID) }}
+      <div class="hx:w-full">
+        <a href="{{ printf "topics/%s/" $topicID | relLangURL }}" title="{{ index $topicLabels $topicID | default $topicID }}" class="hx:font-medium hx:hover:text-primary-600">
+          {{ index $topicLabels $topicID | default $topicID }}
+          <span class="hx:text-sm hx:text-gray-500">&nbsp;{{ len $matches }}</span>
+        </a>
+      </div>
     {{ end }}
   </div>
 </div>
