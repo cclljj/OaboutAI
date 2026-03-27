@@ -40,7 +40,7 @@ Every item front matter must include:
 - `title`
 - `source_url`
 - `source_type` (`webpage|pdf|youtube|other`)
-- `types` (single-item array equal to `source_type`)
+- `types` (array where `types[0]` is the primary type and must equal `source_type`; additional secondary types allowed)
 - `source_date` (`YYYY-MM-DD`)
 - `submission_date` (`YYYY-MM-DD`)
 - `executive_summary`

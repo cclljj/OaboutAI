@@ -25,7 +25,7 @@
 - `title`
 - `source_url`
 - `source_type` (`webpage|pdf|youtube|other`)
-- `types`（單一元素陣列，且值必須等於 `source_type`）
+- `types`（陣列；`types[0]` 為 primary type，且必須等於 `source_type`；可追加其他 secondary types）
 - `source_date` (`YYYY-MM-DD`)
 - `submission_date` (`YYYY-MM-DD`)
 - `executive_summary`

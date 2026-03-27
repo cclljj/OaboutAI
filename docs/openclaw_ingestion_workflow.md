@@ -19,6 +19,11 @@ Source type mapping:
 - `.pdf` -> `pdf`
 - all other readable files -> `other`
 
+Type taxonomy rule:
+- `source_type` is the primary type.
+- `types[0]` must equal `source_type`.
+- Additional secondary types may be appended to `types` when relevant.
+
 ## Required Context
 
 - Repo root: `OaboutAI`
