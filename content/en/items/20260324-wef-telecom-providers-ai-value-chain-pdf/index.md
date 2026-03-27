@@ -1,14 +1,14 @@
 ---
 title: "The Strategic Role of Telecom Providers Across the AI Value Chain (WEF, 2026)"
 date: 2026-03-24
-source_url: "https://drive.google.com/file/d/1UYfRUPm3a3wzozTI-eKHx8ladUE5bs8v/view?usp=drivesdk"
+source_url: "https://reports.weforum.org/docs/WEF_The_Strategic_Role_of_Telecom_Providers_Across_the_AI_Value_Chain_2026.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2026-03-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-010"
 executive_summary: "This WEF white paper argues that telecom providers can move from connectivity utilities to strategic AI infrastructure and service orchestrators through three pathways: core defense, AI-managed growth, and sovereign-resilience positioning."
-detailed_notes: "Developed with Accenture, the paper outlines strategic plays for CSPs across the AI value chain, with practical prioritization based on value and feasibility. It links AI strategy to operating-model redesign, talent readiness, and ecosystem partnerships, emphasizing that competitive advantage will come from AI-native connectivity plus service-layer innovation. Google Drive file: https://drive.google.com/file/d/1UYfRUPm3a3wzozTI-eKHx8ladUE5bs8v/view?usp=drivesdk"
+detailed_notes: "Developed with Accenture, the paper outlines strategic plays for CSPs across the AI value chain, with practical prioritization based on value and feasibility. It links AI strategy to operating-model redesign, talent readiness, and ecosystem partnerships, emphasizing that competitive advantage will come from AI-native connectivity plus service-layer innovation. Google Drive file: https://drive.google.com/file/d/1FJobiJnEJrtfVGk2cwDtQhewsqd0jJ7k/view?usp=drivesdk"
 keywords: ["governance-framework", "risk-management", "standards"]
 topics: ["ai-governance", "ai-policy"]
 language: "en"
