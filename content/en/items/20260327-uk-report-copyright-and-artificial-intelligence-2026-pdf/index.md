@@ -1,7 +1,7 @@
 ---
 title: "Report on Copyright and Artificial Intelligence (UK DSIT/DCMS, March 2026)"
 date: 2026-03-27T00:00:00+08:00
-source_url: "https://drive.google.com/file/d/1fxIErmYARxg2ZaV82apmpwP3LvNYEz2s/view?usp=drivesdk"
+source_url: "https://assets.publishing.service.gov.uk/media/69ba692226909a14239612e4/CP2602959_-_Report_on_Copyright_and_Artificial_Intelligence_web.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2026-03-01"
