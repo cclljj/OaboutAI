@@ -1,14 +1,14 @@
 ---
 title: "AI Openness: A Primer for Policymakers (OECD, 2025)"
 date: 2026-03-24
-source_url: "https://drive.google.com/file/d/1r6NlcXAGYpTRAAyWY2AWPeQCgm4rItiv/view?usp=drivesdk"
+source_url: "https://www.oecd.org/content/dam/oecd/en/publications/reports/2025/08/ai-openness_958d292b/02f73362-en.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2025-08-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-006"
 executive_summary: "This OECD/GPAI paper provides a policy-oriented framework for AI openness, clarifying why openness can accelerate innovation and trust while also introducing governance, safety, and security trade-offs that require context-specific controls."
-detailed_notes: "The report is designed as a primer for policymakers, with practical framing for balancing open access, responsible release, and risk mitigation across the AI lifecycle. It supports policy design on transparency, accountability, and international co-ordination, while acknowledging that openness is not binary and should be calibrated by capability and risk. Google Drive file (copyright-safe storage): https://drive.google.com/file/d/1r6NlcXAGYpTRAAyWY2AWPeQCgm4rItiv/view?usp=drivesdk"
+detailed_notes: "The report is designed as a primer for policymakers, with practical framing for balancing open access, responsible release, and risk mitigation across the AI lifecycle. It supports policy design on transparency, accountability, and international co-ordination, while acknowledging that openness is not binary and should be calibrated by capability and risk. Google Drive file (copyright-safe storage): https://drive.google.com/file/d/17VSkSTf1_REYXFeWBVtFyQaghggPmSDl/view?usp=drivesdk"
 keywords: ["governance-framework", "risk-management", "standards"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "en"

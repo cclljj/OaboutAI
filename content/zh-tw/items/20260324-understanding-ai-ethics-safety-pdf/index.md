@@ -1,14 +1,14 @@
 ---
 title: "理解人工智慧倫理與安全（2019）"
 date: 2026-03-24
-source_url: "https://drive.google.com/file/d/1hQUsPyPcT7k_771m9iQy-3JPFXxNeIUA/view?usp=drivesdk"
+source_url: "https://www.turing.ac.uk/sites/default/files/2019-08/understanding_artificial_intelligence_ethics_and_safety.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2019-01-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-004"
 executive_summary: "這份 Alan Turing Institute 指南提供公共部門可落地的責任型 AI 治理框架，將公平、問責、永續、安全與透明串接到 AI 專案生命週期。"
-detailed_notes: "這份指南的價值在於，它把責任型 AI 從抽象倫理原則轉成可執行的治理機制，特別適用於公共部門與高監管情境。文件核心不是單點技術修補，而是要求在專案全生命週期中內建治理：從需求定義、採購與資料治理，到模型選型、部署審查、上線後監測與持續修正，都要有明確流程與責任歸屬。它同時強調，公平、透明與安全不是上線前最後一關，而是設計初期就必須納入的約束條件。對實務團隊而言，文件最有操作性的部分是流程化思維：先做利害關係人影響評估，再依情境決定可解釋性與人類監督模式，並透過決策紀錄與審查節點維持可稽核性。指南也明確指出 AI 風險是複合型的，牽涉倫理、法務、營運與資安，若只由模型團隊單線處理，往往會出現治理缺口。整體而言，這份文件可作為政府與受監管場域導入 AI 的基線作業藍圖：在追求創新效益的同時，降低社會風險與決策不可問責問題。Google Drive（版權安全存放）連結：https://drive.google.com/file/d/1hQUsPyPcT7k_771m9iQy-3JPFXxNeIUA/view?usp=drivesdk"
+detailed_notes: "這份指南的價值在於，它把責任型 AI 從抽象倫理原則轉成可執行的治理機制，特別適用於公共部門與高監管情境。文件核心不是單點技術修補，而是要求在專案全生命週期中內建治理：從需求定義、採購與資料治理，到模型選型、部署審查、上線後監測與持續修正，都要有明確流程與責任歸屬。它同時強調，公平、透明與安全不是上線前最後一關，而是設計初期就必須納入的約束條件。對實務團隊而言，文件最有操作性的部分是流程化思維：先做利害關係人影響評估，再依情境決定可解釋性與人類監督模式，並透過決策紀錄與審查節點維持可稽核性。指南也明確指出 AI 風險是複合型的，牽涉倫理、法務、營運與資安，若只由模型團隊單線處理，往往會出現治理缺口。整體而言，這份文件可作為政府與受監管場域導入 AI 的基線作業藍圖：在追求創新效益的同時，降低社會風險與決策不可問責問題。Google Drive（版權安全存放）連結：https://drive.google.com/file/d/1oqeLhWwYBWY1JfRaYloQv2uLUkKaVkA_/view?usp=drivesdk"
 keywords: ["governance-framework", "risk-management", "standards"]
 topics: ["ai-governance", "ai-safety"]
 language: "zh-tw"

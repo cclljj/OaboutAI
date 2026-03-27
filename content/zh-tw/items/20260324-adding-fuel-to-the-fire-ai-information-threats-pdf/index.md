@@ -1,14 +1,14 @@
 ---
 title: "火上加油：AI 資訊威脅與危機事件（2026）"
 date: 2026-03-24
-source_url: "https://drive.google.com/file/d/1tl85sV3OFiuM9tC5lkhKvi8s_TNOmmlb/view?usp=drivesdk"
+source_url: "https://cetas.turing.ac.uk/sites/default/files/2026-02/cetas_research_report_-_adding_fuel_to_the_fire_-_ai_information_threats_and_crisis_events.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2026-02-01"
 submission_date: "2026-03-24"
 doc_id: "DOC-20260324-005"
 executive_summary: "這份 CETaS 報告系統化整理危機事件中 AI 資訊威脅如何被放大，涵蓋內容生成、傳播擴散與用戶互動三個階段，並提出可操作的防禦與應變框架。"
-detailed_notes: "本報告的重要性，在於它把危機期間的 AI 資訊風險視為一個「連續的攻防生命週期」，而非零散的假訊息個案。文件指出，真正的危害往往來自三段連鎖：第一是生成階段（合成影像/文字與敘事偽造），第二是擴散階段（演算法推薦、社群機器人與網路協同放大），第三是互動階段（聊天機器人、問答系統與個人化內容迴路進一步鞏固錯誤敘事）。報告特別強調危機情境的放大效應：當社會處於高不確定、情緒高張與資訊需求急迫時，驗證能力下降、錯誤訊息擴散速度上升，攻擊者更容易把多種 AI 能力組合成高衝擊操作。另一方面，文件並未只談威脅，也提出 AI 可作為防禦工具，例如異常網路偵測、查核任務優先排序與快速澄清流程；但同時提醒，若不透明揭露模型盲點與誤判邊界，防禦工具本身也可能造成錯誤安全感。政策層面，報告主張重點應由事後補救轉為事前準備：建立跨機關/跨平台 SOP、明確責任分工、固定演練與壓力測試，才能在危機真正發生時降低決策延遲與治理失靈。整體結論是，危機資訊韌性不能依賴單一偵測模型，而必須靠制度化協作、可互通流程與高透明度溝通。Google Drive（版權安全存放）連結：https://drive.google.com/file/d/1tl85sV3OFiuM9tC5lkhKvi8s_TNOmmlb/view?usp=drivesdk"
+detailed_notes: "本報告的重要性，在於它把危機期間的 AI 資訊風險視為一個「連續的攻防生命週期」，而非零散的假訊息個案。文件指出，真正的危害往往來自三段連鎖：第一是生成階段（合成影像/文字與敘事偽造），第二是擴散階段（演算法推薦、社群機器人與網路協同放大），第三是互動階段（聊天機器人、問答系統與個人化內容迴路進一步鞏固錯誤敘事）。報告特別強調危機情境的放大效應：當社會處於高不確定、情緒高張與資訊需求急迫時，驗證能力下降、錯誤訊息擴散速度上升，攻擊者更容易把多種 AI 能力組合成高衝擊操作。另一方面，文件並未只談威脅，也提出 AI 可作為防禦工具，例如異常網路偵測、查核任務優先排序與快速澄清流程；但同時提醒，若不透明揭露模型盲點與誤判邊界，防禦工具本身也可能造成錯誤安全感。政策層面，報告主張重點應由事後補救轉為事前準備：建立跨機關/跨平台 SOP、明確責任分工、固定演練與壓力測試，才能在危機真正發生時降低決策延遲與治理失靈。整體結論是，危機資訊韌性不能依賴單一偵測模型，而必須靠制度化協作、可互通流程與高透明度溝通。Google Drive（版權安全存放）連結：https://drive.google.com/file/d/1twTtn3AB6y92u5xpaISJzQViuo-2fJ8t/view?usp=drivesdk"
 keywords: ["risk-management", "incident-reporting", "governance-framework"]
 topics: ["ai-safety", "ai-governance", "ai-policy"]
 language: "zh-tw"
