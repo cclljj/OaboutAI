@@ -115,3 +115,10 @@ For user-uploaded files with copyright risk:
 - keep original in controlled external storage
 - do not commit risky original to public repo
 - record share link in `optional_fields.archived_url` and/or `detailed_notes`
+
+For `[doc]` PDF URL inputs (important normalization rule):
+- download the PDF first
+- upload the PDF to controlled storage (e.g., Google Drive mirror)
+- keep `source_url` as the original external PDF URL
+- include the controlled-storage link in `detailed_notes` (or `optional_fields.archived_url`) for stable internal access
+- keep `source_type: pdf` (do not classify as `webpage`)
