@@ -1,14 +1,14 @@
 ---
 title: "Anthropic Economic Index：AI 採用的地理與企業落差"
 date: 2026-03-25
-source_url: "https://drive.google.com/file/d/1H2IDVta-10sVPL_Y0qRlZ6gfF82B2fmo/view?usp=drivesdk"
+source_url: "https://assets.anthropic.com/m/218c82b858610fac/original/Economic-Index.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2025-09-15"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-006"
 executive_summary: "Anthropic 這份經濟指數指出 AI 採用雖快速成長，但在地理分布與企業落地上存在明顯不均，且企業 API 使用型態與消費端互動有系統性差異。"
-detailed_notes: "這份報告的關鍵貢獻，是把 AI 擴散從總量敘事拆成可量測的地理與企業結構問題。文件指出，Claude 使用雖快速成長，但採用仍高度集中於高所得區域，並透過 Anthropic AI Usage Index（AUI）比較各地「實際使用」與「人口預期使用」差距，揭露跨國不均。美國內部也呈現州別差異，且與當地產業結構有關。企業端方面，報告首次納入第一方 API 使用證據，顯示企業使用比消費端更偏向自動化工作流，且集中於程式與行政支援等可程式化任務。報告並提出一個重要判讀：在企業部署上，能力匹配與任務經濟價值可能比單位成本更能解釋使用分布；但高階落地常受限於上下文資料品質、資料現代化與組織整備度。整體政策意涵是，若不主動投資擴散能力（人才、資料與治理基礎設施），AI 生產力紅利可能持續偏向已具優勢的地區與企業。"
+detailed_notes: "這份報告的關鍵貢獻，是把 AI 擴散從總量敘事拆成可量測的地理與企業結構問題。文件指出，Claude 使用雖快速成長，但採用仍高度集中於高所得區域，並透過 Anthropic AI Usage Index（AUI）比較各地「實際使用」與「人口預期使用」差距，揭露跨國不均。美國內部也呈現州別差異，且與當地產業結構有關。企業端方面，報告首次納入第一方 API 使用證據，顯示企業使用比消費端更偏向自動化工作流，且集中於程式與行政支援等可程式化任務。報告並提出一個重要判讀：在企業部署上，能力匹配與任務經濟價值可能比單位成本更能解釋使用分布；但高階落地常受限於上下文資料品質、資料現代化與組織整備度。整體政策意涵是，若不主動投資擴散能力（人才、資料與治理基礎設施），AI 生產力紅利可能持續偏向已具優勢的地區與企業。 Google Drive（版權安全存放）連結：https://drive.google.com/file/d/1XaVrrLwIKavEewj9Z4lHosqXbhnXXhZH/view?usp=drivesdk"
 keywords: ["economic-impact", "geographic-inequality", "enterprise-adoption", "automation", "diffusion"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "zh-tw"

@@ -1,14 +1,14 @@
 ---
 title: "Anthropic Economic Index：Learning Curves（2026 年 3 月）"
 date: 2026-03-25
-source_url: "https://drive.google.com/file/d/1oficjj7r1Daou61Eq_2wBRSi-KzFXhKu/view?usp=drivesdk"
+source_url: "https://cdn.sanity.io/files/4zrzovbb/website/4053bf3440c0c85b8852052770c5b4cf882689c3.pdf"
 source_type: "pdf"
 types: ["pdf"]
 source_date: "2026-03-24"
 submission_date: "2026-03-25"
 doc_id: "DOC-20260325-004"
 executive_summary: "Anthropic 最新經濟指數顯示 Claude 使用正持續擴散與多樣化；同時，高資歷使用者有更高成功率與更佳任務—模型匹配，意味 AI 生產力紅利可能因學習曲線而被不均勻分配。"
-detailed_notes: "這份報告延伸 Anthropic Economic Index 的分析框架，觀察 2026 年 2 月 Claude 使用情形，並與 2025 年底的樣本比較。第一個重點是「擴散＋多樣化」：Claude.ai 的使用集中度下降（前 10 大任務占比由 24% 降至 19%），平均任務薪資代理值略降，反映用途從早期高價值專業場景（如程式開發）逐步擴展到更廣泛的日常任務。全球層面仍存在明顯不均，使用集中於少數國家；但美國州際內部的使用集中度有小幅收斂。第二個、也是更關鍵的發現是「學習曲線」：高資歷使用者更擅長把任務難度與模型能力做匹配，並在控制任務與地理等因素後仍呈現更高對話成功率（約 +10%）。這代表 AI 效益分配可能不是單純取決於是否能使用模型，而是取決於是否能透過持續使用累積操作能力與策略。政策與產業意涵在於，若學習效果具有自我強化特性，早期採用者可能持續擴大優勢，形成新的技能不平等。對組織而言，AI 導入策略應從「工具可用」升級為「能力建設」：強化任務分流、模型選擇、提示策略與工作流整合訓練，才能真正轉化為可持續生產力。"
+detailed_notes: "這份報告延伸 Anthropic Economic Index 的分析框架，觀察 2026 年 2 月 Claude 使用情形，並與 2025 年底的樣本比較。第一個重點是「擴散＋多樣化」：Claude.ai 的使用集中度下降（前 10 大任務占比由 24% 降至 19%），平均任務薪資代理值略降，反映用途從早期高價值專業場景（如程式開發）逐步擴展到更廣泛的日常任務。全球層面仍存在明顯不均，使用集中於少數國家；但美國州際內部的使用集中度有小幅收斂。第二個、也是更關鍵的發現是「學習曲線」：高資歷使用者更擅長把任務難度與模型能力做匹配，並在控制任務與地理等因素後仍呈現更高對話成功率（約 +10%）。這代表 AI 效益分配可能不是單純取決於是否能使用模型，而是取決於是否能透過持續使用累積操作能力與策略。政策與產業意涵在於，若學習效果具有自我強化特性，早期採用者可能持續擴大優勢，形成新的技能不平等。對組織而言，AI 導入策略應從「工具可用」升級為「能力建設」：強化任務分流、模型選擇、提示策略與工作流整合訓練，才能真正轉化為可持續生產力。 Google Drive（版權安全存放）連結：https://drive.google.com/file/d/1lN3vT-ZpNCISWMA5uSbcR4vFUcMJMH2w/view?usp=drivesdk"
 keywords: ["economic-impact", "adoption-curve", "productivity", "workforce-development", "learning-by-doing"]
 topics: ["ai-governance", "ai-policy", "ai-safety"]
 language: "zh-tw"
