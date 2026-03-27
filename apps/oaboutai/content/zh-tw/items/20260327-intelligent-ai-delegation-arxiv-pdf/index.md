@@ -10,7 +10,7 @@ doc_id: "DOC-20260327-005"
 executive_summary: "本文提出「智慧型 AI 委派」的自適應框架，主張委派不應只被視為任務分派，而需同時管理權限移轉、責任歸屬、問責鏈、角色邊界、意圖清晰度與信任校準，才能在動態多代理環境中維持安全與可靠。"
 detailed_notes: "作者指出，現有多代理委派方法多依賴啟發式策略，面對高風險、情境快速變動的真實環境時，容易脆弱失效。本文將委派擴展為社會技術協定：除任務分派外，還要同步定義 authority、responsibility、accountability、監控機制、邊界條件與信任管理。這個觀點的價值在於把「委派品質」直接連結到治理品質與安全結果，特別是當委派鏈變長時，責任容易模糊、監督容易失真。框架同時涵蓋 AI-AI 與人機委派場景，對未來 agentic web 的協作協定設計具有基礎性意義。若要讓大規模自治協作可稽核、可控且可追責，委派協定需被視為核心基礎設施而非附屬功能。Google Drive（版權安全存放）連結：https://drive.google.com/file/d/19lcR9WFWTxUZveRTUBlLLPe6umr20ApE/view?usp=drivesdk"
 keywords: ["governance-framework", "risk-management", "standards"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
+topics: ["ai-governance", "ai-policy"]
 primary_topic: "ai-safety"
 language: "zh-tw"
 attachments: []

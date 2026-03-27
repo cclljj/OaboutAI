@@ -10,7 +10,7 @@ doc_id: "DOC-20260327-005"
 executive_summary: "This paper proposes an adaptive framework for intelligent delegation among AI agents and humans, reframing delegation as not only task allocation but also explicit transfer of authority, responsibility, accountability, intent, boundaries, and trust calibration in dynamic multi-agent environments."
 detailed_notes: "The authors argue that current agent delegation approaches are too heuristic and brittle for real-world, high-stakes, multi-party environments. They propose a richer delegation model that combines classical task decomposition with governance-critical dimensions: role clarity, authority gradients, accountability assignment, monitoring, trust calibration, and mechanisms to manage delegation failures or changing context. A key contribution is conceptual: delegation is treated as a socio-technical protocol rather than a mere routing optimization problem. This makes the framework relevant for both AI-AI and human-AI settings, especially where long delegation chains can obscure responsibility and create systemic safety risks. The paper positions intelligent delegation as foundational infrastructure for an “agentic web,” where robust protocols are needed to preserve reliability, auditability, and safe escalation boundaries as autonomous coordination scales. Google Drive file (copyright-safe storage): https://drive.google.com/file/d/19lcR9WFWTxUZveRTUBlLLPe6umr20ApE/view?usp=drivesdk"
 keywords: ["governance-framework", "risk-management", "standards"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
+topics: ["ai-governance", "ai-policy"]
 primary_topic: "ai-safety"
 language: "en"
 attachments: []
