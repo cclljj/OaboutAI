@@ -1,20 +1,32 @@
-# OpenClaw Ingestion Workflow (All Readable Formats)
+# OpenClaw Ingestion Workflow (AI-Friendly)
+
+This guide is for AI agents and human operators ingesting readable sources into an app.
 
 ## Scope
-This workflow supports URL, YouTube, PDF, DOC, DOCX, PPT, PPTX, MD, TXT, and other readable files.
 
-Source type mapping used by the toolchain:
-- URL + YouTube domain -> `youtube`
-- URL (non-YouTube) -> `webpage`
+Supported inputs:
+- URL
+- YouTube URL
+- PDF
+- DOC/DOCX
+- PPT/PPTX
+- MD/TXT
+- other readable files
+
+Source type mapping:
+- YouTube URL -> `youtube`
+- non-YouTube URL -> `webpage`
 - `.pdf` -> `pdf`
-- `.doc`, `.docx`, `.ppt`, `.pptx`, `.md`, `.txt`, and other readable files -> `other`
+- all other readable files -> `other`
 
-## Tooling
-- Script: `scripts/ingest_item.py`
-- Validator: `scripts/validate_content.py`
-- Build: `hugo --gc --minify`
+## Required Context
+
+- Repo root: `OaboutAI`
+- Target app: `${APP_ID:-oaboutai}`
+- Script entrypoints: `scripts/*.py`
 
 ## Step 1: Prepare Draft Spec
+
 ```bash
 python scripts/ingest_item.py prepare \
   --source-input "<url-or-local-path>" \
@@ -22,57 +34,60 @@ python scripts/ingest_item.py prepare \
   --output /tmp/oaboutai_draft.json
 ```
 
-Notes:
-- `prepare` infers `source_type`, proposes `keywords/topics`, drafts slug and English summaries.
-- If `source_date` is missing, draft is marked blocked.
+What `prepare` does:
+- infers `source_type`
+- proposes slug/keywords/topics
+- drafts EN summary fields
 
-## Step 2: Fill Final Bilingual Content
-Edit `/tmp/oaboutai_draft.json` and complete:
-- `title.en` / `title.zh-tw`
-- `executive_summary.en` / `executive_summary.zh-tw`
-- `detailed_notes.en` / `detailed_notes.zh-tw`
+## Step 2: Complete Draft JSON
+
+Edit `/tmp/oaboutai_draft.json` and fill:
+- `title.en`, `title.zh-tw`
+- `executive_summary.en`, `executive_summary.zh-tw`
+- `detailed_notes.en`, `detailed_notes.zh-tw`
 - `source_date`
 - `keywords`, `topics`
 
 Optional:
-- `attachments`: additional local files to copy into bundle
-- `keyword_proposals`: list of objects with `term` + `rationale`
-- `optional_fields`: `authors`, `publisher`, `archived_url`, `duration`
+- `attachments`
+- `keyword_proposals`
+- `optional_fields` (`authors`, `publisher`, `archived_url`, `duration`)
 
-Searchability guidance:
-- `executive_summary` and `detailed_notes` should use concrete terminology from the source.
-- Avoid placeholder wording; these fields are indexed by the site full-text search.
+Rules:
+- Use only IDs from `apps/<app-id>/data/topics.json` and `apps/<app-id>/data/keywords.json`
+- No invented keyword IDs
+- Keep wording concrete and searchable
 
-Copyright-safe mode for uploaded files (default for `[doc]`):
-- Keep original uploaded files in Google Drive account `cclljj.agent@gmail.com`, folder `Ebook_Documents`.
-- Do **not** commit copyrighted originals into this public repo unless explicitly approved.
-- Put Google Drive share URL in `optional_fields.archived_url` and/or mention it in `detailed_notes`.
+## Step 3: Dry Run
 
-## Step 3: Ingest + Validate + Build (+ optional Push)
-Dry-run validation without writing files:
 ```bash
 python scripts/ingest_item.py ingest \
   --spec-file /tmp/oaboutai_draft.json \
   --dry-run
 ```
 
-Write files + run checks:
+## Step 4: Write + Checks
+
 ```bash
 python scripts/ingest_item.py ingest \
   --spec-file /tmp/oaboutai_draft.json \
   --run-checks
 ```
 
-Manual pre-push build guard (recommended, mirrors CI/Vercel):
+## Step 5: Build Guard (CI-Equivalent)
+
 ```bash
 python scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
 cd /tmp/oaboutai-site
 python scripts/sync_topics.py
+python scripts/auto_resolve_content_issues.py
+python scripts/validate_content.py
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 ```
 
-Push directly to GitHub main:
+## Step 6: Optional Direct Push
+
 ```bash
 python scripts/ingest_item.py ingest \
   --spec-file /tmp/oaboutai_draft.json \
@@ -81,48 +96,22 @@ python scripts/ingest_item.py ingest \
 ```
 
 ## Expected Outputs
+
 - `apps/<app-id>/content/en/items/<slug>/index.md`
-- `apps/<app-id>/content/zh-tw/items/<slug>/index.md` (required; no English-only entries)
-- Attachments in `apps/<app-id>/content/en/items/<slug>/`
-- Appended lines in `apps/<app-id>/data/keyword_proposals.jsonl` when provided
+- `apps/<app-id>/content/zh-tw/items/<slug>/index.md`
+- optional attachments in EN bundle folder
+- optional proposal lines in `apps/<app-id>/data/keyword_proposals.jsonl`
 
-## Fixed Quality Gate (must pass before push)
-1. English + zh-tw both exist for the same slug.
-2. `keywords`/`topics` only use existing ids in `data/keywords.json` and `data/topics.json`.
+## Quality Gate (Must Pass)
+
+1. EN + zh-tw exist for same slug.
+2. All keyword/topic IDs are valid for target app.
 3. `python scripts/validate_content.py` passes.
-4. `rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify` passes.
+4. `hugo --gc --minify` passes in composed workspace.
 
-## Example Spec Skeleton
-```json
-{
-  "source_input": "https://example.org/policy-update",
-  "source_url": "https://example.org/policy-update",
-  "source_type_hint": "webpage",
-  "source_date": "2026-03-24",
-  "submission_date": "2026-03-24",
-  "slug": "20260324-policy-update-brief",
-  "title": {
-    "en": "Policy Update Brief",
-    "zh-tw": "政策更新重點"
-  },
-  "executive_summary": {
-    "en": "Summary in English.",
-    "zh-tw": "中文摘要。"
-  },
-  "detailed_notes": {
-    "en": "Detailed notes in English.",
-    "zh-tw": "中文詳細筆記。"
-  },
-  "keywords": ["regulation", "governance-framework"],
-  "topics": ["ai-policy", "ai-governance"],
-  "attachments": [],
-  "keyword_proposals": [],
-  "optional_fields": {
-    "authors": null,
-    "publisher": null,
-    "archived_url": null,
-    "duration": null
-  },
-  "blocked_reasons": []
-}
-```
+## Copyright-Safe Mode
+
+For user-uploaded files with copyright risk:
+- keep original in controlled external storage
+- do not commit risky original to public repo
+- record share link in `optional_fields.archived_url` and/or `detailed_notes`
