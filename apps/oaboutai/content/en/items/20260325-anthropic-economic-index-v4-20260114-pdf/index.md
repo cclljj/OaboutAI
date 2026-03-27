@@ -31,10 +31,10 @@ detailed_notes: 'This report appears to serve as an earlier 2026 benchmark in An
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: en
+primary_topic: ai-governance
 ---
 
 ## Detailed Notes

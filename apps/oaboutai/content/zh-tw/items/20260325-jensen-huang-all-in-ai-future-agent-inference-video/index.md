@@ -1,18 +1,32 @@
 ---
-title: "Jensen Huang 談 NVIDIA 的 AI 路線圖、代理式工作負載與全球擴散策略（All-In 專訪）"
+title: Jensen Huang 談 NVIDIA 的 AI 路線圖、代理式工作負載與全球擴散策略（All-In 專訪）
 date: 2026-03-25
-source_url: "https://youtu.be/gwW8GKwHB3I?si=cctcISvBvsjOy9cr"
-source_type: "youtube"
-types: ["youtube"]
-source_date: "2026-03-25"
-submission_date: "2026-03-25"
-doc_id: "DOC-20260325-003"
-executive_summary: "在這場 All-In 專訪中，Jensen Huang 系統性說明 NVIDIA 已由 GPU 公司轉向 AI 工廠平台公司，並主張下一階段競爭關鍵在代理式工作負載、異質化推論與全棧基礎設施經濟性。"
-detailed_notes: "Huang 將當前 AI 發展定義為「架構層級轉換」：從單一模型、單一路徑推論，進入以代理（agent）為核心、需跨記憶體/工具/多模型協作的異質計算時代。他強調推論管線的本質是高度複雜的系統工程問題，不能再以單一晶片效能作為唯一評估標準，而必須看整體工廠吞吐、資源利用率與 token 單位成本。基於此，NVIDIA 的策略已擴展為 AI 工廠全棧：GPU 之外，納入 CPU、交換網路、儲存處理器、系統軟體與排程協調層（如 Dynamo 的 AI factory OS 概念）。訪談也明確提出資本支出與產出成本的區分：看似更昂貴的工廠，若在端到端效率與產能上明顯領先，反而可能提供更低 token 成本。對政策與地緣政治面向，Huang 主張美國 AI 技術棧應廣泛擴散到全球，並同步推進供應鏈韌性、製造多元化與美國再工業化，以避免在關鍵技術上重演其他產業的依賴風險。實務上，他把 AI 基礎設施延伸到實體 AI 與邊緣場景，提出訓練、模擬/評估、邊緣執行三種電腦分工視角。對就業衝擊則採「任務 vs 目的」框架：AI 會自動化部分任務，但更關鍵的是提升職務價值與生產力；能熟練使用 AI 進行規格化表達與流程再設計的人，將取得長期競爭優勢。"
-keywords: ["governance-framework", "risk-management", "standards", "regulation", "public-consultation"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "zh-tw"
+source_url: https://youtu.be/gwW8GKwHB3I?si=cctcISvBvsjOy9cr
+source_type: youtube
+types:
+- youtube
+source_date: '2026-03-25'
+submission_date: '2026-03-25'
+doc_id: DOC-20260325-003
+executive_summary: 在這場 All-In 專訪中，Jensen Huang 系統性說明 NVIDIA 已由 GPU 公司轉向 AI 工廠平台公司，並主張下一階段競爭關鍵在代理式工作負載、異質化推論與全棧基礎設施經濟性。
+detailed_notes: Huang 將當前 AI 發展定義為「架構層級轉換」：從單一模型、單一路徑推論，進入以代理（agent）為核心、需跨記憶體/工具/多模型協作的異質計算時代。他強調推論管線的本質是高度複雜的系統工程問題，不能再以單一晶片效能作為唯一評估標準，而必須看整體工廠吞吐、資源利用率與
+  token 單位成本。基於此，NVIDIA 的策略已擴展為 AI 工廠全棧：GPU 之外，納入 CPU、交換網路、儲存處理器、系統軟體與排程協調層（如 Dynamo
+  的 AI factory OS 概念）。訪談也明確提出資本支出與產出成本的區分：看似更昂貴的工廠，若在端到端效率與產能上明顯領先，反而可能提供更低 token
+  成本。對政策與地緣政治面向，Huang 主張美國 AI 技術棧應廣泛擴散到全球，並同步推進供應鏈韌性、製造多元化與美國再工業化，以避免在關鍵技術上重演其他產業的依賴風險。實務上，他把
+  AI 基礎設施延伸到實體 AI 與邊緣場景，提出訓練、模擬/評估、邊緣執行三種電腦分工視角。對就業衝擊則採「任務 vs 目的」框架：AI 會自動化部分任務，但更關鍵的是提升職務價值與生產力；能熟練使用
+  AI 進行規格化表達與流程再設計的人，將取得長期競爭優勢。
+keywords:
+- governance-framework
+- risk-management
+- standards
+- regulation
+- public-consultation
+topics:
+- ai-safety
+- ai-governance
+language: zh-tw
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## 詳細筆記

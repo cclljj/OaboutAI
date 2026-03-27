@@ -32,10 +32,10 @@ detailed_notes: 'This report provides an early empirical baseline on how frontie
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: en
+primary_topic: ai-governance
 ---
 
 ## Detailed Notes

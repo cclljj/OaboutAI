@@ -1,18 +1,25 @@
 ---
-title: "電信業者在 AI 價值鏈中的策略角色（WEF, 2026）"
+title: 電信業者在 AI 價值鏈中的策略角色（WEF, 2026）
 date: 2026-03-24
-source_url: "https://reports.weforum.org/docs/WEF_The_Strategic_Role_of_Telecom_Providers_Across_the_AI_Value_Chain_2026.pdf"
-source_type: "pdf"
-types: ["pdf"]
-source_date: "2026-03-01"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-010"
-executive_summary: "這份 WEF 白皮書指出，電信業者可透過三條路徑（守住核心、擴張 AI 服務、強化主權韌性）從連線供應者轉型為 AI 時代關鍵基礎設施與服務協調者。"
-detailed_notes: "報告與 Accenture 合作提出可執行策略，並以價值/可行性作為優先排序框架。核心觀點是：未來競爭優勢來自 AI-native 連線能力，搭配服務層創新、營運模型重塑與人才升級。Google Drive 連結：https://drive.google.com/file/d/1FJobiJnEJrtfVGk2cwDtQhewsqd0jJ7k/view?usp=drivesdk"
-keywords: ["governance-framework", "risk-management", "standards"]
-topics: ["ai-governance", "ai-policy"]
-language: "zh-tw"
+source_url: https://reports.weforum.org/docs/WEF_The_Strategic_Role_of_Telecom_Providers_Across_the_AI_Value_Chain_2026.pdf
+source_type: pdf
+types:
+- pdf
+source_date: '2026-03-01'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-010
+executive_summary: 這份 WEF 白皮書指出，電信業者可透過三條路徑（守住核心、擴張 AI 服務、強化主權韌性）從連線供應者轉型為 AI 時代關鍵基礎設施與服務協調者。
+detailed_notes: 報告與 Accenture 合作提出可執行策略，並以價值/可行性作為優先排序框架。核心觀點是：未來競爭優勢來自 AI-native
+  連線能力，搭配服務層創新、營運模型重塑與人才升級。Google Drive 連結：https://drive.google.com/file/d/1FJobiJnEJrtfVGk2cwDtQhewsqd0jJ7k/view?usp=drivesdk
+keywords:
+- governance-framework
+- risk-management
+- standards
+topics:
+- ai-policy
+language: zh-tw
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

@@ -30,11 +30,11 @@ keywords:
 - risk-management
 - regulation
 topics:
-- ai-policy
 - ai-governance
 - ai-safety
 language: en
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## Detailed Notes

@@ -1,18 +1,45 @@
 ---
-title: "Adding Fuel to the Fire: AI Information Threats and Crisis Events (2026)"
+title: 'Adding Fuel to the Fire: AI Information Threats and Crisis Events (2026)'
 date: 2026-03-24
-source_url: "https://cetas.turing.ac.uk/sites/default/files/2026-02/cetas_research_report_-_adding_fuel_to_the_fire_-_ai_information_threats_and_crisis_events.pdf"
-source_type: "pdf"
-types: ["pdf"]
-source_date: "2026-02-01"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-005"
-executive_summary: "This CETaS report maps how AI can intensify information threats during crises, spanning synthetic content generation, distribution manipulation, and engagement-stage exploitation, while also outlining defensive uses for rapid response."
-detailed_notes: "This report is valuable because it treats AI-enabled information threats during crises as a full lifecycle system rather than isolated incidents of fake content. Instead of focusing narrowly on deepfakes, it models how harm compounds across three linked stages: generation (creating misleading synthetic media or narratives), dissemination (algorithmic amplification and coordinated spread), and engagement (interactive reinforcement through chatbots, recommendation loops, and targeted persuasion). A core contribution is showing that crisis environments—high uncertainty, emotional volatility, and urgent information demand—create unusually favorable conditions for adversaries to combine these stages and accelerate social impact. The document also emphasizes that defensive AI and offensive AI evolve together: tools used for detection, triage, and fact-check support can improve response speed, but their limitations must be openly disclosed to avoid overconfidence and governance blind spots. Policy-wise, the report argues for preparedness over ad hoc reaction, including predefined incident playbooks, cross-platform coordination protocols, role clarity between government and private actors, and regular stress-testing through drills. The practical takeaway is that crisis resilience depends less on any single detection model and more on institutional readiness, interoperability, and transparent communication under pressure. Google Drive file (copyright-safe storage): https://drive.google.com/file/d/1twTtn3AB6y92u5xpaISJzQViuo-2fJ8t/view?usp=drivesdk"
-keywords: ["risk-management", "incident-reporting", "governance-framework"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "en"
+source_url: https://cetas.turing.ac.uk/sites/default/files/2026-02/cetas_research_report_-_adding_fuel_to_the_fire_-_ai_information_threats_and_crisis_events.pdf
+source_type: pdf
+types:
+- pdf
+source_date: '2026-02-01'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-005
+executive_summary: This CETaS report maps how AI can intensify information threats
+  during crises, spanning synthetic content generation, distribution manipulation,
+  and engagement-stage exploitation, while also outlining defensive uses for rapid
+  response.
+detailed_notes: 'This report is valuable because it treats AI-enabled information
+  threats during crises as a full lifecycle system rather than isolated incidents
+  of fake content. Instead of focusing narrowly on deepfakes, it models how harm compounds
+  across three linked stages: generation (creating misleading synthetic media or narratives),
+  dissemination (algorithmic amplification and coordinated spread), and engagement
+  (interactive reinforcement through chatbots, recommendation loops, and targeted
+  persuasion). A core contribution is showing that crisis environments—high uncertainty,
+  emotional volatility, and urgent information demand—create unusually favorable conditions
+  for adversaries to combine these stages and accelerate social impact. The document
+  also emphasizes that defensive AI and offensive AI evolve together: tools used for
+  detection, triage, and fact-check support can improve response speed, but their
+  limitations must be openly disclosed to avoid overconfidence and governance blind
+  spots. Policy-wise, the report argues for preparedness over ad hoc reaction, including
+  predefined incident playbooks, cross-platform coordination protocols, role clarity
+  between government and private actors, and regular stress-testing through drills.
+  The practical takeaway is that crisis resilience depends less on any single detection
+  model and more on institutional readiness, interoperability, and transparent communication
+  under pressure. Google Drive file (copyright-safe storage): https://drive.google.com/file/d/1twTtn3AB6y92u5xpaISJzQViuo-2fJ8t/view?usp=drivesdk'
+keywords:
+- risk-management
+- incident-reporting
+- governance-framework
+topics:
+- ai-governance
+- ai-policy
+language: en
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## Detailed Notes

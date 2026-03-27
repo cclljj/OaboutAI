@@ -17,10 +17,10 @@ detailed_notes: 這份報告延伸 Anthropic Economic Index 的分析框架，�
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: zh-tw
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

@@ -36,9 +36,7 @@
               <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
               <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
               <span class="oa-chip">{{ $entry.Params.source_type }}</span>
-              {{ range $entry.Params.topics }}
-                <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ index $topicLabels . | default . }}</a>
-              {{ end }}
+              {{ partial "oa-topic-chips.html" (dict "entry" $entry "topicLabels" $topicLabels) }}
             </p>
             <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
           </article>

@@ -1,0 +1,11 @@
+{{- $entry := .entry -}}
+{{- $topicLabels := .topicLabels -}}
+{{- $primary := $entry.Params.primary_topic | default "" -}}
+{{- if $primary -}}
+  <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" $primary | relLangURL }}">{{ index $topicLabels $primary | default $primary }}</a>
+{{- end -}}
+{{- range ($entry.Params.topics | default (slice)) -}}
+  {{- if ne . $primary -}}
+    <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ index $topicLabels . | default . }}</a>
+  {{- end -}}
+{{- end -}}

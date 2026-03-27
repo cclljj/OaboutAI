@@ -36,10 +36,10 @@ detailed_notes: 'This report extends Anthropic’s Economic Index framework by a
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: en
+primary_topic: ai-governance
 ---
 
 ## Detailed Notes

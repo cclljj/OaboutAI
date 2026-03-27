@@ -46,7 +46,8 @@ Every item front matter must include:
 - `executive_summary`
 - `detailed_notes`
 - `keywords` (array)
-- `topics` (array)
+- `primary_topic` (single topic id)
+- `topics` (array of secondary topic ids; exclude `primary_topic`)
 - `language` (`en|zh-tw`)
 
 Optional:

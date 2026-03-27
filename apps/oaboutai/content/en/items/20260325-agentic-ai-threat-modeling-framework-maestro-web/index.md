@@ -1,18 +1,57 @@
 ---
-title: "CSA proposes MAESTRO, a seven-layer threat modeling framework for Agentic AI"
+title: CSA proposes MAESTRO, a seven-layer threat modeling framework for Agentic AI
 date: 2026-03-25
-source_url: "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2025-02-06"
-submission_date: "2026-03-25"
-doc_id: "DOC-20260325-001"
-executive_summary: "Cloud Security Alliance’s MAESTRO framework extends traditional threat modeling with AI-native controls, mapping risks across a seven-layer agentic architecture and emphasizing cross-layer attack paths, continuous monitoring, and risk-prioritized mitigation."
-detailed_notes: "The CSA article argues that existing threat-modeling frameworks remain useful but are structurally incomplete for agentic AI systems, because autonomy, multi-agent interaction, non-deterministic behavior, and machine-learning attack surfaces create risk patterns that classical software-centric methods only partially capture. It reviews STRIDE, PASTA, LINDDUN, OCTAVE, Trike, and VAST as important foundations, yet highlights recurring gaps: weak treatment of adversarial ML, insufficient modeling of goal misalignment and emergent agent behavior, limited support for dynamic inter-agent trust boundaries, and inadequate coverage of modern AI supply-chain dependencies (models, datasets, tooling, and infrastructure). MAESTRO is introduced as a compensating framework grounded in a seven-layer reference architecture that spans foundation models, data operations, agent frameworks, deployment infrastructure, evaluation/observability, a vertical security/compliance layer, and the top-level agent ecosystem where business outcomes materialize. The practical value of this structure is decomposition: teams can enumerate threats and controls per layer while also identifying cross-layer attack chains such as infrastructure compromise leading to data poisoning, or framework dependency compromise propagating into ecosystem-level abuse. The framework further emphasizes risk-driven prioritization, not checklist compliance, by recommending likelihood-impact assessment and mitigation sequencing across technical and operational constraints. In operational terms, MAESTRO combines layer-specific controls with cross-layer defenses (secure inter-layer communication, systemic monitoring, incident response integration) and AI-native mitigations such as adversarial training, red teaming, explainability, runtime safety monitoring, and formal verification of critical behaviors. A key policy and governance implication is that AI security posture must be continuously updated as model capabilities, agent compositions, and attacker techniques evolve; static one-time reviews are insufficient. Overall, the article positions MAESTRO as a bridge between traditional security governance and AI-era operational reality, offering enterprises a way to move from fragmented control implementation toward auditable, end-to-end threat management for agentic systems."
-keywords: ["risk-management", "red-teaming", "governance-framework", "standards"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "en"
+source_url: https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro
+source_type: webpage
+types:
+- webpage
+source_date: '2025-02-06'
+submission_date: '2026-03-25'
+doc_id: DOC-20260325-001
+executive_summary: Cloud Security Alliance’s MAESTRO framework extends traditional
+  threat modeling with AI-native controls, mapping risks across a seven-layer agentic
+  architecture and emphasizing cross-layer attack paths, continuous monitoring, and
+  risk-prioritized mitigation.
+detailed_notes: 'The CSA article argues that existing threat-modeling frameworks remain
+  useful but are structurally incomplete for agentic AI systems, because autonomy,
+  multi-agent interaction, non-deterministic behavior, and machine-learning attack
+  surfaces create risk patterns that classical software-centric methods only partially
+  capture. It reviews STRIDE, PASTA, LINDDUN, OCTAVE, Trike, and VAST as important
+  foundations, yet highlights recurring gaps: weak treatment of adversarial ML, insufficient
+  modeling of goal misalignment and emergent agent behavior, limited support for dynamic
+  inter-agent trust boundaries, and inadequate coverage of modern AI supply-chain
+  dependencies (models, datasets, tooling, and infrastructure). MAESTRO is introduced
+  as a compensating framework grounded in a seven-layer reference architecture that
+  spans foundation models, data operations, agent frameworks, deployment infrastructure,
+  evaluation/observability, a vertical security/compliance layer, and the top-level
+  agent ecosystem where business outcomes materialize. The practical value of this
+  structure is decomposition: teams can enumerate threats and controls per layer while
+  also identifying cross-layer attack chains such as infrastructure compromise leading
+  to data poisoning, or framework dependency compromise propagating into ecosystem-level
+  abuse. The framework further emphasizes risk-driven prioritization, not checklist
+  compliance, by recommending likelihood-impact assessment and mitigation sequencing
+  across technical and operational constraints. In operational terms, MAESTRO combines
+  layer-specific controls with cross-layer defenses (secure inter-layer communication,
+  systemic monitoring, incident response integration) and AI-native mitigations such
+  as adversarial training, red teaming, explainability, runtime safety monitoring,
+  and formal verification of critical behaviors. A key policy and governance implication
+  is that AI security posture must be continuously updated as model capabilities,
+  agent compositions, and attacker techniques evolve; static one-time reviews are
+  insufficient. Overall, the article positions MAESTRO as a bridge between traditional
+  security governance and AI-era operational reality, offering enterprises a way to
+  move from fragmented control implementation toward auditable, end-to-end threat
+  management for agentic systems.'
+keywords:
+- risk-management
+- red-teaming
+- governance-framework
+- standards
+topics:
+- ai-governance
+- ai-policy
+language: en
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## Detailed Notes

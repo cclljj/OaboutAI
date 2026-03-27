@@ -1,18 +1,27 @@
 ---
-title: "Microsoft 公布 Agentic AI 資安策略：Defender、Entra、Purview 新能力"
+title: Microsoft 公布 Agentic AI 資安策略：Defender、Entra、Purview 新能力
 date: 2026-03-24
-source_url: "https://siliconangle.com/2026/03/22/microsoft-outlines-agentic-ai-security-strategy-new-defender-entra-purview-capabilities/"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-22"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-012"
-executive_summary: "Microsoft 發布以代理型 AI 為核心的資安策略，涵蓋代理治理、身分防護、資料控管、雲與端點防禦，以及 Security Copilot 強化的自動化 SOC 流程。"
-detailed_notes: "重點更新包含 Agent 365 控制平面、Entra 身分韌性功能、Purview 內嵌 AI 資料控管與 Defender/Sentinel 的 agentic defense。整體方向是以集中可視化與政策化控管，搭配可自適應的防禦能力，因應企業級 AI 代理快速擴張。"
-keywords: ["risk-management", "governance-framework", "regulation"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "zh-tw"
+source_url: https://siliconangle.com/2026/03/22/microsoft-outlines-agentic-ai-security-strategy-new-defender-entra-purview-capabilities/
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-22'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-012
+executive_summary: Microsoft 發布以代理型 AI 為核心的資安策略，涵蓋代理治理、身分防護、資料控管、雲與端點防禦，以及 Security
+  Copilot 強化的自動化 SOC 流程。
+detailed_notes: 重點更新包含 Agent 365 控制平面、Entra 身分韌性功能、Purview 內嵌 AI 資料控管與 Defender/Sentinel
+  的 agentic defense。整體方向是以集中可視化與政策化控管，搭配可自適應的防禦能力，因應企業級 AI 代理快速擴張。
+keywords:
+- risk-management
+- governance-framework
+- regulation
+topics:
+- ai-governance
+- ai-safety
+language: zh-tw
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## 詳細筆記

@@ -27,11 +27,11 @@ keywords:
 - governance-framework
 - risk-management
 topics:
-- ai-governance
 - ai-safety
 - ai-policy
 language: en
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## Detailed Notes

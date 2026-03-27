@@ -10,11 +10,17 @@
   <div class="hx:grid hx:grid-cols-1 hx:md:grid-cols-2 hx:lg:grid-cols-3 hx:xl:grid-cols-4 hx:gap-4">
     {{ range site.Data.topics }}
       {{ $topicID := .id }}
-      {{ $matches := where $items "Params.topics" "intersect" (slice $topicID) }}
+      {{ $count := 0 }}
+      {{ range $items }}
+        {{ $secondaryTopics := .Params.topics | default (slice) }}
+        {{ if or (eq (.Params.primary_topic | default "") $topicID) (gt (len (intersect $secondaryTopics (slice $topicID))) 0) }}
+          {{ $count = add $count 1 }}
+        {{ end }}
+      {{ end }}
       <div class="hx:w-full">
         <a href="{{ printf "topics/%s/" $topicID | relLangURL }}" title="{{ index $topicLabels $topicID | default $topicID }}" class="hx:font-medium hx:hover:text-primary-600">
           {{ index $topicLabels $topicID | default $topicID }}
-          <span class="hx:text-sm hx:text-gray-500">&nbsp;{{ len $matches }}</span>
+          <span class="hx:text-sm hx:text-gray-500">&nbsp;{{ $count }}</span>
         </a>
       </div>
     {{ end }}

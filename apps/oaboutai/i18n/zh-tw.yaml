@@ -40,6 +40,12 @@
   translation: 附件
 - id: entriesInTopic
   translation: 此主題的條目
+- id: primaryTopic
+  translation: 主要主題
+- id: otherTopics
+  translation: 其他主題
+- id: relatedEntries
+  translation: 相關條目
 - id: noEntriesInTopic
   translation: 此主題目前無條目。
 - id: menuSearch

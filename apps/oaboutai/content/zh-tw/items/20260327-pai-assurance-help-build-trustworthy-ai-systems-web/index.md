@@ -1,18 +1,27 @@
 ---
-title: "Can Assurance Help Build AI Systems That We Can Trust?（Partnership on AI）"
-date: 2026-03-27T00:00:00+08:00
-source_url: "https://partnershiponai.org/can-assurance-help-build-ai-systems-that-we-can-trust/"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-26"
-submission_date: "2026-03-27"
-doc_id: "DOC-20260327-001"
-executive_summary: "Partnership on AI 指出，若要建立可被合理信任的 AI，需把 assurance（確證）做成完整生態系：結合部署前評估、獨立第三方檢驗、部署後持續監測，以及可隨技術演進調整的標準體系。"
-detailed_notes: "本文整理 AI Standards Hub Global Summit 的核心觀察，主張 assurance 不應只是上線前一次性檢查，而是橫跨整個生命週期的治理能力。文章指出目前市場對獨立 assurance 需求不足，原因包含法規期待不清、企業對揭露專有系統的疑慮，以及對外部 assurance 價值認知不足；並提出可透過法規設計、事件通報與使用情境透明化等政策槓桿，提升需求與可驗證性。面對 frontier 與 agentic AI，作者強調標準必須採「可適應的流程型標準」並搭配可信賴的獨立評估者，同時建立部署後即時失效偵測與持續監測機制，才能降低高風險場景的不確定性。整體而言，真正的信任來自可被檢驗的證據與治理流程，而非單靠開發者宣稱。"
-keywords: ["risk-management", "governance-framework", "standards"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "zh-tw"
+title: Can Assurance Help Build AI Systems That We Can Trust?（Partnership on AI）
+date: 2026-03-27 00:00:00+08:00
+source_url: https://partnershiponai.org/can-assurance-help-build-ai-systems-that-we-can-trust/
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-26'
+submission_date: '2026-03-27'
+doc_id: DOC-20260327-001
+executive_summary: Partnership on AI 指出，若要建立可被合理信任的 AI，需把 assurance（確證）做成完整生態系：結合部署前評估、獨立第三方檢驗、部署後持續監測，以及可隨技術演進調整的標準體系。
+detailed_notes: 本文整理 AI Standards Hub Global Summit 的核心觀察，主張 assurance 不應只是上線前一次性檢查，而是橫跨整個生命週期的治理能力。文章指出目前市場對獨立
+  assurance 需求不足，原因包含法規期待不清、企業對揭露專有系統的疑慮，以及對外部 assurance 價值認知不足；並提出可透過法規設計、事件通報與使用情境透明化等政策槓桿，提升需求與可驗證性。面對
+  frontier 與 agentic AI，作者強調標準必須採「可適應的流程型標準」並搭配可信賴的獨立評估者，同時建立部署後即時失效偵測與持續監測機制，才能降低高風險場景的不確定性。整體而言，真正的信任來自可被檢驗的證據與治理流程，而非單靠開發者宣稱。
+keywords:
+- risk-management
+- governance-framework
+- standards
+topics:
+- ai-governance
+- ai-policy
+language: zh-tw
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## 詳細筆記

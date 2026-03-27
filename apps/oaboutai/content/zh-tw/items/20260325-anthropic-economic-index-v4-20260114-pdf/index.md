@@ -16,10 +16,10 @@ detailed_notes: 這份報告可視為 Anthropic Economic Index 系列在 2026 �
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: zh-tw
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

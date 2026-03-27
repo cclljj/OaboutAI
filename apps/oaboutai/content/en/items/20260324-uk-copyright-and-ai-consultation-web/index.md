@@ -1,18 +1,30 @@
 ---
-title: "Copyright and Artificial Intelligence (UK Government Consultation)"
+title: Copyright and Artificial Intelligence (UK Government Consultation)
 date: 2026-03-24
-source_url: "https://www.gov.uk/government/consultations/copyright-and-artificial-intelligence"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-19"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-021"
-executive_summary: "The UK government consultation on copyright and AI seeks to rebalance rights-holder control, transparency obligations for AI developers, and innovation access to training material, with a 2026 report and impact assessment now published."
-detailed_notes: "The consultation frames copyright as central to creative-economy sustainability while acknowledging AI-sector growth needs. Policy objectives include stronger transparency, practical control/payment pathways for right holders, and a framework that enables continued UK AI model development."
-keywords: ["regulation", "governance-framework", "standards"]
-topics: ["ai-policy", "ai-governance", "ai-safety"]
-language: "en"
+source_url: https://www.gov.uk/government/consultations/copyright-and-artificial-intelligence
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-19'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-021
+executive_summary: The UK government consultation on copyright and AI seeks to rebalance
+  rights-holder control, transparency obligations for AI developers, and innovation
+  access to training material, with a 2026 report and impact assessment now published.
+detailed_notes: The consultation frames copyright as central to creative-economy sustainability
+  while acknowledging AI-sector growth needs. Policy objectives include stronger transparency,
+  practical control/payment pathways for right holders, and a framework that enables
+  continued UK AI model development.
+keywords:
+- regulation
+- governance-framework
+- standards
+topics:
+- ai-governance
+- ai-safety
+language: en
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## Detailed Notes

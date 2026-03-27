@@ -23,6 +23,7 @@ REQUIRED_FIELDS = {
     "executive_summary",
     "detailed_notes",
     "keywords",
+    "primary_topic",
     "topics",
     "language",
 }
@@ -119,14 +120,22 @@ def main() -> int:
                     f"{rel}: unknown keywords {unknown}. Map to existing keyword and add proposal to data/keyword_proposals.jsonl."
                 )
 
-        if not isinstance(fm["topics"], list) or not fm["topics"]:
-            errors.append(f"{rel}: `topics` must be a non-empty array")
+        primary_topic = fm["primary_topic"]
+        if not isinstance(primary_topic, str) or not primary_topic:
+            errors.append(f"{rel}: `primary_topic` must be a non-empty string")
+        elif primary_topic not in topic_ids:
+            errors.append(f"{rel}: unknown primary_topic `{primary_topic}`")
+
+        if not isinstance(fm["topics"], list):
+            errors.append(f"{rel}: `topics` must be an array")
         else:
-            if len(fm["topics"]) > 10:
-                errors.append(f"{rel}: `topics` can include at most 10 values")
+            if len(fm["topics"]) > 9:
+                errors.append(f"{rel}: `topics` can include at most 9 secondary values")
             unknown_topics = sorted({topic for topic in fm["topics"] if topic not in topic_ids})
             if unknown_topics:
                 errors.append(f"{rel}: unknown topics {unknown_topics}")
+            if primary_topic and primary_topic in fm["topics"]:
+                errors.append(f"{rel}: `topics` must exclude `primary_topic`")
 
         attachments = fm.get("attachments")
         if attachments is not None:

@@ -1,18 +1,28 @@
 ---
-title: "Partnership on AI 宣布新任董事會領導（BBC R&D、Capital One 與非營利部門）"
-date: 2026-03-27T00:00:00+08:00
-source_url: "https://partnershiponai.org/partnership-on-ai-appoints-new-board-leadership-from-bbc-rd-capital-one-and-the-nonprofit-sector/"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-26"
-submission_date: "2026-03-27"
-doc_id: "DOC-20260327-002"
-executive_summary: "PAI 公布新任董事會領導組合，涵蓋媒體研發、金融企業 AI 與非營利公平治理視角，顯示其將持續以多方利害關係人模式推動 AI 治理與公共利益導向的實務框架。"
-detailed_notes: "此人事異動雖非直接監理措施，但對 AI 治理生態具指標意義，因董事會結構會影響議題排序、資源分配與跨界合作重點。PAI 由 BBC R&D、Capital One 與公益/公平導向專家共同領導，代表其治理取向仍重視技術可行性、產業落地需求與社會影響之間的平衡。對政策觀察者而言，這類領導層變動常預示未來一年在標準倡議、風險管理語彙、與實務指引產出上的優先方向。換言之，公告本身是「軟治理訊號」：揭示跨部門協作平台將如何塑造可信任 AI 的敘事與執行路線。"
-keywords: ["governance-framework", "standards", "risk-management"]
-topics: ["ai-governance", "ai-policy", "ai-safety"]
-language: "zh-tw"
+title: Partnership on AI 宣布新任董事會領導（BBC R&D、Capital One 與非營利部門）
+date: 2026-03-27 00:00:00+08:00
+source_url: https://partnershiponai.org/partnership-on-ai-appoints-new-board-leadership-from-bbc-rd-capital-one-and-the-nonprofit-sector/
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-26'
+submission_date: '2026-03-27'
+doc_id: DOC-20260327-002
+executive_summary: PAI 公布新任董事會領導組合，涵蓋媒體研發、金融企業 AI 與非營利公平治理視角，顯示其將持續以多方利害關係人模式推動 AI
+  治理與公共利益導向的實務框架。
+detailed_notes: 此人事異動雖非直接監理措施，但對 AI 治理生態具指標意義，因董事會結構會影響議題排序、資源分配與跨界合作重點。PAI 由 BBC
+  R&D、Capital One 與公益/公平導向專家共同領導，代表其治理取向仍重視技術可行性、產業落地需求與社會影響之間的平衡。對政策觀察者而言，這類領導層變動常預示未來一年在標準倡議、風險管理語彙、與實務指引產出上的優先方向。換言之，公告本身是「軟治理訊號」：揭示跨部門協作平台將如何塑造可信任
+  AI 的敘事與執行路線。
+keywords:
+- governance-framework
+- standards
+- risk-management
+topics:
+- ai-governance
+- ai-policy
+language: zh-tw
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## 詳細筆記

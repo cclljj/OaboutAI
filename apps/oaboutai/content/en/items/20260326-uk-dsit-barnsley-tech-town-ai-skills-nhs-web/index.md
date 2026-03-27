@@ -28,11 +28,11 @@ detailed_notes: This announcement illustrates a practical governance approach in
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: en
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## Detailed Notes

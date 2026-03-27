@@ -3,8 +3,18 @@
   <article class="oa-single">
     <h1 class="oa-page-title">{{ .Title }}</h1>
     {{ $topicLabels := dict }}
+    {{ $keywordLabels := dict }}
+    {{ $primaryTopic := .Params.primary_topic | default "" }}
+    {{ $secondaryTopics := .Params.topics | default (slice) }}
+    {{ $allTopics := $secondaryTopics }}
+    {{ if $primaryTopic }}
+      {{ $allTopics = $allTopics | append $primaryTopic }}
+    {{ end }}
     {{ range site.Data.topics }}
       {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
+    {{ end }}
+    {{ range site.Data.keywords }}
+      {{ $keywordLabels = merge $keywordLabels (dict .id (index .label $.Site.Language.Lang | default .id)) }}
     {{ end }}
     <dl class="oa-metadata oa-card">
       <dt>{{ i18n "sourceUrl" }}</dt>
@@ -19,17 +29,28 @@
       <dt>{{ i18n "submittedOn" }}</dt>
       <dd>{{ .Params.submission_date }}</dd>
 
-      <dt>{{ i18n "topics" }}</dt>
+      <dt>{{ i18n "primaryTopic" }}</dt>
       <dd class="oa-chip-wrap">
-        {{ range .Params.topics }}
+        {{ if $primaryTopic }}
+          <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" $primaryTopic | relLangURL }}">{{ index $topicLabels $primaryTopic | default $primaryTopic }}</a>
+        {{ else }}
+          <span>-</span>
+        {{ end }}
+      </dd>
+
+      <dt>{{ i18n "otherTopics" }}</dt>
+      <dd class="oa-chip-wrap">
+        {{ range $secondaryTopics }}
           <a class="oa-chip oa-chip-link" href="{{ printf "topics/%s/" . | relLangURL }}">{{ index $topicLabels . | default . }}</a>
+        {{ else }}
+          <span>-</span>
         {{ end }}
       </dd>
 
       <dt>{{ i18n "keywords" }}</dt>
       <dd class="oa-chip-wrap">
         {{ range .Params.keywords }}
-          <a class="oa-chip oa-chip-link" href="{{ printf "keywords/%s/" . | relLangURL }}">{{ . }}</a>
+          <a class="oa-chip oa-chip-link" href="{{ printf "keywords/%s/" . | relLangURL }}">{{ index $keywordLabels . | default . }}</a>
         {{ end }}
       </dd>
     </dl>
@@ -65,6 +86,42 @@
             {{ end }}
           {{ end }}
         </ul>
+      </section>
+    {{ end }}
+
+    {{ $related := slice }}
+    {{ range (where site.RegularPages "Section" "items") }}
+      {{ if ne .RelPermalink $.RelPermalink }}
+        {{ $candidatePrimary := .Params.primary_topic | default "" }}
+        {{ $candidateSecondary := .Params.topics | default (slice) }}
+        {{ $candidateTopics := $candidateSecondary }}
+        {{ if $candidatePrimary }}
+          {{ $candidateTopics = $candidateTopics | append $candidatePrimary }}
+        {{ end }}
+        {{ $topicOverlap := gt (len (intersect $allTopics $candidateTopics)) 0 }}
+        {{ $keywordOverlap := gt (len (intersect ($.Params.keywords | default (slice)) (.Params.keywords | default (slice)))) 0 }}
+        {{ if or $topicOverlap $keywordOverlap }}
+          {{ $related = $related | append . }}
+        {{ end }}
+      {{ end }}
+    {{ end }}
+    {{ $related = first 6 (sort $related "Params.source_date" "desc") }}
+    {{ if gt (len $related) 0 }}
+      <section class="oa-section">
+        <h2 class="oa-section-title">{{ i18n "relatedEntries" }}</h2>
+        <div class="oa-entry-list">
+          {{ range $entry := $related }}
+            <article class="oa-entry-card">
+              <h3><a class="oa-entry-title" href="{{ $entry.RelPermalink }}">{{ $entry.Title }}</a></h3>
+              <p class="oa-meta">
+                <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
+                <span class="oa-chip">{{ $entry.Params.source_type }}</span>
+                {{ partial "oa-topic-chips.html" (dict "entry" $entry "topicLabels" $topicLabels) }}
+              </p>
+              <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
+            </article>
+          {{ end }}
+        </div>
       </section>
     {{ end }}
   </article>

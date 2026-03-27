@@ -31,10 +31,10 @@ keywords:
 - risk-management
 topics:
 - ai-safety
-- ai-governance
 - ai-policy
 language: en
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## Detailed Notes

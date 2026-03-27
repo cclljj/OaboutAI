@@ -40,6 +40,12 @@
   translation: Attachments
 - id: entriesInTopic
   translation: Entries in this topic
+- id: primaryTopic
+  translation: Primary topic
+- id: otherTopics
+  translation: Other topics
+- id: relatedEntries
+  translation: Related Entries
 - id: noEntriesInTopic
   translation: No entries found for this topic.
 - id: menuSearch

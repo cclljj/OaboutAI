@@ -1,18 +1,25 @@
 ---
-title: "田納西青少年控告 xAI 涉深偽性影像事件（AP）"
+title: 田納西青少年控告 xAI 涉深偽性影像事件（AP）
 date: 2026-03-24
-source_url: "https://apnews.com/article/musk-xai-grok-child-sexual-abuse-59e58fa581e4f53138738e8936b7c59f"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-24"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-016"
-executive_summary: "AP 報導田納西州青少年提告，指稱 xAI 相關圖像生成能力被用於製作涉及未成年人的性剝削深偽內容，凸顯生成式 AI 在兒少保護、平台責任與治理義務上的重大風險。"
-detailed_notes: "訴訟主張現有防護不足以阻止嚴重濫用，並尋求集體訴訟資格。此案對政策層面的意義在於：兒少安全機制、非自願性影像防制、快速下架流程與供應商責任界線，可能被更明確法制化。"
-keywords: ["regulation", "risk-management", "incident-reporting"]
-topics: ["ai-policy", "ai-safety", "ai-governance"]
-language: "zh-tw"
+source_url: https://apnews.com/article/musk-xai-grok-child-sexual-abuse-59e58fa581e4f53138738e8936b7c59f
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-24'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-016
+executive_summary: AP 報導田納西州青少年提告，指稱 xAI 相關圖像生成能力被用於製作涉及未成年人的性剝削深偽內容，凸顯生成式 AI 在兒少保護、平台責任與治理義務上的重大風險。
+detailed_notes: 訴訟主張現有防護不足以阻止嚴重濫用，並尋求集體訴訟資格。此案對政策層面的意義在於：兒少安全機制、非自願性影像防制、快速下架流程與供應商責任界線，可能被更明確法制化。
+keywords:
+- regulation
+- risk-management
+- incident-reporting
+topics:
+- ai-governance
+- ai-safety
+language: zh-tw
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## 詳細筆記

@@ -332,6 +332,7 @@ def build_front_matter(
     executive_summary: str,
     detailed_notes: str,
     keywords: list[str],
+    primary_topic: str,
     topics: list[str],
     language: str,
     date_value: str,
@@ -349,6 +350,7 @@ def build_front_matter(
         "executive_summary": executive_summary,
         "detailed_notes": detailed_notes,
         "keywords": keywords,
+        "primary_topic": primary_topic,
         "topics": topics,
         "language": language,
     }
@@ -376,6 +378,7 @@ def validate_spec(spec: dict[str, Any], valid_topics: set[str], valid_keywords: 
         "executive_summary",
         "detailed_notes",
         "keywords",
+        "primary_topic",
         "topics",
     ]
     for key in required_top:
@@ -395,9 +398,19 @@ def validate_spec(spec: dict[str, Any], valid_topics: set[str], valid_keywords: 
     ensure_iso_date(spec["source_date"], "source_date")
     ensure_iso_date(spec["submission_date"], "submission_date")
 
+    primary_topic = spec["primary_topic"]
+    if not isinstance(primary_topic, str) or not primary_topic:
+        raise ValueError("primary_topic must be a non-empty string")
+    if primary_topic not in valid_topics:
+        raise ValueError(f"unknown primary_topic: {primary_topic}")
+
+    if not isinstance(spec["topics"], list):
+        raise ValueError("topics must be an array")
     unknown_topics = sorted(set(spec["topics"]) - valid_topics)
     if unknown_topics:
-        raise ValueError(f"unknown topics: {unknown_topics}")
+        raise ValueError(f"unknown secondary topics: {unknown_topics}")
+    if primary_topic in spec["topics"]:
+        raise ValueError("topics must exclude primary_topic")
 
     unknown_keywords = sorted(set(spec["keywords"]) - valid_keywords)
     if unknown_keywords:
@@ -472,6 +485,8 @@ def cmd_prepare(args: argparse.Namespace) -> int:
 
     keywords = propose_keywords(extracted.extracted_text, keywords_data)
     topics = propose_topics(keywords, valid_topic_order, topic_by_keyword)
+    primary_topic = topics[0]
+    secondary_topics = topics[1:]
 
     title_en = extracted.title_en.strip() or "Untitled Source"
     slug_base = f"{submission_date.replace('-', '')}-{slugify(title_en)[:50]}"
@@ -500,7 +515,8 @@ def cmd_prepare(args: argparse.Namespace) -> int:
             "zh-tw": "",
         },
         "keywords": keywords,
-        "topics": topics,
+        "primary_topic": primary_topic,
+        "topics": secondary_topics,
         "attachments": [],
         "keyword_proposals": [],
         "optional_fields": {
@@ -598,6 +614,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         executive_summary=spec["executive_summary"]["en"],
         detailed_notes=spec["detailed_notes"]["en"],
         keywords=spec["keywords"],
+        primary_topic=spec["primary_topic"],
         topics=spec["topics"],
         language="en",
         date_value=submission_date,
@@ -614,6 +631,7 @@ def cmd_ingest(args: argparse.Namespace) -> int:
         executive_summary=spec["executive_summary"]["zh-tw"],
         detailed_notes=spec["detailed_notes"]["zh-tw"],
         keywords=spec["keywords"],
+        primary_topic=spec["primary_topic"],
         topics=spec["topics"],
         language="zh-tw",
         date_value=submission_date,

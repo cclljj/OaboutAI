@@ -15,11 +15,11 @@ keywords:
 - governance-framework
 - risk-management
 topics:
-- ai-governance
 - ai-safety
 - ai-policy
 language: zh-tw
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

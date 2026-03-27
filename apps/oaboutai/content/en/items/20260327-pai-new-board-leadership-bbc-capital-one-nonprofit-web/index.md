@@ -1,18 +1,39 @@
 ---
-title: "Partnership on AI Appoints New Board Leadership from BBC R&D, Capital One, and the Nonprofit Sector"
-date: 2026-03-27T00:00:00+08:00
-source_url: "https://partnershiponai.org/partnership-on-ai-appoints-new-board-leadership-from-bbc-rd-capital-one-and-the-nonprofit-sector/"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-26"
-submission_date: "2026-03-27"
-doc_id: "DOC-20260327-002"
-executive_summary: "Partnership on AI announced new board leadership spanning media R&D, financial-sector enterprise AI, and nonprofit equity expertise, signaling continued emphasis on multistakeholder governance and public-interest framing in AI standards and deployment discourse."
-detailed_notes: "This governance update is institutionally meaningful because board composition influences agenda-setting, coalition priorities, and the practical shape of cross-sector AI governance outputs. By elevating leaders from BBC R&D, Capital One, and civil-society-oriented equity work, PAI is reinforcing a governance model that combines technical implementation realities, enterprise deployment constraints, and societal impact concerns. While the announcement is not a regulatory action by itself, it matters as a steering signal for how a prominent multistakeholder organization may prioritize themes such as trustworthy AI practice, inclusive design, and sector-bridging guidance. For policy watchers, these leadership changes can foreshadow shifts in which governance problems receive sustained convening attention and what kinds of actionable frameworks are likely to be produced or amplified."
-keywords: ["governance-framework", "standards", "risk-management"]
-topics: ["ai-governance", "ai-policy", "ai-safety"]
-language: "en"
+title: Partnership on AI Appoints New Board Leadership from BBC R&D, Capital One,
+  and the Nonprofit Sector
+date: 2026-03-27 00:00:00+08:00
+source_url: https://partnershiponai.org/partnership-on-ai-appoints-new-board-leadership-from-bbc-rd-capital-one-and-the-nonprofit-sector/
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-26'
+submission_date: '2026-03-27'
+doc_id: DOC-20260327-002
+executive_summary: Partnership on AI announced new board leadership spanning media
+  R&D, financial-sector enterprise AI, and nonprofit equity expertise, signaling continued
+  emphasis on multistakeholder governance and public-interest framing in AI standards
+  and deployment discourse.
+detailed_notes: This governance update is institutionally meaningful because board
+  composition influences agenda-setting, coalition priorities, and the practical shape
+  of cross-sector AI governance outputs. By elevating leaders from BBC R&D, Capital
+  One, and civil-society-oriented equity work, PAI is reinforcing a governance model
+  that combines technical implementation realities, enterprise deployment constraints,
+  and societal impact concerns. While the announcement is not a regulatory action
+  by itself, it matters as a steering signal for how a prominent multistakeholder
+  organization may prioritize themes such as trustworthy AI practice, inclusive design,
+  and sector-bridging guidance. For policy watchers, these leadership changes can
+  foreshadow shifts in which governance problems receive sustained convening attention
+  and what kinds of actionable frameworks are likely to be produced or amplified.
+keywords:
+- governance-framework
+- standards
+- risk-management
+topics:
+- ai-governance
+- ai-policy
+language: en
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## Detailed Notes

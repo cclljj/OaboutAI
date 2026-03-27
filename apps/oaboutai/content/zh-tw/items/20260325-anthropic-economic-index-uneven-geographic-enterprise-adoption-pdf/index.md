@@ -16,10 +16,10 @@ detailed_notes: 這份報告的關鍵貢獻，是把 AI 擴散從總量敘事拆
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: zh-tw
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

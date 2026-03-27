@@ -16,11 +16,11 @@ detailed_notes: 此公告反映英國在 AI 治理上的務實取向：不只停
 keywords:
 - governance-framework
 topics:
-- ai-governance
 - ai-policy
 - ai-safety
 language: zh-tw
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

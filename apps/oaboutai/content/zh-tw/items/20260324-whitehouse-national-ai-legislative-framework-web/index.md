@@ -1,18 +1,25 @@
 ---
-title: "川普總統公布國家級 AI 立法框架"
+title: 川普總統公布國家級 AI 立法框架
 date: 2026-03-24
-source_url: "https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-20"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-007"
-executive_summary: "白宮公布國家 AI 立法框架，聚焦六大目標：兒少保護、社區與能源、智財與創作者權益、言論自由、創新競爭力與勞動力轉型。"
-detailed_notes: "此框架主張由聯邦層級統一政策方向，避免各州規範碎片化削弱美國 AI 競爭力。政策定位是同時追求 AI 快速部署與社會風險治理，並透過國會立法落地。"
-keywords: ["regulation", "governance-framework", "risk-management"]
-topics: ["ai-policy", "ai-governance", "ai-safety"]
-language: "zh-tw"
+source_url: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-20'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-007
+executive_summary: 白宮公布國家 AI 立法框架，聚焦六大目標：兒少保護、社區與能源、智財與創作者權益、言論自由、創新競爭力與勞動力轉型。
+detailed_notes: 此框架主張由聯邦層級統一政策方向，避免各州規範碎片化削弱美國 AI 競爭力。政策定位是同時追求 AI 快速部署與社會風險治理，並透過國會立法落地。
+keywords:
+- regulation
+- governance-framework
+- risk-management
+topics:
+- ai-governance
+- ai-safety
+language: zh-tw
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## 詳細筆記

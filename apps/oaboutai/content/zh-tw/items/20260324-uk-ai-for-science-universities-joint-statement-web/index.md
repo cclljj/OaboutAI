@@ -1,18 +1,24 @@
 ---
-title: "AI for Science 戰略：英國大學聯合聲明"
+title: AI for Science 戰略：英國大學聯合聲明
 date: 2026-03-24
-source_url: "https://www.gov.uk/government/publications/ai-for-science-strategy-uk-universities-joint-statement/ai-for-science-strategy-uk-universities-joint-statement"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-01"
-submission_date: "2026-03-24"
-doc_id: "DOC-20260324-011"
-executive_summary: "多所英國大學研究領導者聯合支持 UK AI for Science 戰略，並承諾在人才培育、跨域研究文化、技術職涯、產學協作與資料標準上協助落地。"
-detailed_notes: "聲明指出 AI for Science 同時是創新躍升機會與國際競爭重排挑戰。要讓策略真正產生效果，必須採取政府、學術與產業共同推進的全生態系方法。"
-keywords: ["governance-framework", "standards", "public-consultation"]
-topics: ["ai-policy", "ai-governance"]
-language: "zh-tw"
+source_url: https://www.gov.uk/government/publications/ai-for-science-strategy-uk-universities-joint-statement/ai-for-science-strategy-uk-universities-joint-statement
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-01'
+submission_date: '2026-03-24'
+doc_id: DOC-20260324-011
+executive_summary: 多所英國大學研究領導者聯合支持 UK AI for Science 戰略，並承諾在人才培育、跨域研究文化、技術職涯、產學協作與資料標準上協助落地。
+detailed_notes: 聲明指出 AI for Science 同時是創新躍升機會與國際競爭重排挑戰。要讓策略真正產生效果，必須採取政府、學術與產業共同推進的全生態系方法。
+keywords:
+- governance-framework
+- standards
+- public-consultation
+topics:
+- ai-governance
+language: zh-tw
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## 詳細筆記

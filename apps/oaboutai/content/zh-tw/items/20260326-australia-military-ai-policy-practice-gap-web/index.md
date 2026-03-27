@@ -17,11 +17,11 @@ keywords:
 - risk-management
 - regulation
 topics:
-- ai-policy
 - ai-governance
 - ai-safety
 language: zh-tw
 attachments: []
+primary_topic: ai-policy
 ---
 
 ## 詳細筆記

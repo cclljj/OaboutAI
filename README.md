@@ -71,7 +71,8 @@ Required front matter fields for each item:
 - `executive_summary`
 - `detailed_notes`
 - `keywords` (IDs from app `data/keywords.json`)
-- `topics` (IDs from app `data/topics.json`)
+- `primary_topic` (single ID from app `data/topics.json`)
+- `topics` (secondary IDs from app `data/topics.json`, excluding `primary_topic`)
 - `language` (`en|zh-tw`)
 
 ## OpenClaw Ingestion

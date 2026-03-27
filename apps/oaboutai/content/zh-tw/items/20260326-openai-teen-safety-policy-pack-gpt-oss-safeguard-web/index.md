@@ -18,10 +18,10 @@ keywords:
 - risk-management
 topics:
 - ai-safety
-- ai-governance
 - ai-policy
 language: zh-tw
 attachments: []
+primary_topic: ai-governance
 ---
 
 ## 詳細筆記

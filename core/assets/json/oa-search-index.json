@@ -9,7 +9,11 @@
   {{- $items := where .RegularPages "Section" "items" -}}
   {{- range $items -}}
     {{- $topicRefs := slice -}}
-    {{- range (.Params.topics | default (slice)) -}}
+    {{- $allTopics := (.Params.topics | default (slice)) -}}
+    {{- with .Params.primary_topic -}}
+      {{- $allTopics = $allTopics | append . -}}
+    {{- end -}}
+    {{- range $allTopics -}}
       {{- $topicRefs = $topicRefs | append (dict
         "id" .
         "label" (index $topicLabels . | default .)

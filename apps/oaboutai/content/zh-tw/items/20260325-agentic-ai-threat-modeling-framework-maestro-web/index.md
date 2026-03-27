@@ -1,18 +1,33 @@
 ---
-title: "CSA 提出 MAESTRO：面向 Agentic AI 的七層威脅建模框架"
+title: CSA 提出 MAESTRO：面向 Agentic AI 的七層威脅建模框架
 date: 2026-03-25
-source_url: "https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2025-02-06"
-submission_date: "2026-03-25"
-doc_id: "DOC-20260325-001"
-executive_summary: "Cloud Security Alliance 提出的 MAESTRO 以七層代理式 AI 架構為核心，補上傳統威脅建模在自主性、跨層攻擊鏈與 AI 特有風險上的缺口，並強調持續監控與風險優先治理。"
-detailed_notes: "CSA 這篇文章的核心論點是：既有威脅建模方法仍然有價值，但若直接套用到 Agentic AI，會在關鍵風險面上出現系統性盲點。作者先回顧 STRIDE、PASTA、LINDDUN、OCTAVE、Trike、VAST 等主流框架，肯定其在一般資安、隱私或風險治理上的基礎作用，同時指出其對代理式 AI 的覆蓋不足，尤其是對抗式機器學習攻擊、目標偏移、非決定性行為、多代理互動關係與 AI 供應鏈風險。為補足這些缺口，文中提出 MAESTRO，並以七層參考架構作為分析骨架：從 Foundation Model、Data Operations、Agent Framework、Deployment/Infrastructure、Evaluation/Observability，到橫切全層的 Security & Compliance，以及最上層 Agent Ecosystem。這種分層方法的實務意義在於能把威脅辨識從抽象討論落到可執行的控制項盤點，並同時追蹤跨層攻擊鏈，例如基礎設施入侵如何一路影響資料層、模型行為與最終業務層輸出。文章也強調風險導向優先順序，而非清單式合規：需以可能性與衝擊度排序，決定哪些控制先做、哪些流程先補。防護策略方面，MAESTRO 主張分層控管加上跨層防禦，並納入 AI 特有措施，如對抗訓練、紅隊演練、可解釋性設計、執行期安全監測與關鍵行為的形式化驗證。治理層面則指出 AI 風險是動態演化的，威脅建模不能一次性完成，必須轉為持續更新的運行機制。整體而言，MAESTRO 被定位為連接「傳統資安治理」與「AI 時代實際攻防」的橋樑，協助企業把零散控制整合成可稽核、可持續、端到端的代理式 AI 風險管理能力。"
-keywords: ["risk-management", "red-teaming", "governance-framework", "standards"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "zh-tw"
+source_url: https://cloudsecurityalliance.org/blog/2025/02/06/agentic-ai-threat-modeling-framework-maestro
+source_type: webpage
+types:
+- webpage
+source_date: '2025-02-06'
+submission_date: '2026-03-25'
+doc_id: DOC-20260325-001
+executive_summary: Cloud Security Alliance 提出的 MAESTRO 以七層代理式 AI 架構為核心，補上傳統威脅建模在自主性、跨層攻擊鏈與
+  AI 特有風險上的缺口，並強調持續監控與風險優先治理。
+detailed_notes: CSA 這篇文章的核心論點是：既有威脅建模方法仍然有價值，但若直接套用到 Agentic AI，會在關鍵風險面上出現系統性盲點。作者先回顧
+  STRIDE、PASTA、LINDDUN、OCTAVE、Trike、VAST 等主流框架，肯定其在一般資安、隱私或風險治理上的基礎作用，同時指出其對代理式 AI
+  的覆蓋不足，尤其是對抗式機器學習攻擊、目標偏移、非決定性行為、多代理互動關係與 AI 供應鏈風險。為補足這些缺口，文中提出 MAESTRO，並以七層參考架構作為分析骨架：從
+  Foundation Model、Data Operations、Agent Framework、Deployment/Infrastructure、Evaluation/Observability，到橫切全層的
+  Security & Compliance，以及最上層 Agent Ecosystem。這種分層方法的實務意義在於能把威脅辨識從抽象討論落到可執行的控制項盤點，並同時追蹤跨層攻擊鏈，例如基礎設施入侵如何一路影響資料層、模型行為與最終業務層輸出。文章也強調風險導向優先順序，而非清單式合規：需以可能性與衝擊度排序，決定哪些控制先做、哪些流程先補。防護策略方面，MAESTRO
+  主張分層控管加上跨層防禦，並納入 AI 特有措施，如對抗訓練、紅隊演練、可解釋性設計、執行期安全監測與關鍵行為的形式化驗證。治理層面則指出 AI 風險是動態演化的，威脅建模不能一次性完成，必須轉為持續更新的運行機制。整體而言，MAESTRO
+  被定位為連接「傳統資安治理」與「AI 時代實際攻防」的橋樑，協助企業把零散控制整合成可稽核、可持續、端到端的代理式 AI 風險管理能力。
+keywords:
+- risk-management
+- red-teaming
+- governance-framework
+- standards
+topics:
+- ai-governance
+- ai-policy
+language: zh-tw
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## 詳細筆記

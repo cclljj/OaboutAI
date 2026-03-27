@@ -1,18 +1,38 @@
 ---
-title: "Can Assurance Help Build AI Systems That We Can Trust? (Partnership on AI)"
-date: 2026-03-27T00:00:00+08:00
-source_url: "https://partnershiponai.org/can-assurance-help-build-ai-systems-that-we-can-trust/"
-source_type: "webpage"
-types: ["webpage"]
-source_date: "2026-03-26"
-submission_date: "2026-03-27"
-doc_id: "DOC-20260327-001"
-executive_summary: "Partnership on AI argues that trustworthy AI requires a stronger assurance ecosystem spanning pre-deployment evaluations, independent external assurers, post-deployment monitoring, and adaptive standards that can keep pace with frontier and agentic AI risks."
-detailed_notes: "This article synthesizes policy and practitioner takeaways from the AI Standards Hub Global Summit and frames assurance as a full-lifecycle governance function rather than a one-time compliance checkpoint. It highlights a persistent gap between rapid AI deployment and comparatively weak demand for independent assurance, then identifies practical levers—such as clearer regulation, incident reporting, and use-case transparency—to strengthen market incentives. The piece also emphasizes that frontier and agentic systems require adaptable, process-oriented evaluation standards plus ongoing real-time failure detection after deployment, because static controls are likely to decay as capabilities evolve. Overall, the argument is that justified trust in AI systems depends on evidence quality, institutional accountability, and continuous monitoring infrastructure, not solely on developer claims."
-keywords: ["risk-management", "governance-framework", "standards"]
-topics: ["ai-safety", "ai-governance", "ai-policy"]
-language: "en"
+title: Can Assurance Help Build AI Systems That We Can Trust? (Partnership on AI)
+date: 2026-03-27 00:00:00+08:00
+source_url: https://partnershiponai.org/can-assurance-help-build-ai-systems-that-we-can-trust/
+source_type: webpage
+types:
+- webpage
+source_date: '2026-03-26'
+submission_date: '2026-03-27'
+doc_id: DOC-20260327-001
+executive_summary: Partnership on AI argues that trustworthy AI requires a stronger
+  assurance ecosystem spanning pre-deployment evaluations, independent external assurers,
+  post-deployment monitoring, and adaptive standards that can keep pace with frontier
+  and agentic AI risks.
+detailed_notes: This article synthesizes policy and practitioner takeaways from the
+  AI Standards Hub Global Summit and frames assurance as a full-lifecycle governance
+  function rather than a one-time compliance checkpoint. It highlights a persistent
+  gap between rapid AI deployment and comparatively weak demand for independent assurance,
+  then identifies practical levers—such as clearer regulation, incident reporting,
+  and use-case transparency—to strengthen market incentives. The piece also emphasizes
+  that frontier and agentic systems require adaptable, process-oriented evaluation
+  standards plus ongoing real-time failure detection after deployment, because static
+  controls are likely to decay as capabilities evolve. Overall, the argument is that
+  justified trust in AI systems depends on evidence quality, institutional accountability,
+  and continuous monitoring infrastructure, not solely on developer claims.
+keywords:
+- risk-management
+- governance-framework
+- standards
+topics:
+- ai-governance
+- ai-policy
+language: en
 attachments: []
+primary_topic: ai-safety
 ---
 
 ## Detailed Notes
