@@ -2,15 +2,29 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/cclljj/OaboutAI/docs-site-ci.yml?branch=main&label=CI)](https://github.com/cclljj/OaboutAI/actions/workflows/docs-site-ci.yml)
 [![Demo Site](https://img.shields.io/badge/Demo-oaboutai.vercel.app-000?logo=vercel)](https://oaboutai.vercel.app/)
+[![Last Commit](https://img.shields.io/github/last-commit/cclljj/OaboutAI?label=last%20commit)](https://github.com/cclljj/OaboutAI/commits/main)
+[![Stars](https://img.shields.io/github/stars/cclljj/OaboutAI?style=social)](https://github.com/cclljj/OaboutAI/stargazers)
+[![Issues](https://img.shields.io/github/issues/cclljj/OaboutAI)](https://github.com/cclljj/OaboutAI/issues)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cclljj/OaboutAI/pulls)
+[![Hugo](https://img.shields.io/badge/Hugo-0.152.2-ff4088?logo=hugo)](https://gohugo.io/)
 
-Bilingual Hugo knowledge archive with composable architecture:
-- `core/` = reusable framework
-- `apps/<app-id>/` = app-specific content/config
+Composable bilingual Hugo knowledge archive for AI policy/governance/safety curation.
 
 Production app: `oaboutai`
 Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
-## Document Targets
+## Overview
+
+Repository model:
+- `core/`: reusable framework
+- `apps/<app-id>/`: app-specific content/config
+
+This repo is optimized for:
+- machine-maintained publishing workflows
+- strict metadata and controlled vocabularies
+- parallel human + AI agent operations
+
+## Documentation Map
 
 - `README.md` (this file): quick orientation and architecture overview
 - `INSTALL.md`: full setup/run/deploy commands (human + AI agent operations)
@@ -39,6 +53,12 @@ python3 scripts/sync_topics.py
 npx --yes hugo-bin server -D
 ```
 
+## Key Content Rules
+
+- Every item must include EN canonical + zh-TW pair.
+- Topics/keywords must use app registries (`data/topics.json`, `data/keywords.json`).
+- Slug format: `YYYYMMDD-short-kebab-title`.
+
 ## Content Contract
 
 Required front matter fields for each item:
@@ -53,9 +73,6 @@ Required front matter fields for each item:
 - `keywords` (IDs from app `data/keywords.json`)
 - `topics` (IDs from app `data/topics.json`)
 - `language` (`en|zh-tw`)
-
-Slug format:
-- `YYYYMMDD-short-kebab-title`
 
 ## OpenClaw Ingestion
 
