@@ -34,6 +34,9 @@ def main() -> int:
 
     shutil.copytree(core_root, output_root, dirs_exist_ok=True)
     shutil.copytree(app_root, output_root, dirs_exist_ok=True)
+    vercel_config = repo_root / "vercel.json"
+    if vercel_config.exists():
+        shutil.copy2(vercel_config, output_root / "vercel.json")
 
     print(f"Composed app '{args.app_id}' into: {output_root}")
     return 0
