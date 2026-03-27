@@ -10,6 +10,12 @@ Bilingual Hugo knowledge archive with composable architecture:
 Production app: `oaboutai`
 Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
+## Document Targets
+
+- `README.md` (this file): quick orientation and architecture overview
+- `INSTALL.md`: full setup/run/deploy commands (human + AI agent operations)
+- `AGENTS.md`: strict agent contract, constraints, and governance
+
 ## Architecture
 
 - Shared framework: `core/`
@@ -18,22 +24,19 @@ Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 - App manifest: `apps/<app-id>/app.toml`
 - Script wrappers (stable entrypoints): `scripts/*.py`
 
-Wrappers forward to `core/scripts/*.py` and default `APP_ID=oaboutai` if not set.
+Wrappers forward to `core/scripts/*.py` and default `APP_ID=oaboutai` when not set.
 
-## Quickstart (AI-Friendly)
+## Quick Start
+
+Use [INSTALL.md](INSTALL.md) for full commands.
+
+Minimal local start:
 
 ```bash
-git clone https://github.com/cclljj/OaboutAI.git
-cd OaboutAI
-python3 -m pip install --upgrade pip pyyaml
 python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
-python3 scripts/auto_resolve_content_issues.py
-python3 scripts/validate_content.py
-rm -f data/keyword_proposals.jsonl
-npx --yes hugo-bin --gc --minify
-test -f public/index.html
+npx --yes hugo-bin server -D
 ```
 
 ## Content Contract
@@ -56,25 +59,12 @@ Slug format:
 
 ## OpenClaw Ingestion
 
-Primary docs:
 - `docs/openclaw_ingestion_workflow.md`
 - `docs/openclaw_system_prompt.md`
 
-Standard flow:
-1. `python scripts/ingest_item.py prepare ...`
-2. Fill bilingual fields in draft JSON
-3. `python scripts/ingest_item.py ingest --dry-run`
-4. `python scripts/ingest_item.py ingest --run-checks`
-5. Optional: `--git-push`
-
 ## Local Development
 
-```bash
-python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
-cd /tmp/oaboutai-site
-python3 scripts/sync_topics.py
-npx --yes hugo-bin server -D
-```
+See [INSTALL.md](INSTALL.md) section 4 and section 5 for dev server and CI-equivalent build guard.
 
 ## CI/CD (GitHub Actions + Vercel)
 
@@ -89,3 +79,9 @@ Pipeline:
 
 Required secret:
 - `VERCEL_TOKEN`
+
+## Related Docs
+
+- Setup and deployment: [INSTALL.md](INSTALL.md)
+- Agent operating rules: [AGENTS.md](AGENTS.md)
+- OpenClaw ingestion: [docs/openclaw_ingestion_workflow.md](docs/openclaw_ingestion_workflow.md)

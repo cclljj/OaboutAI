@@ -7,6 +7,12 @@ This repo uses a composable layout:
 
 Default app is `oaboutai`.
 
+## 0. Document Target
+
+- Use this file when you need executable setup/run/deploy steps.
+- If you only need high-level repo orientation, read `README.md`.
+- If you are an automation/agent enforcing policy, read `AGENTS.md`.
+
 ## 1. Prerequisites
 
 Required:
