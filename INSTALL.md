@@ -1,129 +1,110 @@
 # INSTALL.md
 
-This guide provides two installation paths:
-- Local installation (run and validate on your machine)
-- Vercel installation (deploy and host online)
+This document is written for both humans and AI agents.
+Goal: install and run OaboutAI reliably in a fresh environment.
 
-It also includes content update workflows, including OpenClaw ingestion.
+## 1. Installation Modes
 
-## 1. Local Installation
+- Mode A: Local (run on your machine)
+- Mode B: Vercel (host online)
 
-### 1.1 Prerequisites
+## 2. Mode A - Local Installation
 
-Install these tools:
+### 2.1 Prerequisites
+
+Required:
 - Git
-- Python 3.10+
-- Node.js 18+ (LTS recommended)
-- Hugo Extended 0.152.2 (or use `npx --yes hugo-bin`)
+- Python `>=3.10`
+- Node.js `>=18`
 
-### 1.2 Clone Repository
+Optional:
+- Hugo Extended binary (if absent, use `npx --yes hugo-bin`)
+
+### 2.2 Bootstrap Commands (Copy/Paste)
 
 ```bash
 git clone https://github.com/cclljj/OaboutAI.git
 cd OaboutAI
-```
-
-### 1.3 Set Up Python Environment
-
-```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install --upgrade pip
-pip install pyyaml
+python3 -m pip install --upgrade pip pyyaml
 ```
 
-### 1.4 Verify Tooling
+### 2.3 Verification Commands
 
 ```bash
 python3 --version
 node --version
 npx --yes hugo-bin version
-```
-
-### 1.5 Validate Metadata
-
-```bash
+python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
 ```
 
-Expected result:
-- `Validated <N> item files successfully.`
+Expected:
+- validator exits `0`
+- message like `Validated <N> item files successfully.`
 
-### 1.6 Start Local Site
+### 2.4 Run Local Site
 
 ```bash
 npx --yes hugo-bin server -D
 ```
 
 Open:
-- [http://localhost:1313/](http://localhost:1313/)
+- `http://localhost:1313/`
 
-### 1.7 Local Production Build
-
-Mirror CI/Vercel behavior:
+### 2.5 Production-Equivalent Local Build
 
 ```bash
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
+test -f public/index.html
 ```
 
-Expected result:
-- `public/index.html` exists
+Expected:
+- all commands exit `0`
 
-## 2. Vercel Installation (Deploy Online)
+## 3. Mode B - Vercel Installation
 
-There are 2 supported ways:
-- Automatic deployment via GitHub Actions (recommended for this repo)
-- Manual deployment from your machine (Vercel CLI)
+Two supported paths.
 
-### 2.1 Option A: Deploy via GitHub Actions (Recommended)
+### 3.1 Path 1 - GitHub Actions Auto Deploy (Recommended)
 
-1. Fork or clone this repository into your GitHub account.
-2. Create a Vercel project and connect the same GitHub repository.
-3. In GitHub repo secrets, add:
-   - `VERCEL_TOKEN`
-4. Ensure workflow file exists:
-   - `.github/workflows/docs-site-ci.yml`
+1. Fork/push repository to GitHub.
+2. Create or link Vercel project to this repo.
+3. Add GitHub Actions secret:
+- `VERCEL_TOKEN`
+4. Ensure workflow exists:
+- `.github/workflows/docs-site-ci.yml`
 5. Push to `main`.
 
-Pipeline behavior:
-1. Auto-resolve metadata issues
-2. Validate content
-3. Build Hugo output
-4. Deploy to Vercel production
+Pipeline will:
+- auto-resolve common content issues
+- validate metadata
+- build Hugo site
+- deploy to Vercel production
 
-### 2.2 Option B: Manual Vercel Deploy (CLI)
-
-Install Vercel CLI:
+### 3.2 Path 2 - Manual Vercel CLI Deploy
 
 ```bash
 npm install -g vercel@latest
-```
-
-Login and link project:
-
-```bash
 vercel login
 vercel link
-```
-
-Build and deploy:
-
-```bash
 rm -f data/keyword_proposals.jsonl
 vercel build --prod
 vercel deploy --prebuilt --prod
 ```
 
-## 3. Updating Content (Including OpenClaw)
+Expected:
+- deploy command returns production URL
 
-You can update data in this project in multiple ways.
+## 4. Updating Knowledge Content
 
-### 3.1 Method A: OpenClaw Ingestion (Recommended)
+Use either OpenClaw ingestion or manual editing.
 
-Use this for URL / YouTube / PDF / DOC / DOCX / PPT / PPTX / MD / TXT.
+### 4.1 Method A - OpenClaw Ingestion (Preferred)
 
-Prepare draft:
+Step 1: Prepare draft
 
 ```bash
 python scripts/ingest_item.py prepare \
@@ -132,13 +113,13 @@ python scripts/ingest_item.py prepare \
   --output /tmp/oaboutai_draft.json
 ```
 
-Fill bilingual fields in draft:
-- `title.en` / `title.zh-tw`
-- `executive_summary.en` / `executive_summary.zh-tw`
-- `detailed_notes.en` / `detailed_notes.zh-tw`
+Step 2: Complete required bilingual fields in draft JSON
+- `title.en`, `title.zh-tw`
+- `executive_summary.en`, `executive_summary.zh-tw`
+- `detailed_notes.en`, `detailed_notes.zh-tw`
 - `keywords`, `topics`, `source_date`
 
-Dry-run:
+Step 3: Dry run
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -146,7 +127,7 @@ python scripts/ingest_item.py ingest \
   --dry-run
 ```
 
-Write + checks:
+Step 4: Write + checks
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -154,7 +135,7 @@ python scripts/ingest_item.py ingest \
   --run-checks
 ```
 
-Optional direct push:
+Step 5 (optional): Write + checks + push
 
 ```bash
 python scripts/ingest_item.py ingest \
@@ -163,65 +144,67 @@ python scripts/ingest_item.py ingest \
   --git-push
 ```
 
-### 3.2 Method B: Manual Markdown Update
+### 4.2 Method B - Manual Markdown Editing
 
-1. Add canonical entry at:
-   - `content/en/items/<slug>/index.md`
-2. Add paired zh-TW entry at:
-   - `content/zh-tw/items/<slug>/index.md`
-3. Use only controlled IDs from:
-   - `data/topics.json`
-   - `data/keywords.json`
-4. Validate and build:
+1. Create canonical EN entry:
+- `content/en/items/<slug>/index.md`
+2. Create zh-TW paired entry:
+- `content/zh-tw/items/<slug>/index.md`
+3. Use only IDs from:
+- `data/topics.json`
+- `data/keywords.json`
+4. Run checks:
 
 ```bash
+python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 ```
 
-## 4. CI Auto-Resolve Behavior
+## 5. Agent-Safe Operational Rules
 
-CI includes:
+For AI agents working in this repo:
+- Always run `python3 scripts/auto_resolve_content_issues.py` before validation.
+- Always run `python3 scripts/validate_content.py` before build/push.
+- Always remove `data/keyword_proposals.jsonl` before Hugo build.
+- Never publish zh-TW-only items without EN canonical pair.
+- Never invent keyword/topic IDs not present in data registries.
 
-```bash
-python scripts/auto_resolve_content_issues.py
-```
+## 6. Common Failure Cases
 
-This step auto-handles common blockers before strict validation:
-- maps unknown keywords to fallback controlled keyword
-- appends unknown keyword terms to `data/keyword_proposals.jsonl`
-- removes non-existent attachment references
+### 6.1 `unknown keywords [...]`
 
-## 5. Troubleshooting
+Action:
+- run `python3 scripts/auto_resolve_content_issues.py`
+- re-run validator
 
-### 5.1 `unknown keywords [...]` in validation
+### 6.2 `attachment ... not found in bundle`
 
-- Use keyword IDs from `data/keywords.json`.
-- If term is missing, add proposal to `data/keyword_proposals.jsonl`.
+Action:
+- place file under `content/en/items/<slug>/`, or
+- remove/fix front matter `attachments`
 
-### 5.2 `attachment ... not found in bundle`
+### 6.3 Hugo fails due to `keyword_proposals.jsonl`
 
-- Ensure file exists in `content/en/items/<slug>/`, or
-- remove/fix `attachments` in front matter.
-
-### 5.3 Hugo build fails on `data/keyword_proposals.jsonl`
-
-Run build guard:
+Action:
 
 ```bash
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 ```
 
-### 5.4 `npx --yes hugo-bin` network errors
+### 6.4 `npx --yes hugo-bin` network failure
 
-- Retry on stable network, or
-- install Hugo Extended locally and use `hugo` directly.
+Action:
+- retry with stable network, or
+- install Hugo Extended locally and use `hugo` directly
 
-## 6. First Successful Run Checklist
+## 7. Final Ready Checklist
 
-- `python3 scripts/validate_content.py` passes
-- `npx --yes hugo-bin server -D` starts
-- `rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify` succeeds
+A fresh environment is considered ready when all are true:
+- `python3 scripts/auto_resolve_content_issues.py` exits `0`
+- `python3 scripts/validate_content.py` exits `0`
+- `npx --yes hugo-bin server -D` runs successfully
+- `rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify` exits `0`
 - `public/index.html` exists
