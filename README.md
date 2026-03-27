@@ -4,7 +4,7 @@
 [![Demo Site](https://img.shields.io/badge/Demo-oaboutai.vercel.app-000?logo=vercel)](https://oaboutai.vercel.app/)
 [![Hugo](https://img.shields.io/badge/Hugo-0.152.2-ff4088?logo=hugo)](https://gohugo.io/)
 
-Bilingual Hugo knowledge archive for AI Policy / Governance / Safety.
+Bilingual Hugo knowledge archive with **Core + App Overlay** architecture.
 
 Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
@@ -25,9 +25,12 @@ cd OaboutAI
 python3 -m pip install --upgrade pip pyyaml
 ```
 
-3. Run metadata auto-fix and validation:
+3. Compose default app (`oaboutai`) and run checks:
 
 ```bash
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
 ```
@@ -53,11 +56,12 @@ This repository enforces predictable, machine-maintained publishing:
 
 ## Core Structure
 
-- Canonical entry: `content/en/items/<slug>/index.md`
-- zh-TW pair: `content/zh-tw/items/<slug>/index.md`
-- Topic registry: `data/topics.json`
-- Keyword registry: `data/keywords.json`
-- Keyword proposal queue: `data/keyword_proposals.jsonl`
+- Shared framework: `core/`
+- App customization/content: `apps/<app-id>/`
+- Default app: `apps/oaboutai/`
+- App manifest: `apps/<app-id>/app.toml`
+- Compose script: `scripts/compose_site.py`
+- Topic sync script: `scripts/sync_topics.py`
 - Ingestion script: `scripts/ingest_item.py`
 - Validator: `scripts/validate_content.py`
 - Auto-resolver: `scripts/auto_resolve_content_issues.py`
@@ -126,9 +130,12 @@ python scripts/ingest_item.py ingest \
 
 ## Local Development
 
-Run local server:
+Run local server from composed workspace:
 
 ```bash
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python3 scripts/sync_topics.py
 npx --yes hugo-bin server -D
 ```
 
@@ -140,10 +147,12 @@ Browse:
 Workflow: `.github/workflows/docs-site-ci.yml`
 
 Pipeline order:
-1. `python scripts/auto_resolve_content_issues.py`
-2. `python scripts/validate_content.py`
-3. `hugo --gc --minify` (with `data/keyword_proposals.jsonl` removed)
-4. Deploy to Vercel on `main`
+1. `python scripts/compose_site.py --app-id <app>`
+2. `python scripts/sync_topics.py`
+3. `python scripts/auto_resolve_content_issues.py`
+4. `python scripts/validate_content.py`
+5. `hugo --gc --minify` (with `data/keyword_proposals.jsonl` removed)
+6. Deploy to Vercel on `main` (default app: `oaboutai`)
 
 Required GitHub secret:
 - `VERCEL_TOKEN`

@@ -3,34 +3,39 @@ name: docs-site-ci
 on:
   push:
     paths:
-      - "archetypes/**"
-      - "assets/**"
-      - "content/**"
-      - "data/**"
-      - "i18n/**"
-      - "layouts/**"
-      - "themes/**"
+      - "core/**"
+      - "apps/**"
       - "scripts/**"
-      - "hugo.toml"
+      - "docs/**"
+      - "README.md"
+      - "INSTALL.md"
+      - "AGENTS.md"
       - "vercel.json"
       - ".github/workflows/docs-site-ci.yml"
   pull_request:
     paths:
-      - "archetypes/**"
-      - "assets/**"
-      - "content/**"
-      - "data/**"
-      - "i18n/**"
-      - "layouts/**"
-      - "themes/**"
+      - "core/**"
+      - "apps/**"
       - "scripts/**"
-      - "hugo.toml"
+      - "docs/**"
+      - "README.md"
+      - "INSTALL.md"
+      - "AGENTS.md"
       - "vercel.json"
       - ".github/workflows/docs-site-ci.yml"
+  workflow_dispatch:
+    inputs:
+      app_id:
+        description: "App id under apps/<app-id>"
+        required: false
+        default: "oaboutai"
 
 jobs:
   validate-and-build:
     runs-on: ubuntu-latest
+    env:
+      APP_ID: ${{ github.event.inputs.app_id || 'oaboutai' }}
+      COMPOSED_SITE: /tmp/oaboutai-site
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -43,11 +48,20 @@ jobs:
       - name: Install validator dependency
         run: pip install pyyaml
 
+      - name: Compose site (core + app)
+        run: python scripts/compose_site.py --app-id "${APP_ID}" --output "${COMPOSED_SITE}" --clean
+
+      - name: Sync topic pages from topics.json
+        run: python scripts/sync_topics.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
       - name: Auto-resolve common metadata issues
         run: python scripts/auto_resolve_content_issues.py
+        working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Validate content metadata
         run: python scripts/validate_content.py
+        working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Install Hugo Extended
         run: |
@@ -60,15 +74,19 @@ jobs:
         run: |
           rm -f data/keyword_proposals.jsonl
           hugo --gc --minify
+        working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Verify build output
         run: test -f public/index.html
+        working-directory: ${{ env.COMPOSED_SITE }}
 
   deploy-vercel:
     needs: validate-and-build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
+      APP_ID: oaboutai
+      COMPOSED_SITE: /tmp/oaboutai-site
       VERCEL_ORG_ID: team_RTKyG0Rcfpu4LYhgPpGRJqJK
       VERCEL_PROJECT_ID: prj_1e1JptyR4OdLQ7653OBGl40QL1nc
     steps:
@@ -90,14 +108,25 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
+      - name: Compose site (core + app)
+        run: python scripts/compose_site.py --app-id "${APP_ID}" --output "${COMPOSED_SITE}" --clean
+
+      - name: Sync topic pages from topics.json
+        run: python scripts/sync_topics.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
       - name: Pull Vercel project settings
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Remove transient keyword proposal queue before Vercel build
         run: rm -f data/keyword_proposals.jsonl
+        working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Build Vercel artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Deploy to Vercel Production
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ${{ env.COMPOSED_SITE }}

@@ -3,8 +3,8 @@
 你是 OaboutAI 的內容入庫與發布 agent。你必須對所有可讀來源（URL、YouTube、PDF、DOC、DOCX、PPT、PPTX、MD、TXT 等）執行一致流程：雙語產生、規範化 metadata、驗證、Git push。
 
 ## 1) 路徑與語言
-- 必建英文 canonical：`content/en/items/<slug>/index.md`
-- 必建繁中翻譯：`content/zh-tw/items/<slug>/index.md`
+- 必建英文 canonical：`apps/<app-id>/content/en/items/<slug>/index.md`
+- 必建繁中翻譯：`apps/<app-id>/content/zh-tw/items/<slug>/index.md`
 - 禁止只有 zh-tw 沒有 en
 - `<slug>`：`YYYYMMDD-short-kebab-title`
 
@@ -27,13 +27,13 @@
 - DOC/DOCX/PPT/PPTX/MD/TXT/其他可讀檔 -> `other`
 
 ## 4) Taxonomy
-- `topics` 只能使用 `data/topics.json` 的 id
-- `keywords` 只能使用 `data/keywords.json` 的 id
-- 無精準 keyword：選最接近 id，並 append 一行 JSON 到 `data/keyword_proposals.jsonl`
+- `topics` 只能使用 `apps/<app-id>/data/topics.json` 的 id
+- `keywords` 只能使用 `apps/<app-id>/data/keywords.json` 的 id
+- 無精準 keyword：選最接近 id，並 append 一行 JSON 到 `apps/<app-id>/data/keyword_proposals.jsonl`
 - 不得在 entry 發明新 keyword id
 
 ## 5) 附件規則
-- 若為一般可公開來源，可依需要將附件放到 `content/en/items/<slug>/`。
+- 若為一般可公開來源，可依需要將附件放到 `apps/<app-id>/content/en/items/<slug>/`。
 - 若為使用者上傳且可能涉及版權之檔案：
   - 原檔保留在 Google Drive（`cclljj.agent@gmail.com` / `Ebook_Documents`，權限控管）
   - 不把原檔提交到公開 repo
@@ -47,7 +47,7 @@
 
 ## 7) 完成門檻
 - `python scripts/validate_content.py` 必須通過
-- 建置前先執行 `rm -f data/keyword_proposals.jsonl`
+- 建置前先執行 `python scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean && cd /tmp/oaboutai-site && python scripts/sync_topics.py && rm -f data/keyword_proposals.jsonl`
 - 再執行 `npx --yes hugo-bin --gc --minify` 並通過
 - 失敗先修復再重跑，不可跳過
 
@@ -55,7 +55,7 @@
 - Repo: `https://github.com/cclljj/OaboutAI.git`
 - Branch: `main`
 - Commit message: `content: add <slug> (<source_type>)`
-- `git add`（新建條目與 `data/keyword_proposals.jsonl`）
+- `git add`（新建條目與 `apps/<app-id>/data/keyword_proposals.jsonl`）
 - `git commit`
 - `git push origin main`
 - 若 HTTPS interactive auth 失敗，使用 SSH host alias（例如 `github.com-oaboutai`）推送。

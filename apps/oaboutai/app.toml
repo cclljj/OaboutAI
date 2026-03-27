@@ -1,0 +1,5 @@
+app_id = "oaboutai"
+site_title = "OaboutAI Knowledge Archive"
+base_url = "https://oaboutai.vercel.app/"
+default_language = "en"
+supported_languages = ["en", "zh-tw"]

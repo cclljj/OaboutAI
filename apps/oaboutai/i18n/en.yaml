@@ -1,0 +1,72 @@
+- id: monthlyArchive
+  translation: Monthly Archive
+- id: browseByTopic
+  translation: Browse by Topic
+- id: browseByKeyword
+  translation: Browse by Keyword
+- id: browseByType
+  translation: Browse by Type
+- id: browseAllEntries
+  translation: Browse All Entries
+- id: topics
+  translation: Topics
+- id: types
+  translation: Types
+- id: recentEntries
+  translation: Recent Entries
+- id: heroEyebrowDefault
+  translation: Curated Knowledge Archive
+- id: submittedOn
+  translation: Submitted on
+- id: sourceDate
+  translation: Source date
+- id: noEntriesYet
+  translation: No entries yet.
+- id: newestFirst
+  translation: Entries are ordered from newest to oldest.
+- id: sourceType
+  translation: Source type
+- id: sourceUrl
+  translation: Source URL
+- id: keywords
+  translation: Keywords
+- id: executiveSummary
+  translation: Executive Summary
+- id: detailedNotes
+  translation: Detailed Notes
+- id: takeAway
+  translation: Take-away
+- id: attachments
+  translation: Attachments
+- id: entriesInTopic
+  translation: Entries in this topic
+- id: noEntriesInTopic
+  translation: No entries found for this topic.
+- id: menuSearch
+  translation: Search
+- id: sortBy
+  translation: Sort by
+- id: sortOrder
+  translation: Order
+- id: sortNewestFirst
+  translation: Newest to oldest
+- id: sortOldestFirst
+  translation: Oldest to newest
+- id: itemsPerPage
+  translation: Per page
+- id: previousPage
+  translation: Previous
+- id: nextPage
+  translation: Next
+- id: pageStatus
+  translation: Page %d of %d
+- id: searchPlaceholderLong
+  translation: Search all entries (EN + zh-TW)...
+- id: searchTypeToStart
+  translation: Start typing to search.
+- id: searchNoResults
+  translation: No matching entries found.
+- id: searchResultsCount
+  translation: "%d results found"
+- id: searchResultLanguage
+  translation: Language

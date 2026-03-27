@@ -36,6 +36,9 @@ python3 -m pip install --upgrade pip pyyaml
 python3 --version
 node --version
 npx --yes hugo-bin version
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
 ```
@@ -47,6 +50,9 @@ Expected:
 ### 2.4 Run Local Site
 
 ```bash
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python3 scripts/sync_topics.py
 npx --yes hugo-bin server -D
 ```
 
@@ -56,6 +62,9 @@ Open:
 ### 2.5 Production-Equivalent Local Build
 
 ```bash
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python3 scripts/sync_topics.py
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 test -f public/index.html
@@ -150,12 +159,15 @@ python scripts/ingest_item.py ingest \
 - `content/en/items/<slug>/index.md`
 2. Create zh-TW paired entry:
 - `content/zh-tw/items/<slug>/index.md`
-3. Use only IDs from:
-- `data/topics.json`
-- `data/keywords.json`
+3. Use only IDs from app-level registries:
+- `apps/<app-id>/data/topics.json`
+- `apps/<app-id>/data/keywords.json`
 4. Run checks:
 
 ```bash
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
 rm -f data/keyword_proposals.jsonl
@@ -167,6 +179,7 @@ npx --yes hugo-bin --gc --minify
 For AI agents working in this repo:
 - Always run `python3 scripts/auto_resolve_content_issues.py` before validation.
 - Always run `python3 scripts/validate_content.py` before build/push.
+- Always run `python3 scripts/sync_topics.py` after compose to reflect topic config changes.
 - Always remove `data/keyword_proposals.jsonl` before Hugo build.
 - Never publish zh-TW-only items without EN canonical pair.
 - Never invent keyword/topic IDs not present in data registries.

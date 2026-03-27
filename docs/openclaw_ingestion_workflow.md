@@ -65,6 +65,9 @@ python scripts/ingest_item.py ingest \
 
 Manual pre-push build guard (recommended, mirrors CI/Vercel):
 ```bash
+python scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+cd /tmp/oaboutai-site
+python scripts/sync_topics.py
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 ```
@@ -78,10 +81,10 @@ python scripts/ingest_item.py ingest \
 ```
 
 ## Expected Outputs
-- `content/en/items/<slug>/index.md`
-- `content/zh-tw/items/<slug>/index.md` (required; no English-only entries)
-- Attachments in `content/en/items/<slug>/`
-- Appended lines in `data/keyword_proposals.jsonl` when provided
+- `apps/<app-id>/content/en/items/<slug>/index.md`
+- `apps/<app-id>/content/zh-tw/items/<slug>/index.md` (required; no English-only entries)
+- Attachments in `apps/<app-id>/content/en/items/<slug>/`
+- Appended lines in `apps/<app-id>/data/keyword_proposals.jsonl` when provided
 
 ## Fixed Quality Gate (must pass before push)
 1. English + zh-tw both exist for the same slug.

@@ -1,6 +1,6 @@
 # AGENTS.md - OaboutAI Hugo Knowledge Archive
 
-This document is the authoritative operating manual for agents that contribute to and maintain this repository root Hugo site.
+This document is the authoritative operating manual for agents that contribute to and maintain this composable Hugo site (`core` + `apps/<app-id>`).
 
 ## 1. Design Logic
 
@@ -17,15 +17,22 @@ Core principles:
 
 ## 2. Directory Contract
 
-You must follow these paths exactly:
+Monorepo contract:
+
+- Shared framework: `core/`
+- App content/customization: `apps/<app-id>/`
+- Default app in this repo: `apps/oaboutai/`
+
+Inside each app root (`apps/<app-id>/`), follow:
 
 - Canonical entries: `content/en/items/<slug>/index.md`
 - Optional zh-TW translation: `content/zh-tw/items/<slug>/index.md`
-- Topic pages: `content/<lang>/topics/<topic>.md`
+- Topic pages: `content/<lang>/topics/<topic>.md` (managed by `scripts/sync_topics.py`)
 - Monthly archive page: `content/<lang>/archive/monthly.md`
 - Topic source of truth: `data/topics.json`
 - Keyword source of truth: `data/keywords.json`
 - Keyword proposal queue: `data/keyword_proposals.jsonl`
+- App manifest: `app.toml`
 
 Attachment rule:
 
@@ -60,20 +67,16 @@ Optional fields:
 
 ### Topics
 
-- `data/topics.json` is the source of truth.
+- `apps/<app-id>/data/topics.json` is the source of truth.
 - Keep no more than 10 top-level topics.
-- Current required topics:
-  - `ai-policy`
-  - `ai-governance`
-  - `ai-safety`
 - Entries can belong to multiple topics.
 
 ### Keywords
 
-- Use only IDs from `data/keywords.json`.
+- Use only IDs from `apps/<app-id>/data/keywords.json`.
 - If no exact keyword exists:
   1. Choose the closest existing keyword.
-  2. Append one JSON line to `data/keyword_proposals.jsonl` with candidate term and rationale.
+  2. Append one JSON line to `apps/<app-id>/data/keyword_proposals.jsonl` with candidate term and rationale.
 - Do not publish entries with invented keyword IDs.
 
 ## 5. Language Policy
@@ -118,7 +121,10 @@ Procedure:
    - `python scripts/ingest_item.py ingest --spec-file /tmp/oaboutai_draft.json --dry-run`
 4. Write files and run checks:
    - `python scripts/ingest_item.py ingest --spec-file /tmp/oaboutai_draft.json --run-checks`
-5. Build guard (required before push):
+5. Compose + topic sync + build guard (required before push):
+   - `python scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean`
+   - `cd /tmp/oaboutai-site`
+   - `python scripts/sync_topics.py`
    - `rm -f data/keyword_proposals.jsonl`
    - `npx --yes hugo-bin --gc --minify`
 6. Push path (if requested):
@@ -126,10 +132,10 @@ Procedure:
 
 Expected outputs:
 
-- `content/en/items/<slug>/index.md`
-- `content/zh-tw/items/<slug>/index.md`
-- Attachments under `content/en/items/<slug>/`
-- Optional proposals appended to `data/keyword_proposals.jsonl`
+- `apps/<app-id>/content/en/items/<slug>/index.md`
+- `apps/<app-id>/content/zh-tw/items/<slug>/index.md`
+- Attachments under `apps/<app-id>/content/en/items/<slug>/`
+- Optional proposals appended to `apps/<app-id>/data/keyword_proposals.jsonl`
 
 Copyright-safe mode (for user-uploaded files, default for `[doc]` tasks):
 
@@ -153,16 +159,16 @@ Git push convention:
 
 ### Add a new topic
 
-1. Add topic object in `data/topics.json`.
+1. Add topic object in `apps/<app-id>/data/topics.json`.
 2. Ensure topic count remains <= 10.
-3. Add topic page in `content/en/topics/` and optional `content/zh-tw/topics/`.
-4. Update menus in `hugo.toml` when needed.
+3. Run `python scripts/sync_topics.py` to regenerate topic pages.
+4. Do not hardcode topic menu links in app `hugo.toml`; use the shared Topics entry.
 
 ### Add a new keyword
 
-1. Add keyword object in `data/keywords.json` with stable `id`, bilingual labels, and optional aliases.
+1. Add keyword object in `apps/<app-id>/data/keywords.json` with stable `id`, bilingual labels, and optional aliases.
 2. Backfill existing entries if this resolves overloaded keyword mapping.
-3. Remove processed suggestion lines from `data/keyword_proposals.jsonl`.
+3. Remove processed suggestion lines from `apps/<app-id>/data/keyword_proposals.jsonl`.
 
 ## 9. Quality Gate
 
