@@ -1,4 +1,4 @@
-﻿---
+---
 title: Judge sides with Anthropic to temporarily block the Pentagon’s ban (The Verge)
 date: 2026-03-28
 source_url: https://www.theverge.com/ai-artificial-intelligence/902149/anthropic-dod-pentagon-lawsuit-supply-chain-risk-injunction

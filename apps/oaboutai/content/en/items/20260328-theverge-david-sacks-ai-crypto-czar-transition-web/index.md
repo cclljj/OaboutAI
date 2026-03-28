@@ -1,4 +1,4 @@
-﻿---
+---
 title: David Sacks is no longer the White House AI and Crypto Czar (The Verge)
 date: 2026-03-28
 source_url: https://www.theverge.com/policy/902140/david-sacks-out-ai-crypto-czar

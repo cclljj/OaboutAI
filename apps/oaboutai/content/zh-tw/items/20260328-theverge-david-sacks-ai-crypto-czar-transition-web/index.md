@@ -1,4 +1,4 @@
-﻿---
+---
 title: David Sacks 不再擔任白宮 AI 與加密沙皇（The Verge）
 date: 2026-03-28
 source_url: https://www.theverge.com/policy/902140/david-sacks-out-ai-crypto-czar

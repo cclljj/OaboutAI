@@ -1,4 +1,4 @@
-﻿---
+---
 title: 法官暫時阻止五角大廈對 Anthropic 的封鎖令（The Verge）
 date: 2026-03-28
 source_url: https://www.theverge.com/ai-artificial-intelligence/902149/anthropic-dod-pentagon-lawsuit-supply-chain-risk-injunction
