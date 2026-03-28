@@ -1,5 +1,5 @@
 ﻿---
-title: Robotics Advisory Group: Expressions of Interest for co-chair and external expert advisors (GOV.UK)
+title: "Robotics Advisory Group: Expressions of Interest for co-chair and external expert advisors (GOV.UK)"
 date: 2026-03-28
 source_url: https://www.gov.uk/government/news/robotics-advisory-group-expressions-of-interest-for-co-chair-and-external-expert-advisors
 source_type: webpage
