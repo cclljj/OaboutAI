@@ -1,4 +1,4 @@
-﻿---
+---
 title: Taiwan’s Flagship Supercomputer “JingChuang-26” to Launch in Q3, Expanding National AI Compute
 date: 2026-03-29
 source_url: https://www.cna.com.tw/news/ait/202603290021.aspx

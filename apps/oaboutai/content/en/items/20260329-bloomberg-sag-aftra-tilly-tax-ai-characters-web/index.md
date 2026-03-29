@@ -1,4 +1,4 @@
-﻿---
+---
 title: Actors Union Is Bargaining for “Tilly Tax” On AI Film Characters
 date: 2026-03-29
 source_url: https://www.bloomberg.com/news/articles/2026-03-28/sag-aftra-actors-union-bargaining-for-tilly-tax-on-ai-film-characters

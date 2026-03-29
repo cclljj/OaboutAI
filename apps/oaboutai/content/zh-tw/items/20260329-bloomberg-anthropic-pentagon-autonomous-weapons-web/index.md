@@ -1,4 +1,4 @@
-﻿---
+---
 title: Anthropic、五角大廈與自主武器邊界之爭
 date: 2026-03-29
 source_url: https://www.bloomberg.com/news/articles/2026-03-28/anthropic-s-fight-with-us-military-over-future-of-autonomous-weapons

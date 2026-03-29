@@ -1,4 +1,4 @@
-﻿---
+---
 title: 台灣最強超級電腦「晶創26」第3季上線，國家算力布局加速
 date: 2026-03-29
 source_url: https://www.cna.com.tw/news/ait/202603290021.aspx

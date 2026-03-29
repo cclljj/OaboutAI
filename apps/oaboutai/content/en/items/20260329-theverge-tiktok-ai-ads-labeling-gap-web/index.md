@@ -1,4 +1,4 @@
-﻿---
+---
 title: Why can’t TikTok identify AI generated ads when I can?
 date: 2026-03-29
 source_url: https://www.theverge.com/ai-artificial-intelligence/900400/tiktok-ai-ads-labels-samsung-disclosure

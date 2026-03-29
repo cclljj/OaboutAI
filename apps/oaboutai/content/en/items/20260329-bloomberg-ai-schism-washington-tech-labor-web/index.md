@@ -1,4 +1,4 @@
-﻿---
+---
 title: AI Schism Grips Washington as Tech, Labor Vie for Upper Hand
 date: 2026-03-29
 source_url: https://www.bloomberg.com/news/articles/2026-03-28/ai-schism-grips-washington-as-tech-labor-vie-for-upper-hand

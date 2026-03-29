@@ -1,4 +1,4 @@
-﻿---
+---
 title: Anthropic, the Pentagon, and the Future of Autonomous Weapons
 date: 2026-03-29
 source_url: https://www.bloomberg.com/news/articles/2026-03-28/anthropic-s-fight-with-us-military-over-future-of-autonomous-weapons

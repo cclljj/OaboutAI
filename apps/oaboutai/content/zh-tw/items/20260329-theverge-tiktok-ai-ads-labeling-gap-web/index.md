@@ -1,4 +1,4 @@
-﻿---
+---
 title: 為何 TikTok 連我都看得出的 AI 廣告卻標不出來？
 date: 2026-03-29
 source_url: https://www.theverge.com/ai-artificial-intelligence/900400/tiktok-ai-ads-labels-samsung-disclosure

@@ -1,4 +1,4 @@
-﻿---
+---
 title: AI 監管分歧擴大：華府科技與勞工陣營角力
 date: 2026-03-29
 source_url: https://www.bloomberg.com/news/articles/2026-03-28/ai-schism-grips-washington-as-tech-labor-vie-for-upper-hand
