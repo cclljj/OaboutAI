@@ -599,7 +599,28 @@
     return output;
   }
 
+  function syncLanguageSwitchQueryParams() {
+    const current = new URL(window.location.href);
+    if (!current.search) return;
+    const links = Array.from(document.querySelectorAll(".hextra-language-options a[href]"));
+    for (const link of links) {
+      const rawHref = link.getAttribute("href") || "";
+      if (!rawHref || rawHref.startsWith("#")) continue;
+      let target;
+      try {
+        target = new URL(rawHref, window.location.origin);
+      } catch (_error) {
+        continue;
+      }
+      if (target.origin !== window.location.origin) continue;
+      target.search = current.search;
+      link.setAttribute("href", `${target.pathname}${target.search}${target.hash}`);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", async () => {
+    syncLanguageSwitchQueryParams();
+
     const labels = getLabels();
     const roots = Array.from(document.querySelectorAll("[data-oa-protected-view]"));
     if (!roots.length) return;
