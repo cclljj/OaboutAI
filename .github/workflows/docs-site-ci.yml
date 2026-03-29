@@ -199,3 +199,8 @@ jobs:
       - name: Deploy to Vercel Production
         run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Post-deploy smoke tests
+        env:
+          BASE_URL: https://oaboutai.vercel.app
+        run: bash scripts/smoke_test_routes.sh

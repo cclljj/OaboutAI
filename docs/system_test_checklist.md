@@ -162,6 +162,10 @@ After GitHub Actions + Vercel deploy:
 3. Verify `/keywords/` and `/types/` drill-down no longer 404.
 4. Verify language switch on entry preserves slug.
 
+Automated in CI:
+- `.github/workflows/docs-site-ci.yml` now runs `scripts/smoke_test_routes.sh` after production deploy.
+- script covers key route availability and rewrite compatibility in EN + zh-tw paths.
+
 ## 7. Known Failure Signatures and Quick Diagnosis
 
 1. Symptom: entry page shows only title/shell.
