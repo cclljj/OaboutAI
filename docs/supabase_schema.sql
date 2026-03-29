@@ -1,5 +1,10 @@
 -- OaboutAI Supabase schema for protected article delivery + per-user favorites.
 -- Run in Supabase SQL editor.
+--
+-- Current production notes:
+-- 1) `public.articles` is the runtime source-of-truth for protected content.
+-- 2) `language` must stay canonical (`en`, `zh-tw`) for list pages to render correctly.
+-- 3) RLS allows article reads only for authenticated users.
 
 create extension if not exists pgcrypto;
 

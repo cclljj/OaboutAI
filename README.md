@@ -2,49 +2,58 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/cclljj/OaboutAI/docs-site-ci.yml?branch=main&label=CI)](https://github.com/cclljj/OaboutAI/actions/workflows/docs-site-ci.yml)
 [![Demo Site](https://img.shields.io/badge/Demo-oaboutai.vercel.app-000?logo=vercel)](https://oaboutai.vercel.app/)
-[![Last Commit](https://img.shields.io/github/last-commit/cclljj/OaboutAI?label=last%20commit)](https://github.com/cclljj/OaboutAI/commits/main)
-[![Stars](https://img.shields.io/github/stars/cclljj/OaboutAI?style=social)](https://github.com/cclljj/OaboutAI/stargazers)
-[![Issues](https://img.shields.io/github/issues/cclljj/OaboutAI)](https://github.com/cclljj/OaboutAI/issues)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cclljj/OaboutAI/pulls)
 [![Hugo](https://img.shields.io/badge/Hugo-0.152.2-ff4088?logo=hugo)](https://gohugo.io/)
 
-Composable bilingual Hugo knowledge archive for AI policy/governance/safety curation.
+OaboutAI is a bilingual Hugo site with **protected content delivery via Supabase**.
 
-Production app: `oaboutai`
+Production app: `oaboutai`  
 Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
-## Overview
+## Current Architecture (Important)
 
-Repository model:
-- `core/`: reusable framework
-- `apps/<app-id>/`: app-specific content/config
+This repository now uses a strict split:
+- `core/` + `apps/<app-id>/`: Hugo shell (layout, navigation, static pages, client app bootstrapping)
+- Supabase (`articles`, `favorites`): protected article data and per-user state
 
-This repo is optimized for:
-- machine-maintained publishing workflows
-- strict metadata and controlled vocabularies
-- parallel human + AI agent operations
+What this means:
+- The public repo no longer stores full article markdown bundles under `apps/.../content/*/items/*/index.md`.
+- Page content is loaded client-side after Google sign-in.
+- Unauthenticated users only see shell pages (no protected article body in HTML source).
+
+## Repository Model
+
+- `core/`: reusable framework (layouts, assets, scripts)
+- `apps/<app-id>/`: app-specific configuration/content shell
+- default app: `apps/oaboutai/`
+- workflow entrypoints: `scripts/*.py`
+
+## Runtime Features
+
+- Google OAuth (Supabase Auth)
+- Auth-gated article list and single-item view
+- Per-user favorites (`favorites` table)
+- Dynamic `topics`, `keywords`, `types` counts from Supabase article rows
+- Legacy compatibility rewrites:
+  - `/items/<slug>` -> `/item/?slug=<slug>`
+  - `/zh-tw/items/<slug>` -> `/zh-tw/item/?slug=<slug>`
+
+## Required Runtime Env Vars (Vercel)
+
+Set these in Vercel project settings:
+- `HUGO_SUPABASE_URL`
+- `HUGO_SUPABASE_ANON_KEY`
+- `HUGO_SUPABASE_REDIRECT_URL`
 
 ## Documentation Map
 
-- `README.md` (this file): quick orientation and architecture overview
-- `INSTALL.md`: full setup/run/deploy commands (human + AI agent operations)
-- `AGENTS.md`: strict agent contract, constraints, and governance
+- `INSTALL.md`: setup, local run, deploy, and Supabase operations
+- `docs/supabase_schema.sql`: DB + RLS schema
+- `docs/supabase_operations.md`: day-2 operations (seed/import/checklist)
+- `AGENTS.md`: repo operating contract for AI agents
+- `docs/openclaw_ingestion_workflow.md`: legacy markdown ingestion notes and migration guidance
+- `docs/openclaw_system_prompt.md`: legacy agent prompt template
 
-## Architecture
-
-- Shared framework: `core/`
-- App overlay: `apps/<app-id>/`
-- Default app in this repo: `apps/oaboutai/`
-- App manifest: `apps/<app-id>/app.toml`
-- Script wrappers (stable entrypoints): `scripts/*.py`
-
-Wrappers forward to `core/scripts/*.py` and default `APP_ID=oaboutai` when not set.
-
-## Quick Start
-
-Use [INSTALL.md](INSTALL.md) for full commands.
-
-Minimal local start:
+## Local Development (Quick)
 
 ```bash
 python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
@@ -53,53 +62,18 @@ python3 scripts/sync_topics.py
 npx --yes hugo-bin server -D
 ```
 
-## Key Content Rules
+Open `http://localhost:1313/`.
 
-- Every item must include EN canonical + zh-TW pair.
-- Topics/keywords must use app registries (`data/topics.json`, `data/keywords.json`).
-- Slug format: `YYYYMMDD-short-kebab-title`.
-
-## Content Contract
-
-Required front matter fields for each item:
-- `title`
-- `source_url`
-- `source_type` (`webpage|pdf|youtube|other`)
-- `types` (array where `types[0]` is the primary type and must equal `source_type`; additional secondary types allowed)
-- `source_date` (`YYYY-MM-DD`)
-- `submission_date` (`YYYY-MM-DD`)
-- `executive_summary`
-- `detailed_notes`
-- `keywords` (IDs from app `data/keywords.json`)
-- `primary_topic` (single ID from app `data/topics.json`)
-- `topics` (secondary IDs from app `data/topics.json`, excluding `primary_topic`)
-- `language` (`en|zh-tw`)
-
-## OpenClaw Ingestion
-
-- `docs/openclaw_ingestion_workflow.md`
-- `docs/openclaw_system_prompt.md`
-
-## Local Development
-
-See [INSTALL.md](INSTALL.md) section 4 and section 5 for dev server and CI-equivalent build guard.
-
-## CI/CD (GitHub Actions + Vercel)
+## CI/CD
 
 Workflow: `.github/workflows/docs-site-ci.yml`
 
-Pipeline:
-1. Compose `core + app`
-2. Sync topic pages from `data/topics.json`
-3. Auto-resolve/validate metadata
-4. Build Hugo site
-5. Deploy to Vercel (push to `main`, app fixed to `oaboutai`)
+Pipeline summary:
+1. compose `core + app`
+2. sync topics
+3. validate content shell metadata
+4. Hugo build
+5. deploy composed output to Vercel (push to `main`)
 
 Required secret:
 - `VERCEL_TOKEN`
-
-## Related Docs
-
-- Setup and deployment: [INSTALL.md](INSTALL.md)
-- Agent operating rules: [AGENTS.md](AGENTS.md)
-- OpenClaw ingestion: [docs/openclaw_ingestion_workflow.md](docs/openclaw_ingestion_workflow.md)

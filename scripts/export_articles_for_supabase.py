@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
-Export Hugo item content into JSONL rows suitable for Supabase `articles` table import.
+Legacy helper: export Hugo markdown item bundles into JSONL rows suitable for
+Supabase `articles` table import.
+
+Note:
+  In the current Supabase-first production model, the public repo may contain
+  zero tracked `content/*/items/*/index.md` files. In that case this script
+  will export 0 rows.
 
 Usage:
   python3 scripts/export_articles_for_supabase.py \
