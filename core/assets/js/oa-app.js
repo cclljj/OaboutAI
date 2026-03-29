@@ -222,7 +222,9 @@
 
   function articleHref(slug) {
     const encoded = encodeURIComponent(String(slug || ""));
-    return `/item/?slug=${encoded}`;
+    const currentLang = normalizeLang(document.documentElement.lang);
+    const base = currentLang === "zh-tw" ? "/zh-tw/item/" : "/item/";
+    return `${base}?slug=${encoded}`;
   }
 
   function favoriteButton(slug, isSaved, labels) {
@@ -622,6 +624,19 @@
       return (data || []).sort(byNewest);
     }
 
+    async function fetchArticleBySlug(slug, preferredLang) {
+      if (!slug) return null;
+      const fallbackLang = preferredLang === "zh-tw" ? "en" : "zh-tw";
+      const { data, error } = await client
+        .from("articles")
+        .select(ARTICLE_COLUMNS)
+        .eq("slug", slug)
+        .in("language", [preferredLang, fallbackLang]);
+      if (error) return null;
+      const rows = data || [];
+      return rows.find((row) => row.language === preferredLang) || rows[0] || null;
+    }
+
     async function renderViews() {
       const { data: sessionData } = await client.auth.getSession();
       const user = sessionData?.session?.user || null;
@@ -645,7 +660,10 @@
         const filters = collectFilters(root);
 
         if (filters.view === "item_single") {
-          const target = articles.find((record) => record.slug === filters.slug);
+          let target = articles.find((record) => record.slug === filters.slug);
+          if (!target && filters.slug) {
+            target = await fetchArticleBySlug(filters.slug, lang);
+          }
           renderSingle(root, target, labels, favoriteSlugs);
           continue;
         }
