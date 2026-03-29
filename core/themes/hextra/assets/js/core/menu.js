@@ -3,7 +3,9 @@
 document.addEventListener('DOMContentLoaded', function () {
   const menu = document.querySelector('.hextra-hamburger-menu');
   const sidebarContainer = document.querySelector('.hextra-sidebar-container');
+  if (!menu || !sidebarContainer) return;
   const mobileQuery = window.matchMedia('(max-width: 767px)');
+  let lastPointerAt = 0;
 
   function isMenuOpen() {
     return menu.querySelector('svg').classList.contains('open');
@@ -54,10 +56,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
   menu.addEventListener('click', (e) => {
     e.preventDefault();
-    // Pointer-initiated clicks on mobile should not force focus into the search input,
-    // which opens the software keyboard immediately.
-    toggleMenu({ focusOnOpen: e.detail === 0 });
+    // Pointer/touch-initiated clicks on mobile should not force focus into the
+    // search input, which opens the software keyboard immediately.
+    const pointerLike = e.detail > 0 || (Date.now() - lastPointerAt) < 700;
+    toggleMenu({ focusOnOpen: !pointerLike });
   });
+
+  menu.addEventListener('pointerdown', () => {
+    lastPointerAt = Date.now();
+  });
+
+  menu.addEventListener('touchstart', () => {
+    lastPointerAt = Date.now();
+  }, { passive: true });
 
   // Close menu on Escape key (mobile only)
   document.addEventListener('keydown', (e) => {

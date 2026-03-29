@@ -156,3 +156,27 @@ npx --yes hugo-bin --gc --minify
 ### 9.4 `npx --yes hugo-bin` network failure
 - Retry with stable network
 - Or install Hugo Extended and run `hugo --gc --minify`
+
+## 10. Supabase Auth + Favorites Setup
+
+1. Create a Supabase project.
+2. In Supabase SQL editor, run `docs/supabase_schema.sql`.
+3. Configure Google provider under `Authentication -> Providers -> Google`.
+4. Set redirect URL to your site URL (e.g. `https://oaboutai.vercel.app`).
+5. Export article rows from Hugo content:
+
+```bash
+python3 scripts/export_articles_for_supabase.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai_articles.jsonl
+```
+
+6. Import `/tmp/oaboutai_articles.jsonl` into Supabase `articles` table.
+7. Set Supabase values in `apps/oaboutai/hugo.toml`:
+
+```bash
+[params.supabase]
+url = "https://<project-ref>.supabase.co"
+anonKey = "<anon-public-key>"
+redirectUrl = "https://oaboutai.vercel.app"
+```
+
+8. Deploy. Users must sign in with Google to view protected article content.

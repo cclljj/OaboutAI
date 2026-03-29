@@ -8,15 +8,18 @@
     <meta name="robots" content="noindex, nofollow" />
   {{ end -}}
   {{ partialCached "favicons.html" . -}}
+  {{- $privateContentMode := site.Params.privateContent | default false -}}
   <title>
-    {{- if .IsHome -}}
+    {{- if $privateContentMode -}}
+      {{ .Site.Title -}}
+    {{- else if .IsHome -}}
       {{ .Site.Title -}}
     {{ else -}}
       {{ with .Title }}{{ . }} – {{ end -}}
       {{ .Site.Title -}}
     {{ end -}}
   </title>
-  <meta name="description" content="{{ partial "utils/page-description.html" . }}" />
+  <meta name="description" content="{{ if $privateContentMode }}{{ .Site.Params.description }}{{ else }}{{ partial "utils/page-description.html" . }}{{ end }}" />
 
   {{- with .Params.canonical -}}
     <link rel="canonical" href="{{ . }}" itemprop="url" />
@@ -24,9 +27,11 @@
     <link rel="canonical" href="{{ .Permalink }}" itemprop="url" />
   {{- end -}}
 
-  {{- partial "opengraph.html" . -}}
-  {{- partial "schema.html" . -}}
-  {{- partial "twitter_cards.html" . -}}
+  {{- if not $privateContentMode -}}
+    {{- partial "opengraph.html" . -}}
+    {{- partial "schema.html" . -}}
+    {{- partial "twitter_cards.html" . -}}
+  {{- end -}}
 
   {{- $mainCss := resources.Get "css/compiled/main.css" -}}
   {{- $customCss := resources.Get "css/custom.css" -}}

@@ -76,3 +76,21 @@
   translation: 共找到 %d 筆結果
 - id: searchResultLanguage
   translation: 語言
+- id: loadingProtectedContent
+  translation: 正在載入受保護內容...
+- id: loginRequired
+  translation: 請先使用 Google 登入後再瀏覽內容。
+- id: supabaseConfigMissing
+  translation: Supabase 尚未設定完成，請設定 SUPABASE_URL 與 SUPABASE_ANON_KEY。
+- id: signInWithGoogle
+  translation: 使用 Google 登入
+- id: signOut
+  translation: 登出
+- id: signedInAs
+  translation: 目前登入
+- id: myFavorites
+  translation: 我的收藏
+- id: save
+  translation: 收藏
+- id: saved
+  translation: 已收藏

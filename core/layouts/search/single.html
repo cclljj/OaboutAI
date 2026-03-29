@@ -2,29 +2,8 @@
 <div class="oa-shell">
   <h1 class="oa-page-title">{{ .Title }}</h1>
   <div class="oa-page-subtitle">{{ .Content }}</div>
-
-  {{- $indexName := printf "%s.oa-search-index.json" .Site.Language.Lang -}}
-  {{- $index := resources.Get "json/oa-search-index.json" | resources.ExecuteAsTemplate $indexName . -}}
-  {{- if hugo.IsProduction -}}
-    {{- $index = $index | minify | fingerprint -}}
-  {{- end -}}
-
-  <section
-    class="oa-search-page"
-    data-oa-search-page
-    data-index-url="{{ $index.RelPermalink }}"
-    data-no-results-text="{{ i18n "searchNoResults" }}"
-    data-type-to-start-text="{{ i18n "searchTypeToStart" }}"
-    data-results-count-template="{{ i18n "searchResultsCount" }}"
-    data-language-label="{{ i18n "searchResultLanguage" }}"
-    data-source-date-label="{{ i18n "sourceDate" }}"
-    data-submission-date-label="{{ i18n "submittedOn" }}"
-  >
-    <div class="oa-search-input-wrap">
-      <input class="oa-search-input" type="search" placeholder="{{ i18n "searchPlaceholderLong" }}" data-oa-search-input />
-    </div>
-    <p class="oa-search-status" data-oa-search-status>{{ i18n "searchTypeToStart" }}</p>
-    <div class="oa-search-results" data-oa-search-results></div>
+  <section data-oa-protected-view="search">
+    <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
   </section>
 </div>
 {{ end }}

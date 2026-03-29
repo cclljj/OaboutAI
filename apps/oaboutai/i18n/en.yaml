@@ -76,3 +76,21 @@
   translation: "%d results found"
 - id: searchResultLanguage
   translation: Language
+- id: loadingProtectedContent
+  translation: Loading protected content...
+- id: loginRequired
+  translation: Please sign in with Google to view this content.
+- id: supabaseConfigMissing
+  translation: Supabase is not configured yet. Please set SUPABASE_URL and SUPABASE_ANON_KEY.
+- id: signInWithGoogle
+  translation: Sign in with Google
+- id: signOut
+  translation: Sign out
+- id: signedInAs
+  translation: Signed in as
+- id: myFavorites
+  translation: My Favorites
+- id: save
+  translation: Save
+- id: saved
+  translation: Saved

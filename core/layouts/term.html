@@ -4,50 +4,13 @@
     <div class="oa-shell">
       <h1 class="oa-page-title">{{ .Title }}</h1>
       {{ with .Content }}<div class="oa-page-subtitle">{{ . }}</div>{{ end }}
-      {{ $sorted := sort .Pages "Params.source_date" "desc" }}
-      {{ $topicLabels := dict }}
-      {{ range site.Data.topics }}
-        {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
-      {{ end }}
-      <div class="oa-sort-controls" data-oa-sort-controls>
-        <label class="oa-sort-label" for="oa-sort-by">{{ i18n "sortBy" }}</label>
-        <select id="oa-sort-by" class="oa-sort-select" data-oa-sort-by>
-          <option value="source_date">{{ i18n "sourceDate" }}</option>
-          <option value="submission_date">{{ i18n "submittedOn" }}</option>
-        </select>
-        <label class="oa-sort-label" for="oa-sort-order">{{ i18n "sortOrder" }}</label>
-        <select id="oa-sort-order" class="oa-sort-select" data-oa-sort-order>
-          <option value="desc">{{ i18n "sortNewestFirst" }}</option>
-          <option value="asc">{{ i18n "sortOldestFirst" }}</option>
-        </select>
-        <label class="oa-sort-label" for="oa-page-size">{{ i18n "itemsPerPage" }}</label>
-        <select id="oa-page-size" class="oa-sort-select" data-oa-page-size>
-          <option value="10">10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-      <div class="oa-entry-list" data-oa-sort-list>
-        {{ range $idx, $entry := $sorted }}
-          <article class="oa-entry-card" data-source-date="{{ $entry.Params.source_date }}" data-submission-date="{{ $entry.Params.submission_date }}" data-sort-index="{{ $idx }}">
-            <h3><a class="oa-entry-title" href="{{ $entry.RelPermalink }}">{{ $entry.Title }}</a></h3>
-            <p class="oa-meta">
-              <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
-              <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
-              <span class="oa-chip">{{ $entry.Params.source_type }}</span>
-              {{ partial "oa-topic-chips.html" (dict "entry" $entry "topicLabels" $topicLabels) }}
-            </p>
-            <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
-          </article>
-        {{ else }}
-          <p>{{ i18n "noEntriesYet" }}</p>
-        {{ end }}
-      </div>
-      <div class="oa-pagination" data-oa-pagination>
-        <button class="oa-page-btn" type="button" data-oa-page-prev>{{ i18n "previousPage" }}</button>
-        <span class="oa-page-status" data-oa-page-status data-template="{{ i18n "pageStatus" }}"></span>
-        <button class="oa-page-btn" type="button" data-oa-page-next>{{ i18n "nextPage" }}</button>
+      <div
+        class="oa-entry-list"
+        data-oa-protected-view="term"
+        data-oa-term-type="{{ .Data.Plural }}"
+        data-oa-term-value="{{ .Data.Term }}"
+      >
+        <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
       </div>
     </div>
   {{ else }}

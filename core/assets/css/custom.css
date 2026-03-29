@@ -457,6 +457,63 @@
   margin-top: 0.4rem;
 }
 
+.oa-entry-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.oa-favorite-btn,
+.oa-auth-btn {
+  border: 1px solid #b7d1e3;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f4a66;
+  font-size: 0.76rem;
+  font-weight: 620;
+  line-height: 1;
+  min-height: 1.9rem;
+  padding: 0.4rem 0.7rem;
+  cursor: pointer;
+}
+
+.oa-favorite-btn:hover,
+.oa-auth-btn:hover {
+  border-color: rgba(15, 118, 110, 0.5);
+  background: #ebf8f6;
+}
+
+.oa-favorite-btn.is-saved {
+  border-color: rgba(15, 118, 110, 0.52);
+  background: rgba(15, 118, 110, 0.11);
+  color: #0e6d66;
+}
+
+.oa-auth-controls {
+  color: #3a5b72;
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.oa-auth-controls-mobile {
+  padding: 0.2rem 0.5rem;
+}
+
+.oa-auth-user {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 16rem;
+}
+
+.oa-auth-gate {
+  border: 1px dashed #bfd6e6;
+  border-radius: var(--oa-radius-md);
+  background: #f8fcff;
+  padding: 1rem;
+}
+
 @media (max-width: 920px) {
   .oa-shell {
     padding: 1rem 1rem 2rem;
@@ -511,5 +568,14 @@
   .oa-sort-controls {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .oa-entry-card-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .oa-auth-user {
+    max-width: 13rem;
   }
 }

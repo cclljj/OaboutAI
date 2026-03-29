@@ -1,8 +1,42 @@
-{{- $sortScript := resources.Get "js/oa-sort-controls.js" -}}
-{{- $searchScript := resources.Get "js/oa-search-page.js" -}}
+{{- $supabaseURL := site.Params.supabase.url | default "" -}}
+{{- $supabaseAnonKey := site.Params.supabase.anonKey | default "" -}}
+{{- $supabaseRedirectURL := site.Params.supabase.redirectUrl | default "" -}}
+
+<meta name="oa-supabase-url" content="{{ $supabaseURL }}">
+<meta name="oa-supabase-anon-key" content="{{ $supabaseAnonKey }}">
+<meta name="oa-supabase-redirect-url" content="{{ $supabaseRedirectURL }}">
+
+{{- $labels := dict
+  "loading" (i18n "loadingProtectedContent")
+  "loginRequired" (i18n "loginRequired")
+  "configMissing" (i18n "supabaseConfigMissing")
+  "signIn" (i18n "signInWithGoogle")
+  "signOut" (i18n "signOut")
+  "signedInAs" (i18n "signedInAs")
+  "myFavorites" (i18n "myFavorites")
+  "sourceDate" (i18n "sourceDate")
+  "submissionDate" (i18n "submittedOn")
+  "sourceType" (i18n "sourceType")
+  "sourceUrl" (i18n "sourceUrl")
+  "keywords" (i18n "keywords")
+  "primaryTopic" (i18n "primaryTopic")
+  "otherTopics" (i18n "otherTopics")
+  "executiveSummary" (i18n "executiveSummary")
+  "detailedNotes" (i18n "detailedNotes")
+  "takeAway" (i18n "takeAway")
+  "attachments" (i18n "attachments")
+  "noEntriesYet" (i18n "noEntriesYet")
+  "noResults" (i18n "searchNoResults")
+  "searchPlaceholder" (i18n "searchPlaceholderLong")
+  "searchTypeToStart" (i18n "searchTypeToStart")
+  "save" (i18n "save")
+  "saved" (i18n "saved")
+-}}
+<script id="oa-labels" type="application/json">{{ $labels | jsonify | safeHTML }}</script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+{{- $appScript := resources.Get "js/oa-app.js" -}}
 {{- if hugo.IsProduction -}}
-  {{- $sortScript = $sortScript | minify | fingerprint -}}
-  {{- $searchScript = $searchScript | minify | fingerprint -}}
+  {{- $appScript = $appScript | minify | fingerprint -}}
 {{- end -}}
-<script defer src="{{ $sortScript.RelPermalink }}" {{ with $sortScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
-<script defer src="{{ $searchScript.RelPermalink }}" {{ with $searchScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
+<script defer src="{{ $appScript.RelPermalink }}" {{ with $appScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>

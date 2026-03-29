@@ -18,12 +18,18 @@ enableGitInfo = false
   term = ["HTML", "RSS"]
 
 [permalinks]
-  items = "/items/:slug/"
+  items = "/items/:contentbasename/"
 
 [params]
   description = "Agent-maintained archive for AI policy, governance, and safety resources."
+  privateContent = true
   displayUpdatedDate = true
   dateFormat = "2006-01-02"
+
+  [params.supabase]
+    url = ""
+    anonKey = ""
+    redirectUrl = ""
 
   [params.search]
     enable = true

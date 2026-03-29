@@ -9,6 +9,10 @@
 }
 
 .hextra-sidebar-container {
+  .hextra-sidebar-collapsible-button {
+    @apply hx:w-6 hx:h-6 hx:flex hx:items-center hx:justify-center;
+  }
+
   li > .hextra-sidebar-children {
     @apply hx:h-0;
   }

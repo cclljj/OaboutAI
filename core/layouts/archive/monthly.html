@@ -2,47 +2,8 @@
 <div class="oa-shell">
   <h1 class="oa-page-title">{{ .Title }}</h1>
   <div class="oa-page-subtitle">{{ .Content }}</div>
-
-  {{ $items := where site.RegularPages "Section" "items" }}
-  {{ $sorted := sort $items "Params.source_date" "desc" }}
-  {{ $topicLabels := dict }}
-  {{ $months := slice }}
-  {{ $monthScratch := newScratch }}
-  {{ range site.Data.topics }}
-    {{ $topicLabels = merge $topicLabels (dict .id (index .title $.Site.Language.Lang | default .id)) }}
-  {{ end }}
-  {{ range $entry := $sorted }}
-    {{ $monthKey := dateFormat "2006-01" (time $entry.Params.source_date) }}
-    {{ if not ($monthScratch.Get (printf "seen-%s" $monthKey)) }}
-      {{ $months = $months | append $monthKey }}
-      {{ $monthScratch.Set (printf "seen-%s" $monthKey) true }}
-    {{ end }}
-    {{ $monthScratch.Add (printf "entries-%s" $monthKey) (slice $entry) }}
-  {{ end }}
-
-  {{ if gt (len $months) 0 }}
-    {{ range $month := $months }}
-      {{ $entries := $monthScratch.Get (printf "entries-%s" $month) }}
-      <section class="oa-section">
-        <h2 class="oa-section-title">{{ $month }} <span class="oa-chip">{{ len $entries }}</span></h2>
-        <div class="oa-entry-list">
-          {{ range $entry := $entries }}
-            <article class="oa-entry-card">
-              <h3><a class="oa-entry-title" href="{{ $entry.RelPermalink }}">{{ $entry.Title }}</a></h3>
-              <p class="oa-meta">
-                <span class="oa-chip">{{ i18n "sourceDate" }} {{ $entry.Params.source_date }}</span>
-                <span class="oa-chip">{{ i18n "submittedOn" }} {{ $entry.Params.submission_date }}</span>
-                <span class="oa-chip">{{ $entry.Params.source_type }}</span>
-                {{ partial "oa-topic-chips.html" (dict "entry" $entry "topicLabels" $topicLabels) }}
-              </p>
-              <p class="oa-summary">{{ $entry.Params.executive_summary }}</p>
-            </article>
-          {{ end }}
-        </div>
-      </section>
-    {{ end }}
-  {{ else }}
-    <p>{{ i18n "noEntriesYet" }}</p>
-  {{ end }}
+  <div data-oa-protected-view="archive">
+    <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
+  </div>
 </div>
 {{ end }}

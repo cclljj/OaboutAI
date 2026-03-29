@@ -1,10 +1,9 @@
 {{ define "main" }}
 <div class="oa-shell">
   <h1 class="oa-page-title">{{ .Title }}</h1>
-  <p class="oa-page-subtitle">{{ i18n "newestFirst" }}</p>
-
-  <div class="oa-entry-list" data-oa-protected-view="items_list">
+  <div class="oa-page-subtitle">{{ .Content }}</div>
+  <section data-oa-protected-view="favorites">
     <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
-  </div>
+  </section>
 </div>
 {{ end }}
