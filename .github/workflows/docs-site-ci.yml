@@ -154,6 +154,38 @@ jobs:
               {
                 "source": "/zh-tw/items/:slug/",
                 "destination": "/zh-tw/item/?slug=:slug"
+              },
+              {
+                "source": "/keywords/:term",
+                "destination": "/items/?term_type=keywords&term_value=:term"
+              },
+              {
+                "source": "/keywords/:term/",
+                "destination": "/items/?term_type=keywords&term_value=:term"
+              },
+              {
+                "source": "/types/:term",
+                "destination": "/items/?term_type=types&term_value=:term"
+              },
+              {
+                "source": "/types/:term/",
+                "destination": "/items/?term_type=types&term_value=:term"
+              },
+              {
+                "source": "/zh-tw/keywords/:term",
+                "destination": "/zh-tw/items/?term_type=keywords&term_value=:term"
+              },
+              {
+                "source": "/zh-tw/keywords/:term/",
+                "destination": "/zh-tw/items/?term_type=keywords&term_value=:term"
+              },
+              {
+                "source": "/zh-tw/types/:term",
+                "destination": "/zh-tw/items/?term_type=types&term_value=:term"
+              },
+              {
+                "source": "/zh-tw/types/:term/",
+                "destination": "/zh-tw/items/?term_type=types&term_value=:term"
               }
             ]
           }

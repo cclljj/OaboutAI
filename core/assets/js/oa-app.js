@@ -494,11 +494,12 @@
   }
 
   function collectFilters(root) {
+    const params = new URLSearchParams(window.location.search);
     const view = root.dataset.oaProtectedView || "";
-    const topic = root.dataset.oaTopic || "";
-    const termType = root.dataset.oaTermType || "";
-    const termValue = root.dataset.oaTermValue || "";
-    const querySlug = new URLSearchParams(window.location.search).get("slug") || "";
+    const topic = root.dataset.oaTopic || params.get("topic") || "";
+    const termType = root.dataset.oaTermType || params.get("term_type") || "";
+    const termValue = root.dataset.oaTermValue || params.get("term_value") || "";
+    const querySlug = params.get("slug") || "";
     const slug = root.dataset.oaSlug || querySlug || "";
     return { view, topic, termType, termValue, slug };
   }
@@ -572,7 +573,7 @@
     root.innerHTML = `
       <div class="oa-term-grid">
         ${sorted.map(([term, count]) => `
-          <a class="oa-term-card" href="${escapeHtml(languagePath(`${termType}/${encodeURIComponent(String(term))}/`))}">
+          <a class="oa-term-card" href="${escapeHtml(languagePath(`items/?term_type=${encodeURIComponent(String(termType))}&term_value=${encodeURIComponent(String(term))}`))}">
             <span class="oa-term-label">${escapeHtml(term)}</span>
             <span class="oa-term-count">${count}</span>
           </a>
