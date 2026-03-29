@@ -49,6 +49,7 @@ Set these in Vercel project settings:
 - `INSTALL.md`: setup, local run, deploy, and Supabase operations
 - `docs/supabase_schema.sql`: DB + RLS schema
 - `docs/supabase_operations.md`: day-2 operations (seed/import/checklist)
+- `docs/system_test_checklist.md`: regression and release go/no-go checklist
 - `AGENTS.md`: repo operating contract for AI agents
 - `docs/openclaw_ingestion_workflow.md`: legacy markdown ingestion notes and migration guidance
 - `docs/openclaw_system_prompt.md`: legacy agent prompt template
