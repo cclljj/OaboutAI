@@ -626,15 +626,13 @@
 
     async function fetchArticleBySlug(slug, preferredLang) {
       if (!slug) return null;
-      const fallbackLang = preferredLang === "zh-tw" ? "en" : "zh-tw";
       const { data, error } = await client
         .from("articles")
         .select(ARTICLE_COLUMNS)
-        .eq("slug", slug)
-        .in("language", [preferredLang, fallbackLang]);
+        .eq("slug", slug);
       if (error) return null;
       const rows = data || [];
-      return rows.find((row) => row.language === preferredLang) || rows[0] || null;
+      return rows.find((row) => normalizeLang(row.language) === preferredLang) || rows[0] || null;
     }
 
     async function renderViews() {
