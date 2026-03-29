@@ -35,7 +35,7 @@ assert_contains_regex() {
     echo "FAIL: ${url} returned HTTP ${code}"
     exit 1
   fi
-  if ! rg -q "${pattern}" "${out}"; then
+  if ! grep -Eq "${pattern}" "${out}"; then
     echo "FAIL: ${url} missing expected marker pattern: ${pattern}"
     exit 1
   fi
