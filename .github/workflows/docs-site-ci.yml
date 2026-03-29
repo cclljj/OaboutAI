@@ -131,6 +131,17 @@ jobs:
         run: rm -f data/keyword_proposals.jsonl
         working-directory: ${{ env.COMPOSED_SITE }}
 
+      - name: Write compose-site Vercel config
+        run: |
+          cat > vercel.json <<'JSON'
+          {
+            "$schema": "https://openapi.vercel.sh/vercel.json",
+            "buildCommand": "rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
+            "outputDirectory": "public"
+          }
+          JSON
+        working-directory: ${{ env.COMPOSED_SITE }}
+
       - name: Build Vercel artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ${{ env.COMPOSED_SITE }}
