@@ -656,8 +656,9 @@
         let scoped = filterRecords(articles, filters);
 
         if (filters.view === "home_recent") {
-          scoped = scoped.slice(0, 10);
-          renderList(root, scoped, labels, favoriteSlugs);
+          renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+            renderList(node, pageItems, labels, favoriteSlugs);
+          }, () => bindGlobalActions(user));
           continue;
         }
 
