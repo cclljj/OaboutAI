@@ -35,7 +35,15 @@
     save: "Save",
     saved: "Saved",
     remove: "Remove",
-    openArticle: "Open"
+    openArticle: "Open",
+    sortBy: "Sort by",
+    sortOrder: "Order",
+    sortNewestFirst: "Newest to oldest",
+    sortOldestFirst: "Oldest to newest",
+    itemsPerPage: "Per page",
+    previousPage: "Previous",
+    nextPage: "Next",
+    pageStatus: "Page %d of %d"
   };
 
   const ARTICLE_COLUMNS = [
@@ -54,6 +62,17 @@
     "topics",
     "attachments"
   ].join(",");
+  const SORT_BY_KEY = "sort_by";
+  const SORT_ORDER_KEY = "sort_order";
+  const PAGE_SIZE_KEY = "page_size";
+  const PAGE_KEY = "page";
+  const DEFAULT_SORT_BY = "source_date";
+  const DEFAULT_SORT_ORDER = "desc";
+  const DEFAULT_PAGE_SIZE = 20;
+  const DEFAULT_PAGE = 1;
+  const VALID_SORT_BY = new Set(["source_date", "submission_date"]);
+  const VALID_SORT_ORDER = new Set(["asc", "desc"]);
+  const VALID_PAGE_SIZES = new Set([20, 50, 100]);
 
   function normalizeLang(value) {
     const lower = String(value || "en").toLowerCase();
@@ -88,6 +107,104 @@
 
   function byNewest(a, b) {
     return parseDate(b.source_date || b.submission_date) - parseDate(a.source_date || a.submission_date);
+  }
+
+  function normalize(value, valid, fallback) {
+    return valid.has(value) ? value : fallback;
+  }
+
+  function normalizePageSize(value) {
+    const parsed = Number.parseInt(String(value || ""), 10);
+    return VALID_PAGE_SIZES.has(parsed) ? parsed : DEFAULT_PAGE_SIZE;
+  }
+
+  function normalizePage(value) {
+    const parsed = Number.parseInt(String(value || ""), 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_PAGE;
+  }
+
+  function formatPageText(template, current, total) {
+    return String(template || "Page %d of %d")
+      .replace("%d", String(current))
+      .replace("%d", String(total));
+  }
+
+  function getListStateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+      sortBy: normalize(params.get(SORT_BY_KEY), VALID_SORT_BY, DEFAULT_SORT_BY),
+      sortOrder: normalize(params.get(SORT_ORDER_KEY), VALID_SORT_ORDER, DEFAULT_SORT_ORDER),
+      pageSize: normalizePageSize(params.get(PAGE_SIZE_KEY)),
+      page: normalizePage(params.get(PAGE_KEY))
+    };
+  }
+
+  function updateListStateInUrl(state) {
+    const url = new URL(window.location.href);
+    url.searchParams.set(SORT_BY_KEY, state.sortBy);
+    url.searchParams.set(SORT_ORDER_KEY, state.sortOrder);
+    url.searchParams.set(PAGE_SIZE_KEY, String(state.pageSize));
+    url.searchParams.set(PAGE_KEY, String(state.page));
+    window.history.replaceState({}, "", url);
+  }
+
+  function sortRecords(records, state) {
+    const direction = state.sortOrder === "asc" ? 1 : -1;
+    const primaryField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
+    return [...records].sort((a, b) => {
+      const aDate = parseDate(a[primaryField] || a.source_date || a.submission_date);
+      const bDate = parseDate(b[primaryField] || b.source_date || b.submission_date);
+      if (aDate === bDate) {
+        return String(a.slug || "").localeCompare(String(b.slug || ""));
+      }
+      return aDate < bDate ? -1 * direction : 1 * direction;
+    });
+  }
+
+  function paginateRecords(records, state) {
+    const totalPages = Math.max(1, Math.ceil(records.length / state.pageSize));
+    const safePage = Math.min(Math.max(state.page, 1), totalPages);
+    const start = (safePage - 1) * state.pageSize;
+    return {
+      page: safePage,
+      totalPages,
+      visible: records.slice(start, start + state.pageSize)
+    };
+  }
+
+  function controlsTemplate(labels) {
+    return `
+      <section class="oa-sort-controls" data-oa-list-controls>
+        <label class="oa-sort-label">
+          ${escapeHtml(labels.sortBy)}
+          <select class="oa-sort-select" data-oa-sort-by>
+            <option value="source_date">${escapeHtml(labels.sourceDate)}</option>
+            <option value="submission_date">${escapeHtml(labels.submissionDate)}</option>
+          </select>
+        </label>
+        <label class="oa-sort-label">
+          ${escapeHtml(labels.sortOrder)}
+          <select class="oa-sort-select" data-oa-sort-order>
+            <option value="desc">${escapeHtml(labels.sortNewestFirst)}</option>
+            <option value="asc">${escapeHtml(labels.sortOldestFirst)}</option>
+          </select>
+        </label>
+        <label class="oa-sort-label">
+          ${escapeHtml(labels.itemsPerPage)}
+          <select class="oa-sort-select" data-oa-page-size>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+        </label>
+      </section>
+      <div class="oa-entry-list" data-oa-list-content></div>
+      <nav class="oa-pagination" data-oa-pagination>
+        <button class="oa-page-btn" type="button" data-oa-page-prev>${escapeHtml(labels.previousPage)}</button>
+        <span class="oa-page-status" data-oa-page-status>${escapeHtml(labels.pageStatus)}</span>
+        <button class="oa-page-btn" type="button" data-oa-page-next>${escapeHtml(labels.nextPage)}</button>
+      </nav>
+    `;
   }
 
   function escapeHtml(value) {
@@ -235,6 +352,82 @@
     `;
   }
 
+  function mountCollectionControls(root, labels, state, onChange) {
+    root.innerHTML = controlsTemplate(labels);
+    const bySelect = root.querySelector("[data-oa-sort-by]");
+    const orderSelect = root.querySelector("[data-oa-sort-order]");
+    const pageSizeSelect = root.querySelector("[data-oa-page-size]");
+    const prevBtn = root.querySelector("[data-oa-page-prev]");
+    const nextBtn = root.querySelector("[data-oa-page-next]");
+
+    if (!bySelect || !orderSelect || !pageSizeSelect || !prevBtn || !nextBtn) return null;
+    bySelect.value = state.sortBy;
+    orderSelect.value = state.sortOrder;
+    pageSizeSelect.value = String(state.pageSize);
+
+    bySelect.onchange = () => {
+      state.sortBy = normalize(bySelect.value, VALID_SORT_BY, DEFAULT_SORT_BY);
+      state.page = DEFAULT_PAGE;
+      onChange();
+    };
+    orderSelect.onchange = () => {
+      state.sortOrder = normalize(orderSelect.value, VALID_SORT_ORDER, DEFAULT_SORT_ORDER);
+      state.page = DEFAULT_PAGE;
+      onChange();
+    };
+    pageSizeSelect.onchange = () => {
+      state.pageSize = normalizePageSize(pageSizeSelect.value);
+      state.page = DEFAULT_PAGE;
+      onChange();
+    };
+    prevBtn.onclick = () => {
+      state.page = Math.max(DEFAULT_PAGE, state.page - 1);
+      onChange();
+    };
+    nextBtn.onclick = () => {
+      state.page += 1;
+      onChange();
+    };
+    return {
+      bySelect,
+      orderSelect,
+      pageSizeSelect,
+      prevBtn,
+      nextBtn,
+      listRoot: root.querySelector("[data-oa-list-content]"),
+      statusNode: root.querySelector("[data-oa-page-status]")
+    };
+  }
+
+  function renderCollectionView(root, records, labels, state, renderPageItems, afterRender) {
+    const controls = mountCollectionControls(root, labels, state, rerender);
+    if (!controls) return;
+
+    function rerender() {
+      controls.bySelect.value = state.sortBy;
+      controls.orderSelect.value = state.sortOrder;
+      controls.pageSizeSelect.value = String(state.pageSize);
+
+      const sorted = sortRecords(records, state);
+      const paged = paginateRecords(sorted, state);
+      state.page = paged.page;
+
+      if (controls.statusNode) {
+        controls.statusNode.textContent = formatPageText(labels.pageStatus, paged.page, paged.totalPages);
+      }
+      controls.prevBtn.disabled = paged.page <= 1;
+      controls.nextBtn.disabled = paged.page >= paged.totalPages;
+      updateListStateInUrl(state);
+
+      renderPageItems(controls.listRoot, paged.visible);
+      if (typeof afterRender === "function") {
+        afterRender();
+      }
+    }
+
+    rerender();
+  }
+
   function applySearch(root, records, labels, favoritesSet) {
     root.innerHTML = `
       <section class="oa-search-page">
@@ -349,6 +542,7 @@
     });
 
     let favoriteSlugs = new Set();
+    const listState = getListStateFromUrl();
 
     async function loadFavorites(userId) {
       const { data, error } = await client
@@ -469,16 +663,22 @@
 
         if (filters.view === "favorites") {
           scoped = scoped.filter((record) => favoriteSlugs.has(record.slug));
-          renderList(root, scoped, labels, favoriteSlugs);
+          renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+            renderList(node, pageItems, labels, favoriteSlugs);
+          }, () => bindGlobalActions(user));
           continue;
         }
 
         if (filters.view === "archive") {
-          renderArchive(root, scoped, labels, favoriteSlugs);
+          renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+            renderArchive(node, pageItems, labels, favoriteSlugs);
+          }, () => bindGlobalActions(user));
           continue;
         }
 
-        renderList(root, scoped, labels, favoriteSlugs);
+        renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+          renderList(node, pageItems, labels, favoriteSlugs);
+        }, () => bindGlobalActions(user));
       }
 
       bindGlobalActions(user);
