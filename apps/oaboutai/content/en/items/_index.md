@@ -1,3 +1,3 @@
 ---
-title: "All Entries"
+title: "Entries"
 ---
