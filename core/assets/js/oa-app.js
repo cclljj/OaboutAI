@@ -697,14 +697,19 @@
 
     function renderAuthControls(user) {
       for (const node of authControls) {
+        const compact = node.dataset.oaAuthCompact === "true";
         if (!user) {
           node.innerHTML = `<button class=\"oa-auth-btn\" type=\"button\" data-oa-sign-in>${escapeHtml(labels.signIn)}</button>`;
         } else {
           const email = user.email || "";
-          node.innerHTML = `
-            <span class="oa-auth-user">${escapeHtml(labels.signedInAs)} ${escapeHtml(email)}</span>
-            <button class="oa-auth-btn" type="button" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>
-          `;
+          if (compact) {
+            node.innerHTML = `<button class=\"oa-auth-btn\" type=\"button\" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>`;
+          } else {
+            node.innerHTML = `
+              <span class="oa-auth-user">${escapeHtml(labels.signedInAs)} ${escapeHtml(email)}</span>
+              <button class="oa-auth-btn" type="button" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>
+            `;
+          }
         }
       }
       for (const node of favoritesNav) {
