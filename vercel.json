@@ -1,5 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
+  "buildCommand": "bash scripts/vercel_build.sh",
   "outputDirectory": "public"
 }
