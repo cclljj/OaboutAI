@@ -1,0 +1,9 @@
+{{ define "main" }}
+<div class="oa-shell">
+  <h1 class="oa-page-title">{{ .Title }}</h1>
+  {{ with .Content }}<div class="oa-page-subtitle">{{ . }}</div>{{ end }}
+  <section data-oa-protected-view="terms_catalog" data-oa-term-type="keywords">
+    <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
+  </section>
+</div>
+{{ end }}

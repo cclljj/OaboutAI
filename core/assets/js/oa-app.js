@@ -227,6 +227,12 @@
     return `${base}?slug=${encoded}`;
   }
 
+  function languagePath(path) {
+    const currentLang = normalizeLang(document.documentElement.lang);
+    const clean = String(path || "").replace(/^\/+/, "");
+    return currentLang === "zh-tw" ? `/zh-tw/${clean}` : `/${clean}`;
+  }
+
   function favoriteButton(slug, isSaved, labels) {
     const text = isSaved ? labels.saved : labels.save;
     return `<button class=\"oa-favorite-btn ${isSaved ? "is-saved" : ""}\" type=\"button\" data-oa-favorite-toggle data-slug=\"${escapeHtml(slug)}\">${escapeHtml(text)}</button>`;
@@ -497,6 +503,84 @@
     return { view, topic, termType, termValue, slug };
   }
 
+  function getTopicsCatalog() {
+    const node = document.getElementById("oa-topics-catalog");
+    const parsed = node ? parseJsonAttr(node.textContent, []) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  }
+
+  function renderTopicsCatalog(root, topics, records) {
+    const counts = new Map();
+    for (const topic of topics) {
+      counts.set(topic.id, 0);
+    }
+    for (const record of records) {
+      const seen = new Set();
+      if (record.primary_topic) {
+        seen.add(record.primary_topic);
+      }
+      if (Array.isArray(record.topics)) {
+        for (const topicId of record.topics) {
+          seen.add(topicId);
+        }
+      }
+      for (const topicId of seen) {
+        counts.set(topicId, (counts.get(topicId) || 0) + 1);
+      }
+    }
+    root.innerHTML = `
+      <div class="oa-topic-grid">
+        ${topics.map((topic) => `
+          <a class="oa-topic-card" href="${escapeHtml(topic.href || languagePath(`topics/${topic.id}/`))}">
+            <h3 class="oa-topic-title">${escapeHtml(topic.label || topic.id)}
+              <span class="oa-topic-count">${counts.get(topic.id) || 0}</span>
+            </h3>
+            <p class="oa-topic-description">${escapeHtml(topic.description || "")}</p>
+          </a>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderTermsCatalog(root, records, termType, labels) {
+    const counts = new Map();
+    if (termType === "keywords") {
+      for (const record of records) {
+        const terms = Array.isArray(record.keywords) ? record.keywords : [];
+        for (const term of terms) {
+          counts.set(term, (counts.get(term) || 0) + 1);
+        }
+      }
+    } else if (termType === "types") {
+      for (const record of records) {
+        const term = String(record.source_type || "").trim();
+        if (!term) continue;
+        counts.set(term, (counts.get(term) || 0) + 1);
+      }
+    }
+
+    const sorted = Array.from(counts.entries()).sort((a, b) => {
+      if (b[1] !== a[1]) return b[1] - a[1];
+      return String(a[0]).localeCompare(String(b[0]));
+    });
+
+    if (!sorted.length) {
+      root.innerHTML = `<p>${escapeHtml(labels.noEntriesYet)}</p>`;
+      return;
+    }
+
+    root.innerHTML = `
+      <div class="oa-term-grid">
+        ${sorted.map(([term, count]) => `
+          <a class="oa-term-card" href="${escapeHtml(languagePath(`${termType}/${encodeURIComponent(String(term))}/`))}">
+            <span class="oa-term-label">${escapeHtml(term)}</span>
+            <span class="oa-term-count">${count}</span>
+          </a>
+        `).join("")}
+      </div>
+    `;
+  }
+
   function filterRecords(records, filters) {
     let output = [...records];
     if (filters.topic) {
@@ -701,6 +785,16 @@
 
         if (filters.view === "search") {
           applySearch(root, articles, labels, favoriteSlugs);
+          continue;
+        }
+
+        if (filters.view === "topics_catalog") {
+          renderTopicsCatalog(root, getTopicsCatalog(), articles);
+          continue;
+        }
+
+        if (filters.view === "terms_catalog") {
+          renderTermsCatalog(root, articles, filters.termType, labels);
           continue;
         }
 
