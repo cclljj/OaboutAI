@@ -1,6 +1,6 @@
-{{- $supabaseURL := site.Params.supabase.url | default "" -}}
-{{- $supabaseAnonKey := site.Params.supabase.anonKey | default "" -}}
-{{- $supabaseRedirectURL := site.Params.supabase.redirectUrl | default "" -}}
+{{- $supabaseURL := site.Params.supabase.url | default (getenv "HUGO_SUPABASE_URL") | default "" -}}
+{{- $supabaseAnonKey := site.Params.supabase.anonKey | default (getenv "HUGO_SUPABASE_ANON_KEY") | default "" -}}
+{{- $supabaseRedirectURL := site.Params.supabase.redirectUrl | default (getenv "HUGO_SUPABASE_REDIRECT_URL") | default "" -}}
 
 <meta name="oa-supabase-url" content="{{ $supabaseURL }}">
 <meta name="oa-supabase-anon-key" content="{{ $supabaseAnonKey }}">
