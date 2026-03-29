@@ -1,5 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "bash scripts/vercel_build.sh",
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/items/:slug",
+      "destination": "/item/?slug=:slug"
+    },
+    {
+      "source": "/items/:slug/",
+      "destination": "/item/?slug=:slug"
+    },
+    {
+      "source": "/zh-tw/items/:slug",
+      "destination": "/zh-tw/item/?slug=:slug"
+    },
+    {
+      "source": "/zh-tw/items/:slug/",
+      "destination": "/zh-tw/item/?slug=:slug"
+    }
+  ]
 }

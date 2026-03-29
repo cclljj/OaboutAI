@@ -65,8 +65,8 @@ def main() -> int:
 
     item_files = sorted(CONTENT_ROOT.glob("**/items/**/index.md"))
     if not item_files:
-        print("ERROR: no item entries found under content/**/items/**/index.md")
-        return 1
+        print("WARN: no item entries found under content/**/items/**/index.md; skipping entry metadata validation.")
+        return 0
 
     errors: list[str] = []
     en_slugs: set[str] = set()

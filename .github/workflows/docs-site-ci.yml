@@ -137,7 +137,25 @@ jobs:
           {
             "$schema": "https://openapi.vercel.sh/vercel.json",
             "buildCommand": "rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
-            "outputDirectory": "public"
+            "outputDirectory": "public",
+            "rewrites": [
+              {
+                "source": "/items/:slug",
+                "destination": "/item/?slug=:slug"
+              },
+              {
+                "source": "/items/:slug/",
+                "destination": "/item/?slug=:slug"
+              },
+              {
+                "source": "/zh-tw/items/:slug",
+                "destination": "/zh-tw/item/?slug=:slug"
+              },
+              {
+                "source": "/zh-tw/items/:slug/",
+                "destination": "/zh-tw/item/?slug=:slug"
+              }
+            ]
           }
           JSON
         working-directory: ${{ env.COMPOSED_SITE }}

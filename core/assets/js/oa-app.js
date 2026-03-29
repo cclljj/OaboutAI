@@ -221,7 +221,8 @@
   }
 
   function articleHref(slug) {
-    return `/items/${encodeURIComponent(slug)}/`;
+    const encoded = encodeURIComponent(String(slug || ""));
+    return `/item/?slug=${encoded}`;
   }
 
   function favoriteButton(slug, isSaved, labels) {
@@ -477,7 +478,8 @@
     const topic = root.dataset.oaTopic || "";
     const termType = root.dataset.oaTermType || "";
     const termValue = root.dataset.oaTermValue || "";
-    const slug = root.dataset.oaSlug || "";
+    const querySlug = new URLSearchParams(window.location.search).get("slug") || "";
+    const slug = root.dataset.oaSlug || querySlug || "";
     return { view, topic, termType, termValue, slug };
   }
 
