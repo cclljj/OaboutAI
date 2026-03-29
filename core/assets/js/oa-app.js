@@ -355,6 +355,18 @@
     `;
   }
 
+  function renderSingleUnavailable(root, labels, slug, reason) {
+    const safeSlug = escapeHtml(slug || "-");
+    const safeReason = escapeHtml(reason || "");
+    root.innerHTML = `
+      <section class="oa-section oa-card">
+        <h2 class="oa-section-title">${escapeHtml(labels.noEntriesYet)}</h2>
+        <p>Slug: <code>${safeSlug}</code></p>
+        ${safeReason ? `<p>${safeReason}</p>` : ""}
+      </section>
+    `;
+  }
+
   function mountCollectionControls(root, labels, state, onChange) {
     root.innerHTML = controlsTemplate(labels);
     const bySelect = root.querySelector("[data-oa-sort-by]");
@@ -620,8 +632,8 @@
         .from("articles")
         .select(ARTICLE_COLUMNS)
         .eq("language", lang);
-      if (error) return [];
-      return (data || []).sort(byNewest);
+      if (error) return { rows: [], error };
+      return { rows: (data || []).sort(byNewest), error: null };
     }
 
     async function fetchArticleBySlug(slug, preferredLang) {
@@ -630,9 +642,12 @@
         .from("articles")
         .select(ARTICLE_COLUMNS)
         .eq("slug", slug);
-      if (error) return null;
+      if (error) return { row: null, error };
       const rows = data || [];
-      return rows.find((row) => normalizeLang(row.language) === preferredLang) || rows[0] || null;
+      return {
+        row: rows.find((row) => normalizeLang(row.language) === preferredLang) || rows[0] || null,
+        error: null
+      };
     }
 
     async function renderViews() {
@@ -651,18 +666,36 @@
       favoriteSlugs = await loadFavorites(user.id);
 
       const lang = normalizeLang(document.documentElement.lang);
-      const articles = await fetchArticles(lang);
+      const articleResult = await fetchArticles(lang);
+      const articles = articleResult.rows;
 
       for (const root of roots) {
         renderLoading(root, labels);
         const filters = collectFilters(root);
 
         if (filters.view === "item_single") {
-          let target = articles.find((record) => record.slug === filters.slug);
-          if (!target && filters.slug) {
-            target = await fetchArticleBySlug(filters.slug, lang);
+          let target = null;
+          let reason = "";
+          if (filters.slug) {
+            const single = await fetchArticleBySlug(filters.slug, lang);
+            target = single?.row || null;
+            if (single?.error) {
+              reason = `Query error: ${single.error.message || "unknown error"}`;
+            }
+          } else {
+            reason = "Missing slug query parameter.";
           }
-          renderSingle(root, target, labels, favoriteSlugs);
+          if (!target) {
+            target = articles.find((record) => record.slug === filters.slug) || null;
+          }
+          if (!target && !reason && articleResult.error) {
+            reason = `List query error: ${articleResult.error.message || "unknown error"}`;
+          }
+          if (!target) {
+            renderSingleUnavailable(root, labels, filters.slug, reason);
+          } else {
+            renderSingle(root, target, labels, favoriteSlugs);
+          }
           continue;
         }
 
