@@ -10,6 +10,15 @@ OaboutAI 是一個雙語（EN / zh-TW）的 AI 文獻知識庫網站，重點在
 
 Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
+## 3 分鐘快速理解
+
+如果你是第一次接觸這個專案，可以先知道這 5 件事：
+1. 這是一個 AI 文獻整理平台，不是一般部落格。
+2. 使用者登入後，才能閱讀完整內容。
+3. 文章資料存在資料庫（Supabase），不是放在 GitHub 公開 markdown。
+4. 可以用 Topic / Keyword / Type 快速篩選，並把文章加入個人收藏。
+5. 網站是雙語（英文 / 繁中），可直接切換語系閱讀。
+
 ## 專案目的
 
 這個專案解決的問題：
@@ -73,3 +82,17 @@ CI workflow：`.github/workflows/docs-site-ci.yml`
 - [docs/system_test_checklist.md](docs/system_test_checklist.md): 回歸測試與 release checklist
 - [AGENTS.md](AGENTS.md): AI/自動化代理的操作契約
 - [docs/openclaw_ingestion_workflow.md](docs/openclaw_ingestion_workflow.md): OpenClaw（legacy/staging）流程
+
+## 常見問答（FAQ）
+
+Q1. 為什麼 GitHub 裡看不到文章完整內容？  
+A: 目前採用受保護內容架構，文章內容以 Supabase 為準，避免公開 repo 直接外流。
+
+Q2. 沒登入可以看什麼？  
+A: 可以看到網站框架與導覽，但看不到受保護文章正文。
+
+Q3. 為什麼要用 Google 登入？  
+A: 用來做基礎授權控管，並支援每位使用者自己的收藏清單。
+
+Q4. 這個專案是給誰用的？  
+A: 給需要持續追蹤 AI 文獻、政策與治理資訊的研究者、PM、策略或治理團隊。
