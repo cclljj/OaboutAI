@@ -323,7 +323,7 @@
     const keywords = Array.isArray(record.keywords) ? record.keywords : [];
     const topics = Array.isArray(record.topics) ? record.topics : [];
     const attachments = Array.isArray(record.attachments) ? record.attachments : [];
-    const takeAway = String(record.takeaway_html || "").trim();
+    const takeAway = formatTakeAway(record.takeaway_html);
 
     root.innerHTML = `
       <article class="oa-single">
@@ -359,6 +359,35 @@
         ${attachments.length ? `<section class=\"oa-section oa-card\"><h2 class=\"oa-section-title\">${escapeHtml(labels.attachments)}</h2><ul>${attachments.map((a) => `<li>${escapeHtml(a)}</li>`).join("")}</ul></section>` : ""}
       </article>
     `;
+  }
+
+  function formatTakeAway(value) {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+
+    const hasHtmlTag = /<[a-z][\s\S]*>/i.test(raw);
+    if (hasHtmlTag) {
+      return raw;
+    }
+
+    const lines = raw
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    if (!lines.length) {
+      return "";
+    }
+
+    const bulletLike = /^([-*•]\s+|\d+[.)]\s+)/;
+    const normalized = lines.map((line) => line.replace(bulletLike, "").trim());
+    const shouldRenderList = lines.length > 1 || lines.every((line) => bulletLike.test(line));
+
+    if (shouldRenderList) {
+      return `<ul>${normalized.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>`;
+    }
+
+    return `<p>${escapeHtml(raw)}</p>`;
   }
 
   function renderSingleUnavailable(root, labels, slug, reason) {
