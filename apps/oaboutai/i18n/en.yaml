@@ -94,3 +94,107 @@
   translation: Save
 - id: saved
   translation: Saved
+- id: adminPanel
+  translation: Admin
+- id: accessApprovalRequired
+  translation: Access approval required
+- id: accessApprovalDescription
+  translation: Your Google account is signed in, but this archive is limited to approved users.
+- id: accessRequestReasonLabel
+  translation: Why do you need access?
+- id: accessRequestReasonPlaceholder
+  translation: Please briefly describe your role and why you need access to this archive.
+- id: submitAccessRequest
+  translation: Submit request
+- id: accessPendingMessage
+  translation: Your request is pending review.
+- id: accessDeniedMessage
+  translation: Your last request was not approved. You can submit a new reason below.
+- id: accessApprovedMessage
+  translation: Your access has been approved.
+- id: requestStatusPending
+  translation: Pending
+- id: requestStatusApproved
+  translation: Approved
+- id: requestStatusDenied
+  translation: Denied
+- id: requestSubmittedAt
+  translation: Submitted
+- id: requestReviewedAt
+  translation: Reviewed
+- id: requestReason
+  translation: Reason
+- id: requestStatus
+  translation: Status
+- id: requestActions
+  translation: Actions
+- id: requestRequester
+  translation: Requester
+- id: requestLoginHint
+  translation: Sign in to request access.
+- id: requestAdminHint
+  translation: Need access to protected content? Submit a request after signing in.
+- id: requestSubmitSuccess
+  translation: Request submitted.
+- id: requestSubmitError
+  translation: Unable to submit the request right now.
+- id: reasonRequired
+  translation: Please enter a reason before submitting.
+- id: adminOnly
+  translation: Admins only
+- id: adminUnauthorized
+  translation: You do not have permission to view this page.
+- id: adminPendingRequests
+  translation: Pending access requests
+- id: adminNoPendingRequests
+  translation: No pending access requests.
+- id: adminAllowlist
+  translation: Allowlist
+- id: adminAllowlistEmpty
+  translation: No allowlist entries yet.
+- id: adminAllowlistPlaceholder
+  translation: user@example.com
+- id: adminAddAllowlist
+  translation: Add to allowlist
+- id: adminAdmins
+  translation: Current admins
+- id: adminNoAdmins
+  translation: No admins found.
+- id: adminKnownUsers
+  translation: Existing users
+- id: adminNoKnownUsers
+  translation: No signed-in users yet.
+- id: adminApprove
+  translation: Approve
+- id: adminDeny
+  translation: Deny
+- id: adminMakeAdmin
+  translation: Make admin
+- id: adminRemoveAdmin
+  translation: Remove admin
+- id: adminRefresh
+  translation: Refresh
+- id: adminBootstrap
+  translation: Bootstrap admin
+- id: adminLastSeen
+  translation: Last seen
+- id: adminAccessMode
+  translation: Access path
+- id: adminAccessModeAllowlist
+  translation: Allowlisted
+- id: adminAccessModeRequest
+  translation: Requested
+- id: adminDashboardDescription
+  translation: Review access requests, maintain the allowlist, and manage admins.
+- id: adminExplicitRole
+  translation: Explicit admin
+- id: adminEmail
+  translation: Email
+- id: adminDisplayName
+  translation: Name
+- id: adminNoDisplayName
+  translation: Unnamed user
+- id: adminActionSuccess
+  translation: Saved.
+- id: adminActionError
+  translation: Unable to save that change right now.

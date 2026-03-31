@@ -3,11 +3,10 @@
    * @typedef {Object} AuthUser
    * @property {string} id
    * @property {string} [email]
-   * @property {string} [avatar]
-   * @property {string} [displayName]
+   * @property {Object} [user_metadata]
    */
 
-  /** @typedef {"loading" | "signed_out" | "signed_in"} AuthState */
+  const BOOTSTRAP_ADMIN_EMAIL = "cclljj@gmail.com";
 
   const DEFAULT_LABELS = {
     loading: "Loading protected content...",
@@ -17,6 +16,7 @@
     signOut: "Sign out",
     signedInAs: "Signed in as",
     myFavorites: "My Favorites",
+    adminPanel: "Admin",
     sourceDate: "Source date",
     submissionDate: "Submitted on",
     sourceType: "Source type",
@@ -43,7 +43,60 @@
     itemsPerPage: "Per page",
     previousPage: "Previous",
     nextPage: "Next",
-    pageStatus: "Page %d of %d"
+    pageStatus: "Page %d of %d",
+    accessApprovalRequired: "Access approval required",
+    accessApprovalDescription:
+      "Your Google account is signed in, but this archive is limited to approved users.",
+    accessRequestReasonLabel: "Why do you need access?",
+    accessRequestReasonPlaceholder:
+      "Please briefly describe your role and why you need access to this archive.",
+    submitAccessRequest: "Submit request",
+    accessPendingMessage: "Your request is pending review.",
+    accessDeniedMessage: "Your last request was not approved. You can submit a new reason below.",
+    accessApprovedMessage: "Your access has been approved.",
+    requestStatusPending: "Pending",
+    requestStatusApproved: "Approved",
+    requestStatusDenied: "Denied",
+    requestSubmittedAt: "Submitted",
+    requestReviewedAt: "Reviewed",
+    requestReason: "Reason",
+    requestStatus: "Status",
+    requestActions: "Actions",
+    requestRequester: "Requester",
+    requestLoginHint: "Sign in to request access.",
+    requestAdminHint: "Need access to protected content? Submit a request after signing in.",
+    requestSubmitSuccess: "Request submitted.",
+    requestSubmitError: "Unable to submit the request right now.",
+    reasonRequired: "Please enter a reason before submitting.",
+    adminOnly: "Admins only",
+    adminUnauthorized: "You do not have permission to view this page.",
+    adminPendingRequests: "Pending access requests",
+    adminNoPendingRequests: "No pending access requests.",
+    adminAllowlist: "Allowlist",
+    adminAllowlistEmpty: "No allowlist entries yet.",
+    adminAllowlistPlaceholder: "user@example.com",
+    adminAddAllowlist: "Add to allowlist",
+    adminAdmins: "Current admins",
+    adminNoAdmins: "No admins found.",
+    adminKnownUsers: "Existing users",
+    adminNoKnownUsers: "No signed-in users yet.",
+    adminApprove: "Approve",
+    adminDeny: "Deny",
+    adminMakeAdmin: "Make admin",
+    adminRemoveAdmin: "Remove admin",
+    adminRefresh: "Refresh",
+    adminBootstrap: "Bootstrap admin",
+    adminLastSeen: "Last seen",
+    adminAccessMode: "Access path",
+    adminAccessModeAllowlist: "Allowlisted",
+    adminAccessModeRequest: "Requested",
+    adminDashboardDescription: "Review access requests, maintain the allowlist, and manage admins.",
+    adminExplicitRole: "Explicit admin",
+    adminEmail: "Email",
+    adminDisplayName: "Name",
+    adminNoDisplayName: "Unnamed user",
+    adminActionSuccess: "Saved.",
+    adminActionError: "Unable to save that change right now."
   };
 
   const ARTICLE_COLUMNS = [
@@ -78,6 +131,10 @@
     const lower = String(value || "en").toLowerCase();
     if (lower.startsWith("zh")) return "zh-tw";
     return "en";
+  }
+
+  function normalizeEmail(value) {
+    return String(value || "").trim().toLowerCase();
   }
 
   function parseJsonAttr(value, fallback) {
@@ -216,8 +273,9 @@
       .replaceAll("'", "&#39;");
   }
 
-  function buildChip(text) {
-    return `<span class=\"oa-chip\">${escapeHtml(text)}</span>`;
+  function buildChip(text, tone) {
+    const toneClass = tone ? ` oa-chip-${tone}` : "";
+    return `<span class="oa-chip${toneClass}">${escapeHtml(text)}</span>`;
   }
 
   function articleHref(slug) {
@@ -233,9 +291,49 @@
     return currentLang === "zh-tw" ? `/zh-tw/${clean}` : `/${clean}`;
   }
 
+  function formatDateTime(value) {
+    if (!value) return "-";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return String(value);
+    return parsed.toLocaleString();
+  }
+
+  function getUserProfile(user) {
+    const metadata = user?.user_metadata || {};
+    const email = normalizeEmail(user?.email || metadata.email || "");
+    const displayName = String(metadata.full_name || metadata.name || metadata.user_name || email || "").trim();
+    const avatar = String(metadata.avatar_url || metadata.picture || "").trim();
+    return {
+      email,
+      displayName,
+      avatar
+    };
+  }
+
+  function getInitials(value) {
+    const words = String(value || "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (!words.length) return "U";
+    return words
+      .slice(0, 2)
+      .map((word) => word[0] || "")
+      .join("")
+      .toUpperCase();
+  }
+
+  function renderAvatar(profile, sizeClass) {
+    const label = profile.displayName || profile.email || "User";
+    if (profile.avatar) {
+      return `<img class="oa-account-avatar ${sizeClass || ""}" src="${escapeHtml(profile.avatar)}" alt="${escapeHtml(label)}">`;
+    }
+    return `<span class="oa-account-avatar oa-account-avatar-fallback ${sizeClass || ""}" aria-hidden="true">${escapeHtml(getInitials(label))}</span>`;
+  }
+
   function favoriteButton(slug, isSaved, labels) {
     const text = isSaved ? labels.saved : labels.save;
-    return `<button class=\"oa-favorite-btn ${isSaved ? "is-saved" : ""}\" type=\"button\" data-oa-favorite-toggle data-slug=\"${escapeHtml(slug)}\">${escapeHtml(text)}</button>`;
+    return `<button class="oa-favorite-btn ${isSaved ? "is-saved" : ""}" type="button" data-oa-favorite-toggle data-slug="${escapeHtml(slug)}">${escapeHtml(text)}</button>`;
   }
 
   function renderCard(record, labels, favoritesSet) {
@@ -269,7 +367,17 @@
     root.innerHTML = `
       <section class="oa-auth-gate">
         <h2 class="oa-section-title">${escapeHtml(labels.loginRequired)}</h2>
+        <p class="oa-page-subtitle">${escapeHtml(labels.requestLoginHint)}</p>
         <button class="oa-btn oa-btn-primary" type="button" data-oa-sign-in>${escapeHtml(labels.signIn)}</button>
+      </section>
+    `;
+  }
+
+  function renderUnauthorizedState(root, labels) {
+    root.innerHTML = `
+      <section class="oa-auth-gate">
+        <h2 class="oa-section-title">${escapeHtml(labels.adminOnly)}</h2>
+        <p class="oa-page-subtitle">${escapeHtml(labels.adminUnauthorized)}</p>
       </section>
     `;
   }
@@ -355,8 +463,8 @@
           <h2 class="oa-section-title">${escapeHtml(labels.detailedNotes)}</h2>
           <p>${escapeHtml(record.detailed_notes || "")}</p>
         </section>
-        ${takeAway ? `<section class=\"oa-section oa-card\"><h2 class=\"oa-section-title\">${escapeHtml(labels.takeAway)}</h2><div class=\"oa-takeaway\">${takeAway}</div></section>` : ""}
-        ${attachments.length ? `<section class=\"oa-section oa-card\"><h2 class=\"oa-section-title\">${escapeHtml(labels.attachments)}</h2><ul>${attachments.map((a) => `<li>${escapeHtml(a)}</li>`).join("")}</ul></section>` : ""}
+        ${takeAway ? `<section class="oa-section oa-card"><h2 class="oa-section-title">${escapeHtml(labels.takeAway)}</h2><div class="oa-takeaway">${takeAway}</div></section>` : ""}
+        ${attachments.length ? `<section class="oa-section oa-card"><h2 class="oa-section-title">${escapeHtml(labels.attachments)}</h2><ul>${attachments.map((a) => `<li>${escapeHtml(a)}</li>`).join("")}</ul></section>` : ""}
       </article>
     `;
   }
@@ -398,6 +506,227 @@
         <h2 class="oa-section-title">${escapeHtml(labels.noEntriesYet)}</h2>
         <p>Slug: <code>${safeSlug}</code></p>
         ${safeReason ? `<p>${safeReason}</p>` : ""}
+      </section>
+    `;
+  }
+
+  function renderAccessRequestState(root, labels, access) {
+    const latestRequest = access.latestRequest || null;
+    const canSubmit = !latestRequest || latestRequest.status === "denied";
+    const statusLabel = latestRequest
+      ? latestRequest.status === "approved"
+        ? labels.requestStatusApproved
+        : latestRequest.status === "denied"
+          ? labels.requestStatusDenied
+          : labels.requestStatusPending
+      : "";
+    const message = latestRequest
+      ? latestRequest.status === "approved"
+        ? labels.accessApprovedMessage
+        : latestRequest.status === "denied"
+          ? labels.accessDeniedMessage
+          : labels.accessPendingMessage
+      : labels.accessApprovalDescription;
+    const statusTone = latestRequest
+      ? latestRequest.status === "approved"
+        ? "success"
+        : latestRequest.status === "denied"
+          ? "danger"
+          : "warning"
+      : "";
+
+    root.innerHTML = `
+      <section class="oa-auth-gate oa-access-gate">
+        <div class="oa-access-gate-head">
+          <div>
+            <h2 class="oa-section-title">${escapeHtml(labels.accessApprovalRequired)}</h2>
+            <p class="oa-page-subtitle">${escapeHtml(message)}</p>
+          </div>
+          ${statusLabel ? buildChip(statusLabel, statusTone) : ""}
+        </div>
+        <div class="oa-access-meta">
+          <p><strong>${escapeHtml(labels.signedInAs)}</strong> ${escapeHtml(access.profile.email || "-")}</p>
+          ${latestRequest ? `<p><strong>${escapeHtml(labels.requestSubmittedAt)}</strong> ${escapeHtml(formatDateTime(latestRequest.created_at))}</p>` : ""}
+          ${latestRequest?.reviewed_at ? `<p><strong>${escapeHtml(labels.requestReviewedAt)}</strong> ${escapeHtml(formatDateTime(latestRequest.reviewed_at))}</p>` : ""}
+          ${latestRequest?.reason ? `<p><strong>${escapeHtml(labels.requestReason)}</strong> ${escapeHtml(latestRequest.reason)}</p>` : ""}
+        </div>
+        ${canSubmit ? `
+          <form class="oa-stack" data-oa-access-request-form>
+            <label class="oa-form-label" for="oa-access-reason">
+              ${escapeHtml(labels.accessRequestReasonLabel)}
+            </label>
+            <textarea
+              id="oa-access-reason"
+              class="oa-textarea"
+              name="reason"
+              rows="5"
+              placeholder="${escapeHtml(labels.accessRequestReasonPlaceholder)}"
+              required
+            ></textarea>
+            <div class="oa-form-actions">
+              <button class="oa-btn oa-btn-primary" type="submit">${escapeHtml(labels.submitAccessRequest)}</button>
+            </div>
+            <p class="oa-inline-feedback" data-oa-feedback></p>
+          </form>
+        ` : ""}
+      </section>
+    `;
+  }
+
+  function renderAdminDashboard(root, labels, dashboard, access) {
+    const pendingRequests = dashboard.requests.filter((row) => row.status === "pending");
+    const explicitAdminIds = new Set(
+      dashboard.roles
+        .filter((row) => row.role === "admin")
+        .map((row) => row.user_id)
+    );
+    const knownAdmins = dashboard.users.filter((user) => explicitAdminIds.has(user.id));
+    const bootstrapEntry =
+      dashboard.users.find((user) => normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL) ||
+      { id: "", email: BOOTSTRAP_ADMIN_EMAIL, display_name: labels.adminBootstrap, avatar_url: "", last_seen_at: "" };
+    const adminRows = [];
+    adminRows.push({
+      ...bootstrapEntry,
+      isBootstrap: true,
+      isExplicit: explicitAdminIds.has(bootstrapEntry.id)
+    });
+    for (const user of knownAdmins) {
+      if (normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL) continue;
+      adminRows.push({ ...user, isBootstrap: false, isExplicit: true });
+    }
+
+    const allowlistRows = [...dashboard.allowlist].sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
+    const knownUsers = [...dashboard.users].sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
+
+    root.innerHTML = `
+      <section class="oa-admin-grid">
+        <section class="oa-card oa-admin-card">
+          <div class="oa-admin-card-head">
+            <div>
+              <h2 class="oa-section-title">${escapeHtml(labels.adminPendingRequests)}</h2>
+              <p class="oa-page-subtitle">${escapeHtml(labels.adminDashboardDescription)}</p>
+            </div>
+            <button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-refresh>${escapeHtml(labels.adminRefresh)}</button>
+          </div>
+          <p class="oa-page-subtitle">${escapeHtml(labels.signedInAs)} ${escapeHtml(access.profile.email || "-")}</p>
+          ${pendingRequests.length ? `
+            <div class="oa-admin-table-wrap">
+              <table class="oa-admin-table">
+                <thead>
+                  <tr>
+                    <th>${escapeHtml(labels.requestRequester)}</th>
+                    <th>${escapeHtml(labels.requestReason)}</th>
+                    <th>${escapeHtml(labels.requestSubmittedAt)}</th>
+                    <th>${escapeHtml(labels.requestActions)}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${pendingRequests.map((row) => `
+                    <tr>
+                      <td>${escapeHtml(row.email || "-")}</td>
+                      <td>${escapeHtml(row.reason || "-")}</td>
+                      <td>${escapeHtml(formatDateTime(row.created_at))}</td>
+                      <td>
+                        <div class="oa-inline-actions">
+                          <button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-approve="${escapeHtml(row.id)}">${escapeHtml(labels.adminApprove)}</button>
+                          <button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-deny="${escapeHtml(row.id)}">${escapeHtml(labels.adminDeny)}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          ` : `<p>${escapeHtml(labels.adminNoPendingRequests)}</p>`}
+        </section>
+
+        <section class="oa-card oa-admin-card">
+          <h2 class="oa-section-title">${escapeHtml(labels.adminAllowlist)}</h2>
+          <form class="oa-stack" data-oa-allowlist-form>
+            <label class="oa-form-label" for="oa-allowlist-email">${escapeHtml(labels.adminEmail)}</label>
+            <div class="oa-inline-form">
+              <input
+                id="oa-allowlist-email"
+                class="oa-input"
+                type="email"
+                name="email"
+                placeholder="${escapeHtml(labels.adminAllowlistPlaceholder)}"
+                required
+              >
+              <button class="oa-btn oa-btn-primary" type="submit">${escapeHtml(labels.adminAddAllowlist)}</button>
+            </div>
+            <p class="oa-inline-feedback" data-oa-feedback></p>
+          </form>
+          ${allowlistRows.length ? `
+            <ul class="oa-admin-list">
+              ${allowlistRows.map((row) => `
+                <li class="oa-admin-list-item">
+                  <div>
+                    <strong>${escapeHtml(row.email)}</strong>
+                    <div class="oa-page-subtitle">${escapeHtml(formatDateTime(row.created_at))}</div>
+                  </div>
+                  <button class="oa-btn oa-btn-secondary" type="button" data-oa-allowlist-remove="${escapeHtml(row.email)}">${escapeHtml(labels.remove)}</button>
+                </li>
+              `).join("")}
+            </ul>
+          ` : `<p>${escapeHtml(labels.adminAllowlistEmpty)}</p>`}
+        </section>
+
+        <section class="oa-card oa-admin-card">
+          <h2 class="oa-section-title">${escapeHtml(labels.adminAdmins)}</h2>
+          ${adminRows.length ? `
+            <ul class="oa-admin-list">
+              ${adminRows.map((row) => `
+                <li class="oa-admin-list-item">
+                  <div class="oa-account-row">
+                    ${renderAvatar({ avatar: row.avatar_url || "", displayName: row.display_name || row.email || "", email: row.email || "" }, "oa-account-avatar-sm")}
+                    <div>
+                      <strong>${escapeHtml(row.display_name || row.email || labels.adminNoDisplayName)}</strong>
+                      <div class="oa-page-subtitle">${escapeHtml(row.email || "-")}</div>
+                      <div class="oa-chip-wrap">
+                        ${row.isBootstrap ? buildChip(labels.adminBootstrap, "success") : ""}
+                        ${row.isExplicit ? buildChip(labels.adminExplicitRole) : ""}
+                      </div>
+                    </div>
+                  </div>
+                  ${row.isExplicit ? `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-remove="${escapeHtml(row.id)}">${escapeHtml(labels.adminRemoveAdmin)}</button>` : ""}
+                </li>
+              `).join("")}
+            </ul>
+          ` : `<p>${escapeHtml(labels.adminNoAdmins)}</p>`}
+        </section>
+
+        <section class="oa-card oa-admin-card">
+          <h2 class="oa-section-title">${escapeHtml(labels.adminKnownUsers)}</h2>
+          ${knownUsers.length ? `
+            <div class="oa-admin-table-wrap">
+              <table class="oa-admin-table">
+                <thead>
+                  <tr>
+                    <th>${escapeHtml(labels.adminDisplayName)}</th>
+                    <th>${escapeHtml(labels.adminEmail)}</th>
+                    <th>${escapeHtml(labels.adminLastSeen)}</th>
+                    <th>${escapeHtml(labels.requestActions)}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${knownUsers.map((user) => `
+                    <tr>
+                      <td>${escapeHtml(user.display_name || labels.adminNoDisplayName)}</td>
+                      <td>${escapeHtml(user.email || "-")}</td>
+                      <td>${escapeHtml(formatDateTime(user.last_seen_at || user.created_at))}</td>
+                      <td>
+                        ${explicitAdminIds.has(user.id) || normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL
+                          ? buildChip(labels.adminPanel, "success")
+                          : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-promote="${escapeHtml(user.id)}">${escapeHtml(labels.adminMakeAdmin)}</button>`}
+                      </td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          ` : `<p>${escapeHtml(labels.adminNoKnownUsers)}</p>`}
+        </section>
       </section>
     `;
   }
@@ -647,33 +976,144 @@
     }
   }
 
+  function setFeedback(node, message, isError) {
+    if (!node) return;
+    node.textContent = message || "";
+    node.dataset.error = isError ? "true" : "false";
+  }
+
+  function closeAllAccountMenus() {
+    document.querySelectorAll("[data-oa-account-menu]").forEach((menu) => {
+      menu.hidden = true;
+    });
+    document.querySelectorAll("[data-oa-account-toggle]").forEach((toggle) => {
+      toggle.setAttribute("aria-expanded", "false");
+    });
+  }
+
+  document.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-oa-account-toggle]");
+    if (toggle) {
+      const shell = toggle.closest("[data-oa-account-shell]");
+      const menu = shell?.querySelector("[data-oa-account-menu]");
+      const willOpen = Boolean(menu?.hidden);
+      closeAllAccountMenus();
+      if (menu) {
+        menu.hidden = !willOpen;
+        toggle.setAttribute("aria-expanded", willOpen ? "true" : "false");
+      }
+      return;
+    }
+
+    if (!event.target.closest("[data-oa-account-shell]")) {
+      closeAllAccountMenus();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeAllAccountMenus();
+    }
+  });
+
   document.addEventListener("DOMContentLoaded", async () => {
     syncLanguageSwitchQueryParams();
 
     const labels = getLabels();
     const roots = Array.from(document.querySelectorAll("[data-oa-protected-view]"));
-    if (!roots.length) return;
-
     const supabaseUrl = document.querySelector('meta[name="oa-supabase-url"]')?.content || "";
     const supabaseAnonKey = document.querySelector('meta[name="oa-supabase-anon-key"]')?.content || "";
     const oauthRedirectTo = document.querySelector('meta[name="oa-supabase-redirect-url"]')?.content || window.location.origin;
 
     const authControls = Array.from(document.querySelectorAll("[data-oa-auth-controls]"));
-    const favoritesNav = Array.from(document.querySelectorAll("[data-oa-favorites-nav]"));
+    const listState = getListStateFromUrl();
 
     function renderAuthSkeleton(message) {
       for (const node of authControls) {
-        node.innerHTML = `<span class=\"oa-auth-message\">${escapeHtml(message)}</span>`;
+        node.innerHTML = `<span class="oa-auth-message">${escapeHtml(message)}</span>`;
       }
-      for (const node of favoritesNav) {
-        node.hidden = true;
-      }
+    }
+
+    function renderAuthControls(user, access) {
+      authControls.forEach((node, index) => {
+        const compact = node.dataset.oaAuthCompact === "true";
+        if (!user) {
+          node.innerHTML = `<button class="oa-auth-btn" type="button" data-oa-sign-in>${escapeHtml(labels.signIn)}</button>`;
+          return;
+        }
+
+        const profile = access?.profile || getUserProfile(user);
+        const menuItems = [
+          access?.isApproved
+            ? `<a class="oa-account-link" href="${escapeHtml(languagePath("favorites/"))}">${escapeHtml(labels.myFavorites)}</a>`
+            : "",
+          access?.isAdmin
+            ? `<a class="oa-account-link" href="${escapeHtml(languagePath("admin/"))}">${escapeHtml(labels.adminPanel)}</a>`
+            : "",
+          `<button class="oa-account-link oa-account-link-button" type="button" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>`
+        ].filter(Boolean);
+
+        const statusText = access?.isAdmin
+          ? labels.adminPanel
+          : access?.isApproved
+            ? labels.requestStatusApproved
+            : access?.latestRequest?.status === "pending"
+              ? labels.requestStatusPending
+              : labels.accessApprovalRequired;
+
+        if (compact) {
+          node.innerHTML = `
+            <div class="oa-account-shell" data-oa-account-shell>
+              <button
+                class="oa-account-toggle"
+                type="button"
+                aria-expanded="false"
+                data-oa-account-toggle
+                aria-label="${escapeHtml(profile.email || profile.displayName || "Account")}"
+              >
+                ${renderAvatar(profile, "")}
+              </button>
+              <div class="oa-account-menu" data-oa-account-menu hidden>
+                <div class="oa-account-menu-head">
+                  ${renderAvatar(profile, "oa-account-avatar-sm")}
+                  <div>
+                    <strong>${escapeHtml(profile.displayName || profile.email || labels.signedInAs)}</strong>
+                    <div class="oa-account-email">${escapeHtml(profile.email || "-")}</div>
+                    <div class="oa-account-status">${escapeHtml(statusText)}</div>
+                  </div>
+                </div>
+                <div class="oa-account-menu-body">
+                  ${menuItems.join("")}
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          node.innerHTML = `
+            <div class="oa-account-inline">
+              <div class="oa-account-row">
+                ${renderAvatar(profile, "oa-account-avatar-sm")}
+                <div>
+                  <strong>${escapeHtml(profile.displayName || profile.email || labels.signedInAs)}</strong>
+                  <div class="oa-account-email">${escapeHtml(profile.email || "-")}</div>
+                  <div class="oa-account-status">${escapeHtml(statusText)}</div>
+                </div>
+              </div>
+              <div class="oa-account-inline-actions">
+                ${access?.isApproved ? `<a class="oa-auth-btn oa-auth-btn-link" href="${escapeHtml(languagePath("favorites/"))}">${escapeHtml(labels.myFavorites)}</a>` : ""}
+                ${access?.isAdmin ? `<a class="oa-auth-btn oa-auth-btn-link" href="${escapeHtml(languagePath("admin/"))}">${escapeHtml(labels.adminPanel)}</a>` : ""}
+                <button class="oa-auth-btn" type="button" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>
+              </div>
+            </div>
+          `;
+        }
+      });
     }
 
     if (!supabaseUrl || !supabaseAnonKey) {
       renderAuthSkeleton(labels.configMissing);
       for (const root of roots) {
-        root.innerHTML = `<p class=\"oa-page-subtitle\">${escapeHtml(labels.configMissing)}</p>`;
+        root.innerHTML = `<p class="oa-page-subtitle">${escapeHtml(labels.configMissing)}</p>`;
       }
       return;
     }
@@ -693,79 +1133,6 @@
     });
 
     let favoriteSlugs = new Set();
-    const listState = getListStateFromUrl();
-
-    async function loadFavorites(userId) {
-      const { data, error } = await client
-        .from("favorites")
-        .select("article_slug")
-        .eq("user_id", userId);
-      if (error) return new Set();
-      return new Set((data || []).map((row) => row.article_slug));
-    }
-
-    async function toggleFavorite(slug, userId) {
-      if (!slug || !userId) return;
-      if (favoriteSlugs.has(slug)) {
-        await client.from("favorites").delete().eq("user_id", userId).eq("article_slug", slug);
-        favoriteSlugs.delete(slug);
-      } else {
-        await client.from("favorites").insert({ user_id: userId, article_slug: slug });
-        favoriteSlugs.add(slug);
-      }
-      await renderViews();
-    }
-
-    async function signIn() {
-      await client.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: oauthRedirectTo || window.location.href
-        }
-      });
-    }
-
-    async function signOut() {
-      await client.auth.signOut();
-    }
-
-    function bindGlobalActions(user) {
-      document.querySelectorAll("[data-oa-sign-in]").forEach((btn) => {
-        btn.onclick = () => {
-          signIn();
-        };
-      });
-      document.querySelectorAll("[data-oa-sign-out]").forEach((btn) => {
-        btn.onclick = () => {
-          signOut();
-        };
-      });
-      document.querySelectorAll("[data-oa-favorite-toggle]").forEach((btn) => {
-        btn.onclick = () => toggleFavorite(btn.dataset.slug || "", user?.id || "");
-      });
-    }
-
-    function renderAuthControls(user) {
-      for (const node of authControls) {
-        const compact = node.dataset.oaAuthCompact === "true";
-        if (!user) {
-          node.innerHTML = `<button class=\"oa-auth-btn\" type=\"button\" data-oa-sign-in>${escapeHtml(labels.signIn)}</button>`;
-        } else {
-          const email = user.email || "";
-          if (compact) {
-            node.innerHTML = `<button class=\"oa-auth-btn\" type=\"button\" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>`;
-          } else {
-            node.innerHTML = `
-              <span class="oa-auth-user">${escapeHtml(labels.signedInAs)} ${escapeHtml(email)}</span>
-              <button class="oa-auth-btn" type="button" data-oa-sign-out>${escapeHtml(labels.signOut)}</button>
-            `;
-          }
-        }
-      }
-      for (const node of favoritesNav) {
-        node.hidden = !user;
-      }
-    }
 
     async function fetchArticles(lang) {
       const { data, error } = await client
@@ -790,28 +1157,296 @@
       };
     }
 
+    async function upsertCurrentUser(user) {
+      const profile = getUserProfile(user);
+      if (!user?.id || !profile.email) return;
+      await client.from("app_users").upsert({
+        id: user.id,
+        email: profile.email,
+        display_name: profile.displayName || null,
+        avatar_url: profile.avatar || null,
+        last_seen_at: new Date().toISOString()
+      }, { onConflict: "id" });
+    }
+
+    async function loadAccessContext(user) {
+      const profile = getUserProfile(user);
+      await upsertCurrentUser(user);
+
+      const [rolesResult, allowlistResult, requestResult] = await Promise.all([
+        client.from("user_roles").select("role").eq("user_id", user.id),
+        client.from("access_allowlist").select("email").eq("email", profile.email).limit(1),
+        client.from("access_requests").select("id,status,reason,created_at,reviewed_at").eq("requester_user_id", user.id).order("created_at", { ascending: false }).limit(1)
+      ]);
+
+      const roles = (rolesResult.data || []).map((row) => row.role);
+      const latestRequest = (requestResult.data || [])[0] || null;
+      const isBootstrapAdmin = profile.email === BOOTSTRAP_ADMIN_EMAIL;
+      const isAdmin = isBootstrapAdmin || roles.includes("admin");
+      const isAllowlisted = Boolean((allowlistResult.data || []).length);
+      const isApproved = isAdmin || isAllowlisted || latestRequest?.status === "approved";
+
+      return {
+        profile,
+        roles,
+        latestRequest,
+        isBootstrapAdmin,
+        isAdmin,
+        isAllowlisted,
+        isApproved
+      };
+    }
+
+    async function loadFavorites(userId) {
+      const { data, error } = await client
+        .from("favorites")
+        .select("article_slug")
+        .eq("user_id", userId);
+      if (error) return new Set();
+      return new Set((data || []).map((row) => row.article_slug));
+    }
+
+    async function toggleFavorite(slug, userId) {
+      if (!slug || !userId) return;
+      if (favoriteSlugs.has(slug)) {
+        await client.from("favorites").delete().eq("user_id", userId).eq("article_slug", slug);
+        favoriteSlugs.delete(slug);
+      } else {
+        await client.from("favorites").insert({ user_id: userId, article_slug: slug });
+        favoriteSlugs.add(slug);
+      }
+      await renderViews();
+    }
+
+    async function fetchAdminDashboard() {
+      const [requestsResult, allowlistResult, usersResult, rolesResult] = await Promise.all([
+        client.from("access_requests").select("id,requester_user_id,email,reason,status,created_at,reviewed_at,reviewer_user_id").order("created_at", { ascending: false }),
+        client.from("access_allowlist").select("email,created_at,created_by").order("email", { ascending: true }),
+        client.from("app_users").select("id,email,display_name,avatar_url,last_seen_at,created_at").order("last_seen_at", { ascending: false }),
+        client.from("user_roles").select("user_id,role,created_at")
+      ]);
+
+      return {
+        requests: requestsResult.data || [],
+        allowlist: allowlistResult.data || [],
+        users: usersResult.data || [],
+        roles: rolesResult.data || []
+      };
+    }
+
+    async function signIn() {
+      await client.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: oauthRedirectTo || window.location.href
+        }
+      });
+    }
+
+    async function signOut() {
+      closeAllAccountMenus();
+      await client.auth.signOut();
+    }
+
+    async function submitAccessRequest(form, user) {
+      const feedback = form.querySelector("[data-oa-feedback]");
+      const reason = String(new FormData(form).get("reason") || "").trim();
+      if (!reason) {
+        setFeedback(feedback, labels.reasonRequired, true);
+        return;
+      }
+      setFeedback(feedback, "", false);
+      const profile = getUserProfile(user);
+      const { error } = await client.from("access_requests").insert({
+        requester_user_id: user.id,
+        email: profile.email,
+        reason,
+        status: "pending"
+      });
+      if (error) {
+        setFeedback(feedback, error.message || labels.requestSubmitError, true);
+        return;
+      }
+      await renderViews();
+    }
+
+    async function reviewAccessRequest(requestId, approved, user) {
+      const { error } = await client
+        .from("access_requests")
+        .update({
+          status: approved ? "approved" : "denied",
+          reviewer_user_id: user.id,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq("id", requestId);
+      if (!error) {
+        await renderViews();
+      }
+    }
+
+    async function addAllowlistEntry(form, user) {
+      const feedback = form.querySelector("[data-oa-feedback]");
+      const email = normalizeEmail(String(new FormData(form).get("email") || ""));
+      if (!email) {
+        setFeedback(feedback, labels.adminActionError, true);
+        return;
+      }
+      const { error } = await client.from("access_allowlist").upsert({
+        email,
+        created_by: user.id
+      }, { onConflict: "email" });
+      if (error) {
+        setFeedback(feedback, error.message || labels.adminActionError, true);
+        return;
+      }
+      await renderViews();
+    }
+
+    async function removeAllowlistEntry(email) {
+      const { error } = await client.from("access_allowlist").delete().eq("email", normalizeEmail(email));
+      if (!error) {
+        await renderViews();
+      }
+    }
+
+    async function promoteAdmin(userId, currentUser) {
+      const { error } = await client.from("user_roles").upsert({
+        user_id: userId,
+        role: "admin",
+        created_by: currentUser.id
+      }, { onConflict: "user_id,role" });
+      if (!error) {
+        await renderViews();
+      }
+    }
+
+    async function removeAdmin(userId) {
+      if (!userId) return;
+      const { error } = await client.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
+      if (!error) {
+        await renderViews();
+      }
+    }
+
+    function bindGlobalActions(user, access) {
+      document.querySelectorAll("[data-oa-sign-in]").forEach((btn) => {
+        btn.onclick = () => {
+          signIn();
+        };
+      });
+      document.querySelectorAll("[data-oa-sign-out]").forEach((btn) => {
+        btn.onclick = () => {
+          signOut();
+        };
+      });
+      document.querySelectorAll("[data-oa-favorite-toggle]").forEach((btn) => {
+        btn.onclick = () => toggleFavorite(btn.dataset.slug || "", user?.id || "");
+      });
+      document.querySelectorAll("[data-oa-access-request-form]").forEach((form) => {
+        form.onsubmit = async (event) => {
+          event.preventDefault();
+          if (!user) return;
+          await submitAccessRequest(form, user);
+        };
+      });
+      document.querySelectorAll("[data-oa-admin-approve]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!user || !access?.isAdmin) return;
+          await reviewAccessRequest(btn.dataset.oaAdminApprove || "", true, user);
+        };
+      });
+      document.querySelectorAll("[data-oa-admin-deny]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!user || !access?.isAdmin) return;
+          await reviewAccessRequest(btn.dataset.oaAdminDeny || "", false, user);
+        };
+      });
+      document.querySelectorAll("[data-oa-allowlist-form]").forEach((form) => {
+        form.onsubmit = async (event) => {
+          event.preventDefault();
+          if (!user || !access?.isAdmin) return;
+          await addAllowlistEntry(form, user);
+        };
+      });
+      document.querySelectorAll("[data-oa-allowlist-remove]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!access?.isAdmin) return;
+          await removeAllowlistEntry(btn.dataset.oaAllowlistRemove || "");
+        };
+      });
+      document.querySelectorAll("[data-oa-admin-promote]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!user || !access?.isAdmin) return;
+          await promoteAdmin(btn.dataset.oaAdminPromote || "", user);
+        };
+      });
+      document.querySelectorAll("[data-oa-admin-remove]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!access?.isAdmin) return;
+          await removeAdmin(btn.dataset.oaAdminRemove || "");
+        };
+      });
+      document.querySelectorAll("[data-oa-admin-refresh]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!access?.isAdmin) return;
+          await renderViews();
+        };
+      });
+    }
+
     async function renderViews() {
       const { data: sessionData } = await client.auth.getSession();
       const user = sessionData?.session?.user || null;
-      renderAuthControls(user);
 
       if (!user) {
+        favoriteSlugs = new Set();
+        renderAuthControls(null, null);
         for (const root of roots) {
-          renderGuestState(root, labels);
+          const filters = collectFilters(root);
+          if (filters.view === "admin") {
+            renderGuestState(root, labels);
+          } else {
+            renderGuestState(root, labels);
+          }
         }
-        bindGlobalActions(null);
+        bindGlobalActions(null, null);
         return;
       }
 
-      favoriteSlugs = await loadFavorites(user.id);
+      const access = await loadAccessContext(user);
+      renderAuthControls(user, access);
+
+      if (!roots.length) {
+        bindGlobalActions(user, access);
+        return;
+      }
 
       const lang = normalizeLang(document.documentElement.lang);
-      const articleResult = await fetchArticles(lang);
+      const needsProtectedContent = access.isApproved && roots.some((root) => collectFilters(root).view !== "admin");
+      const articleResult = needsProtectedContent ? await fetchArticles(lang) : { rows: [], error: null };
       const articles = articleResult.rows;
+      favoriteSlugs = needsProtectedContent ? await loadFavorites(user.id) : new Set();
+
+      let adminDashboard = null;
 
       for (const root of roots) {
         renderLoading(root, labels);
         const filters = collectFilters(root);
+
+        if (filters.view === "admin") {
+          if (!access.isAdmin) {
+            renderUnauthorizedState(root, labels);
+          } else {
+            adminDashboard = adminDashboard || await fetchAdminDashboard();
+            renderAdminDashboard(root, labels, adminDashboard, access);
+          }
+          continue;
+        }
+
+        if (!access.isApproved) {
+          renderAccessRequestState(root, labels, access);
+          continue;
+        }
 
         if (filters.view === "item_single") {
           let target = null;
@@ -859,7 +1494,7 @@
         if (filters.view === "home_recent") {
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
             renderList(node, pageItems, labels, favoriteSlugs);
-          }, () => bindGlobalActions(user));
+          }, () => bindGlobalActions(user, access));
           continue;
         }
 
@@ -867,23 +1502,23 @@
           scoped = scoped.filter((record) => favoriteSlugs.has(record.slug));
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
             renderList(node, pageItems, labels, favoriteSlugs);
-          }, () => bindGlobalActions(user));
+          }, () => bindGlobalActions(user, access));
           continue;
         }
 
         if (filters.view === "archive") {
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
             renderArchive(node, pageItems, labels, favoriteSlugs);
-          }, () => bindGlobalActions(user));
+          }, () => bindGlobalActions(user, access));
           continue;
         }
 
         renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
           renderList(node, pageItems, labels, favoriteSlugs);
-        }, () => bindGlobalActions(user));
+        }, () => bindGlobalActions(user, access));
       }
 
-      bindGlobalActions(user);
+      bindGlobalActions(user, access);
     }
 
     client.auth.onAuthStateChange(() => {
