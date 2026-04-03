@@ -138,12 +138,26 @@ jobs:
             exit 1
           fi
 
+      - name: Normalize private data token
+        run: |
+          set -euo pipefail
+          cleaned_token="$(python - <<'PY'
+import os
+print((os.environ.get("OABOUTAI_DATA_REPO_TOKEN") or "").strip(), end="")
+PY
+)"
+          {
+            echo "OABOUTAI_DATA_REPO_TOKEN_CLEAN<<EOF"
+            printf '%s\n' "${cleaned_token}"
+            echo "EOF"
+          } >> "${GITHUB_ENV}"
+
       - name: Verify private data repo access
         run: |
           set -euo pipefail
-          token="${OABOUTAI_DATA_REPO_TOKEN}"
+          token="${OABOUTAI_DATA_REPO_TOKEN_CLEAN}"
           if [[ "${token}" =~ [[:space:]] ]]; then
-            echo "OABOUTAI_DATA_REPO_TOKEN contains whitespace/newlines. Please use a GitHub PAT (not SSH key material)."
+            echo "OABOUTAI_DATA_REPO_TOKEN still contains whitespace/newlines after trim. Please use a single-line GitHub PAT."
             exit 1
           fi
           api_url="https://api.github.com/repos/cclljj/OaboutAI_data"
@@ -176,7 +190,7 @@ jobs:
             --clean \
             --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
             --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
-            --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
+            --data-repo-token-env "OABOUTAI_DATA_REPO_TOKEN_CLEAN" \
             --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
 
       - name: Sync topic pages from topics.json
