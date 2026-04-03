@@ -5,7 +5,7 @@ Day-2 operational runbook for OaboutAI runtime content.
 ## 1. Source of Truth
 
 Production article content is read from:
-- `public.articles`
+- private repo Obsidian markdown (`OaboutAI_data/obsidian/*`) compiled into static JSON
 
 Per-user saved items are read from:
 - `public.favorites`
@@ -23,11 +23,10 @@ Public GitHub content bundles are **not** the production source of protected art
 Run once (or re-apply on reset):
 - execute `docs/supabase_schema.sql` in Supabase SQL editor
 
-After running, verify tables exist:
+After running, verify required tables exist:
 
 ```sql
-select to_regclass('public.articles') as articles_table,
-       to_regclass('public.favorites') as favorites_table,
+select to_regclass('public.favorites') as favorites_table,
        to_regclass('public.app_users') as app_users_table,
        to_regclass('public.user_roles') as user_roles_table,
        to_regclass('public.access_allowlist') as access_allowlist_table,
@@ -38,20 +37,14 @@ Bootstrap admin:
 - `cclljj@gmail.com` is always treated as an admin by policy, even before a `user_roles` row exists.
 - Additional admins are stored in `public.user_roles`.
 
-## 3. Required Data Rules (`public.articles`)
+## 3. Legacy Optional Table (`public.articles`)
 
-- `slug`: stable identifier
-- `language`: must be `en` or `zh-tw`
-- `source_type`: typically `webpage|pdf|youtube|other`
-- `keywords`: JSON array
-- `topics`: JSON array
-- `primary key`: (`slug`, `language`)
+`public.articles` is no longer required for runtime page rendering in the Obsidian pipeline.
+Keep it only if you still need historical SQL workflows (imports, reporting, keyword normalization scripts).
 
-Important runtime note:
-- list views filter by exact language; if you import `zh_TW` / `zh-TW` inconsistently, list pages may appear empty.
-- use canonical values only: `en`, `zh-tw`.
+If you keep using this table, keep canonical language values: `en`, `zh-tw`.
 
-## 4. Import / Upsert Patterns
+## 4. Legacy Import / Upsert Patterns
 
 Use one of these:
 1. Supabase dashboard CSV import
@@ -90,34 +83,7 @@ do update set
 
 ## 5. Health Checks
 
-### 5.1 Count rows by language
-
-```sql
-select language, count(*)
-from public.articles
-group by language
-order by language;
-```
-
-### 5.2 Check a specific slug
-
-```sql
-select slug, language, title, source_date
-from public.articles
-where slug = '20260324-adding-fuel-to-the-fire-ai-information-threats-pdf'
-order by language;
-```
-
-### 5.3 Detect invalid language values
-
-```sql
-select language, count(*)
-from public.articles
-where language not in ('en', 'zh-tw')
-group by language;
-```
-
-### 5.4 Favorites ownership sanity
+### 5.1 Favorites ownership sanity
 
 ```sql
 select user_id, count(*)
@@ -127,7 +93,7 @@ order by count(*) desc
 limit 20;
 ```
 
-### 5.5 Approved vs pending users
+### 5.2 Approved vs pending users
 
 ```sql
 select status, count(*)
@@ -136,7 +102,7 @@ group by status
 order by status;
 ```
 
-### 5.6 Pending review queue
+### 5.3 Pending review queue
 
 ```sql
 select email, reason, created_at
@@ -145,7 +111,7 @@ where status = 'pending'
 order by created_at asc;
 ```
 
-### 5.7 Current explicit admins
+### 5.4 Current explicit admins
 
 ```sql
 select au.email, ur.created_at
@@ -155,7 +121,7 @@ where ur.role = 'admin'
 order by au.email;
 ```
 
-### 5.8 Allowlist
+### 5.5 Allowlist
 
 ```sql
 select email, created_at
@@ -203,17 +169,16 @@ Important:
 ### 8.1 Login works, but no content appears
 
 Check:
-1. `articles` has rows for current language (`en` or `zh-tw`)
+1. `static/obsidian/articles.<lang>.json` exists and contains records
 2. user is approved via admin role, allowlist, or an `approved` request
 3. env vars are present in current deployment
 
 ### 8.2 `/item/?slug=...` shows empty
 
 Check:
-1. slug exists in `public.articles`
+1. slug exists in `static/obsidian/articles.<lang>.json`
 2. slug spelling in URL is exact
-3. record language values are canonical (`en` / `zh-tw`)
-4. logged-in user is approved
+3. logged-in user is approved
 
 ### 8.3 User can log in but only sees the request form
 
@@ -229,7 +194,7 @@ Check:
 2. `primary_topic`, `topics`, `keywords`, `source_type` fields are populated
 3. imported JSON fields are valid arrays for `topics` / `keywords`
 
-## 9. Normalize Existing Keywords
+## 9. Legacy: Normalize Existing Keywords in `public.articles`
 
 Use this when historical `public.articles.keywords` contains mixed Chinese/English terms or mixed casing.
 

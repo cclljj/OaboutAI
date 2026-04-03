@@ -138,22 +138,22 @@ Expected:
 ## 5. Data Integrity Checklist (Supabase)
 
 Run SQL checks:
-1. Count by language:
+1. Favorites ownership distribution:
 ```sql
-select language, count(*) from public.articles group by language order by language;
+select user_id, count(*) from public.favorites group by user_id order by count(*) desc limit 20;
 ```
-2. invalid language values:
+2. Access request states:
 ```sql
-select language, count(*) from public.articles where language not in ('en','zh-tw') group by language;
+select status, count(*) from public.access_requests group by status order by status;
 ```
-3. known slug exists:
+3. Allowlist health:
 ```sql
-select slug, language, title from public.articles where slug = '<known-slug>' order by language;
+select email, created_at from public.access_allowlist order by email;
 ```
 
 Expected:
-- language values are canonical (`en`, `zh-tw`)
-- critical slugs present
+- favorites are owned per user
+- access requests / allowlist data are queryable
 
 ## 6. Deployment Verification Checklist
 

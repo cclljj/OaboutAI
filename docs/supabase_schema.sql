@@ -3,9 +3,10 @@
 -- Run in Supabase SQL editor.
 --
 -- Current production notes:
--- 1) `public.articles` is the runtime source-of-truth for protected content.
--- 2) `language` must stay canonical (`en`, `zh-tw`) for list pages to render correctly.
--- 3) Article access is limited to approved users, not all authenticated users.
+-- 1) Runtime content is served from Obsidian build artifacts, not directly from `public.articles`.
+-- 2) `public.favorites`, `public.app_users`, `public.user_roles`, `public.access_allowlist`,
+--    and `public.access_requests` remain runtime-critical.
+-- 3) `public.articles` is retained as a legacy optional table for historical SQL workflows.
 
 create extension if not exists pgcrypto;
 

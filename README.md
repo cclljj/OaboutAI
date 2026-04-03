@@ -18,7 +18,7 @@ Production: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 ## Architecture
 
 - Frontend shell: Hugo（頁面框架、導覽、版型）
-- Auth & favorites: Supabase Auth + `public.favorites`
+- Auth, access control, favorites: Supabase Auth + RLS tables
 - Content source: private repo `cclljj/OaboutAI_data`（Obsidian markdown）
 - Build artifact: `static/obsidian/articles.en.json`、`static/obsidian/articles.zh-tw.json`
 
@@ -63,6 +63,18 @@ Workflow: `.github/workflows/docs-site-ci.yml`
 3. Compose with private data injection
 4. Build + deploy to Vercel production
 5. Post-deploy smoke tests
+
+## Supabase Tables In Current Runtime
+
+Required:
+- `public.favorites`
+- `public.app_users`
+- `public.user_roles`
+- `public.access_allowlist`
+- `public.access_requests`
+
+Legacy / optional:
+- `public.articles` (kept only for historical export/analysis tooling; not required for runtime page rendering)
 
 ## Required Secrets / Env
 

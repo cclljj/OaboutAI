@@ -94,9 +94,12 @@ Run in Supabase SQL editor:
 - `docs/supabase_schema.sql`
 
 This creates:
-- `public.articles` (protected content)
 - `public.favorites` (per-user favorites)
-- RLS policies for authenticated read and owner-only favorites CRUD
+- `public.app_users` / `public.user_roles` / `public.access_allowlist` / `public.access_requests` (access control)
+- RLS policies for approval-aware access and owner-only favorites CRUD
+
+Legacy / optional:
+- `public.articles` (no longer required for runtime rendering in Obsidian pipeline; keep only if you still run historical export/analysis SQL)
 
 ### 6.2 Configure Google OAuth
 
@@ -141,9 +144,12 @@ export OABOUTAI_DATA_REPO_TOKEN="<github-token>"
 
 Current model reads article bodies from Obsidian markdown stored in a private data repository and compiled into static JSON at build time.
 
-Use either approach:
-1. Supabase dashboard import (`articles` table; CSV/JSON import)
-2. SQL upsert pipelines maintained by your data process
+Primary approach:
+1. Maintain article markdown in private repo `OaboutAI_data` under `obsidian/en` + `obsidian/zh-tw`.
+2. CI/build compiles these markdown files into static JSON artifacts.
+
+Legacy approach (optional):
+1. Keep using `public.articles` import/upsert only if you need historical SQL workflows.
 
 Reference operations and checklist:
 - `docs/supabase_operations.md`
