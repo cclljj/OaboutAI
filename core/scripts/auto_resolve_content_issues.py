@@ -8,6 +8,7 @@ from common_paths import resolve_site_paths
 PATHS = resolve_site_paths(Path(__file__))
 ROOT = PATHS.site_root
 CONTENT_ROOT = PATHS.content_root
+OBSIDIAN_ROOT = PATHS.data_root / "obsidian"
 KEYWORDS_FILE = PATHS.keywords_file
 KEYWORD_PROPOSALS_FILE = PATHS.keyword_proposals_file
 FALLBACK_KEYWORD = "governance-framework"
@@ -76,7 +77,11 @@ def main() -> int:
     changed_files = 0
     unknown_terms: set[str] = set()
 
-    for path in sorted(CONTENT_ROOT.glob("**/items/**/index.md")):
+    target_files = sorted(OBSIDIAN_ROOT.glob("*/*.md"))
+    if not target_files:
+        target_files = sorted(CONTENT_ROOT.glob("**/items/**/index.md"))
+
+    for path in target_files:
         fm, body = parse_front_matter(path)
         if not fm:
             continue
@@ -110,7 +115,8 @@ def main() -> int:
                 attachment_name = str(name).strip()
                 if not attachment_name:
                     continue
-                if (path.parent / attachment_name).exists():
+                attachment_base = path.parent if path.is_file() else path.parent
+                if (attachment_base / attachment_name).exists():
                     existing_attachments.append(attachment_name)
             if existing_attachments != attachments:
                 changed = True

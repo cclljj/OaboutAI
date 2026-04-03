@@ -101,22 +101,6 @@
     adminActionError: "Unable to save that change right now."
   };
 
-  const ARTICLE_COLUMNS = [
-    "slug",
-    "language",
-    "title",
-    "source_url",
-    "source_type",
-    "source_date",
-    "submission_date",
-    "executive_summary",
-    "detailed_notes",
-    "takeaway_html",
-    "keywords",
-    "primary_topic",
-    "topics",
-    "attachments"
-  ].join(",");
   const SORT_BY_KEY = "sort_by";
   const SORT_ORDER_KEY = "sort_order";
   const PAGE_SIZE_KEY = "page_size";
@@ -1334,30 +1318,71 @@
     });
 
     let favoriteSlugs = new Set();
+    const articleCache = new Map();
+
+    async function fetchArticlesFromStatic(lang) {
+      const key = normalizeLang(lang);
+      if (articleCache.has(key)) {
+        return articleCache.get(key);
+      }
+
+      const candidates = [
+        `/obsidian/articles.${key}.json`,
+        languagePath(`obsidian/articles.${key}.json`)
+      ];
+      let lastError = null;
+
+      for (const path of candidates) {
+        const target = String(path || "").trim();
+        if (!target) continue;
+        try {
+          const response = await fetch(target, { cache: "no-store", credentials: "same-origin" });
+          if (!response.ok) {
+            lastError = new Error(`HTTP ${response.status} for ${target}`);
+            continue;
+          }
+          const payload = await response.json();
+          if (!Array.isArray(payload)) {
+            lastError = new Error(`Invalid payload for ${target}`);
+            continue;
+          }
+          articleCache.set(key, payload);
+          return payload;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      if (lastError) throw lastError;
+      throw new Error(`Unable to load article dataset for language ${key}`);
+    }
 
     async function fetchArticles(lang) {
-      const { data, error } = await client
-        .from("articles")
-        .select(ARTICLE_COLUMNS)
-        .eq("language", lang);
-      if (error) return { rows: [], error };
-      const rows = (data || []).map((row) => normalizeArticleRecord(row, keywordAliasMap));
-      return { rows: rows.sort(byNewest), error: null };
+      try {
+        const data = await fetchArticlesFromStatic(lang);
+        const rows = data.map((row) => normalizeArticleRecord(row, keywordAliasMap));
+        return { rows: rows.sort(byNewest), error: null };
+      } catch (error) {
+        return { rows: [], error };
+      }
     }
 
     async function fetchArticleBySlug(slug, preferredLang) {
       if (!slug) return null;
-      const { data, error } = await client
-        .from("articles")
-        .select(ARTICLE_COLUMNS)
-        .eq("slug", slug);
-      if (error) return { row: null, error };
-      const rows = data || [];
-      const normalizedRows = rows.map((row) => normalizeArticleRecord(row, keywordAliasMap));
-      return {
-        row: normalizedRows.find((row) => normalizeLang(row.language) === preferredLang) || normalizedRows[0] || null,
-        error: null
-      };
+      const primaryLang = normalizeLang(preferredLang);
+      const fallbackLang = primaryLang === "en" ? "zh-tw" : "en";
+      const languages = [primaryLang, fallbackLang];
+
+      for (const lang of languages) {
+        const result = await fetchArticles(lang);
+        if (result.error) continue;
+        const match = result.rows.find((row) => row.slug === slug);
+        if (match) {
+          return { row: match, error: null };
+        }
+      }
+
+      return { row: null, error: null };
     }
 
     async function upsertCurrentUser(user) {

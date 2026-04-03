@@ -15,7 +15,7 @@ Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 如果你是第一次接觸這個專案，可以先知道這 5 件事：
 1. 這是一個 AI 文獻整理平台，不是一般部落格。
 2. 使用者登入後，才能閱讀完整內容。
-3. 文章資料存在資料庫（Supabase），不是放在 GitHub 公開 markdown。
+3. 文章原始資料在 private repo `OaboutAI_data` 的 Obsidian 檔案，build 時才注入。
 4. 可以用 Topic / Keyword / Type 快速篩選，並把文章加入個人收藏。
 5. 網站是雙語（英文 / 繁中），可直接切換語系閱讀。
 
@@ -38,13 +38,13 @@ Production site: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 ## 系統怎麼運作（簡版）
 
 - 前端與版型：Hugo（負責 shell、導覽、頁面框架）
-- 內容資料：Supabase `public.articles`
+- 內容資料：Obsidian markdown（private repo）→ build 時編譯為 `static/obsidian/articles.<lang>.json`
 - 收藏資料：Supabase `public.favorites`
 - 存取控制：Supabase Auth + RLS
 
 重點：
-- GitHub repo 不再作為受保護文章正文的 production source of truth
-- 未登入僅看到網站框架，登入後才從 Supabase 載入內容
+- 主 repo 不追蹤敏感文章原始檔；CI/本機 build 期間才拉 private data
+- 未登入仍只看到網站框架，登入後由前端載入編譯後文章資料
 
 ## 專案結構
 
@@ -66,10 +66,15 @@ npx --yes hugo-bin server -D
 
 ## 部署需求（Vercel）
 
-需要設定這 3 個環境變數：
+需要設定這些環境變數：
 - `HUGO_SUPABASE_URL`
 - `HUGO_SUPABASE_ANON_KEY`
 - `HUGO_SUPABASE_REDIRECT_URL`
+- `OABOUTAI_DATA_REPO_URL`（例：`https://github.com/cclljj/OaboutAI_data`）
+- `OABOUTAI_DATA_REPO_REF`（例：`main`）
+- `OABOUTAI_DATA_REPO_TOKEN_ENV`（預設：`OABOUTAI_DATA_REPO_TOKEN`）
+- `OABOUTAI_DATA_REPO_SUBDIR`（預設：`obsidian`）
+- `OABOUTAI_DATA_REPO_TOKEN`（private repo access token）
 
 CI workflow：`.github/workflows/docs-site-ci.yml`  
 主要流程：compose -> validate -> build -> deploy -> post-deploy smoke tests

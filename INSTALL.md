@@ -1,6 +1,6 @@
 # INSTALL.md
 
-Operational guide for local development, deployment, and Supabase-backed runtime.
+Operational guide for local development, deployment, and Obsidian(private-repo)+Supabase runtime.
 
 ## 0. Read Order
 
@@ -35,11 +35,16 @@ python3 -m pip install --upgrade pip pyyaml
 python3 --version
 node --version
 npx --yes hugo-bin version
-python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean \
+  --data-repo-url "${OABOUTAI_DATA_REPO_URL:-https://github.com/cclljj/OaboutAI_data}" \
+  --data-repo-ref "${OABOUTAI_DATA_REPO_REF:-main}" \
+  --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV:-OABOUTAI_DATA_REPO_TOKEN}" \
+  --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR:-obsidian}"
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
+python3 scripts/compile_obsidian_articles.py
 ```
 
 Notes:
@@ -48,9 +53,14 @@ Notes:
 ## 4. Run Locally
 
 ```bash
-python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean \
+  --data-repo-url "${OABOUTAI_DATA_REPO_URL:-https://github.com/cclljj/OaboutAI_data}" \
+  --data-repo-ref "${OABOUTAI_DATA_REPO_REF:-main}" \
+  --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV:-OABOUTAI_DATA_REPO_TOKEN}" \
+  --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR:-obsidian}"
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
+python3 scripts/compile_obsidian_articles.py
 npx --yes hugo-bin server -D
 ```
 
@@ -60,11 +70,16 @@ Open:
 ## 5. Production-Equivalent Local Build
 
 ```bash
-python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
+python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean \
+  --data-repo-url "${OABOUTAI_DATA_REPO_URL:-https://github.com/cclljj/OaboutAI_data}" \
+  --data-repo-ref "${OABOUTAI_DATA_REPO_REF:-main}" \
+  --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV:-OABOUTAI_DATA_REPO_TOKEN}" \
+  --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR:-obsidian}"
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
+python3 scripts/compile_obsidian_articles.py
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 test -f public/index.html
@@ -102,6 +117,11 @@ Set these variables in Vercel project settings:
 - `HUGO_SUPABASE_URL=https://<project-ref>.supabase.co`
 - `HUGO_SUPABASE_ANON_KEY=<anon-public-key>`
 - `HUGO_SUPABASE_REDIRECT_URL=https://oaboutai.vercel.app`
+- `OABOUTAI_DATA_REPO_URL=https://github.com/cclljj/OaboutAI_data`
+- `OABOUTAI_DATA_REPO_REF=main`
+- `OABOUTAI_DATA_REPO_TOKEN_ENV=OABOUTAI_DATA_REPO_TOKEN`
+- `OABOUTAI_DATA_REPO_SUBDIR=obsidian`
+- `OABOUTAI_DATA_REPO_TOKEN=<github-token-with-read-access-to-private-data-repo>`
 
 For local shell testing, you can export them before running Hugo:
 
@@ -109,11 +129,16 @@ For local shell testing, you can export them before running Hugo:
 export HUGO_SUPABASE_URL="https://<project-ref>.supabase.co"
 export HUGO_SUPABASE_ANON_KEY="<anon-public-key>"
 export HUGO_SUPABASE_REDIRECT_URL="http://localhost:1313"
+export OABOUTAI_DATA_REPO_URL="https://github.com/cclljj/OaboutAI_data"
+export OABOUTAI_DATA_REPO_REF="main"
+export OABOUTAI_DATA_REPO_TOKEN_ENV="OABOUTAI_DATA_REPO_TOKEN"
+export OABOUTAI_DATA_REPO_SUBDIR="obsidian"
+export OABOUTAI_DATA_REPO_TOKEN="<github-token>"
 ```
 
 ## 7. Load / Refresh Article Data
 
-Current production model reads article bodies from Supabase, not from GitHub `items/` markdown bundles.
+Current model reads article bodies from Obsidian markdown stored in a private data repository and compiled into static JSON at build time.
 
 Use either approach:
 1. Supabase dashboard import (`articles` table; CSV/JSON import)
@@ -144,6 +169,7 @@ Pipeline behavior:
 python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
+python3 scripts/compile_obsidian_articles.py
 npm install -g vercel@latest
 vercel pull --yes --environment=production
 rm -f data/keyword_proposals.jsonl
