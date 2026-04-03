@@ -142,10 +142,10 @@ jobs:
         run: |
           set -euo pipefail
           cleaned_token="$(python - <<'PY'
-import os
-print((os.environ.get("OABOUTAI_DATA_REPO_TOKEN") or "").strip(), end="")
-PY
-)"
+          import os
+          print((os.environ.get("OABOUTAI_DATA_REPO_TOKEN") or "").strip(), end="")
+          PY
+          )"
           {
             echo "OABOUTAI_DATA_REPO_TOKEN_CLEAN<<EOF"
             printf '%s\n' "${cleaned_token}"
