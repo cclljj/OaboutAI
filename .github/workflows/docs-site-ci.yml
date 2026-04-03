@@ -131,6 +131,13 @@ jobs:
             exit 1
           fi
 
+      - name: Check required private data token
+        run: |
+          if [ -z "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
+            echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
+            exit 1
+          fi
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
@@ -141,32 +148,14 @@ jobs:
 
       - name: Compose site (core + app)
         run: |
-          if [ -n "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
-            set +e
-            python scripts/compose_site.py \
-              --app-id "${APP_ID}" \
-              --output "${COMPOSED_SITE}" \
-              --clean \
-              --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
-              --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
-              --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
-              --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
-            status=$?
-            set -e
-            if [ "$status" -ne 0 ]; then
-              echo "Private data compose failed; fallback to compose without private data."
-              python scripts/compose_site.py \
-                --app-id "${APP_ID}" \
-                --output "${COMPOSED_SITE}" \
-                --clean
-            fi
-          else
-            echo "OABOUTAI_DATA_REPO_TOKEN is unavailable; composing without private data."
-            python scripts/compose_site.py \
-              --app-id "${APP_ID}" \
-              --output "${COMPOSED_SITE}" \
-              --clean
-          fi
+          python scripts/compose_site.py \
+            --app-id "${APP_ID}" \
+            --output "${COMPOSED_SITE}" \
+            --clean \
+            --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
+            --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
+            --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
+            --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
 
       - name: Sync topic pages from topics.json
         run: python scripts/sync_topics.py
