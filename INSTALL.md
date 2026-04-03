@@ -48,7 +48,7 @@ python3 scripts/compile_obsidian_articles.py
 ```
 
 Notes:
-- `validate_content.py` may report a warning when `content/**/items/**/index.md` is empty; this is acceptable in the current Supabase-first model.
+- `validate_content.py` may report a warning when no source files exist under `data/obsidian/*/*.md`; this is acceptable in shell-only validation contexts.
 
 ## 4. Run Locally
 
