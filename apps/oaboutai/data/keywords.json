@@ -48,5 +48,16 @@
     "id": "public-consultation",
     "label": { "en": "Public Consultation", "zh-tw": "公眾諮詢" },
     "aliases": ["stakeholder consultation"]
+  },
+  {
+    "id": "sovereign-ai",
+    "label": { "en": "Sovereign AI", "zh-tw": "主權AI" },
+    "aliases": [
+      "ai sovereignty",
+      "national ai sovereignty",
+      "digital sovereignty",
+      "主權ai",
+      "ai主權"
+    ]
   }
 ]
