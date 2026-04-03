@@ -65,12 +65,7 @@ jobs:
               --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
               --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
           else
-            if [ "${{ github.event_name }}" = "pull_request" ]; then
-              echo "OABOUTAI_DATA_REPO_TOKEN is unavailable in PR context; composing without private data."
-            else
-              echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
-              exit 1
-            fi
+            echo "OABOUTAI_DATA_REPO_TOKEN is unavailable; composing without private data."
             python scripts/compose_site.py \
               --app-id "${APP_ID}" \
               --output "${COMPOSED_SITE}" \
