@@ -44,6 +44,10 @@
   translation: 主要主題
 - id: otherTopics
   translation: 其他主題
+- id: keywordLabel
+  translation: 關鍵字
+- id: typeLabel
+  translation: 類型
 - id: relatedEntries
   translation: 相關條目
 - id: noEntriesInTopic

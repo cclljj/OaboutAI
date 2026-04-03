@@ -24,6 +24,8 @@
     keywords: "Keywords",
     primaryTopic: "Primary topic",
     otherTopics: "Other topics",
+    keywordLabel: "Keyword",
+    typeLabel: "Type",
     executiveSummary: "Executive Summary",
     detailedNotes: "Detailed Notes",
     takeAway: "Take-away",
@@ -308,6 +310,15 @@
     return languagePath(`${encodePathSegment(termType)}/${encodePathSegment(termValue)}/`);
   }
 
+  function filteredItemsHref(filters) {
+    const url = new URL(languagePath("items/"), window.location.origin);
+    for (const [key, value] of Object.entries(filters || {})) {
+      if (value == null || value === "") continue;
+      url.searchParams.set(key, String(value));
+    }
+    return `${url.pathname}${url.search}`;
+  }
+
   function formatDateTime(value) {
     if (!value) return "-";
     const parsed = new Date(value);
@@ -403,6 +414,21 @@
     root.innerHTML = `<p class="oa-page-subtitle">${escapeHtml(labels.loading)}</p>`;
   }
 
+  function updateItemsListHeading(root, filters, labels) {
+    const shell = root.closest(".oa-shell");
+    const titleNode = shell ? shell.querySelector(".oa-page-title") : null;
+    if (!titleNode) return;
+
+    if (filters.termType === "keywords" && filters.termValue) {
+      titleNode.textContent = `${labels.keywordLabel}: ${filters.termValue}`;
+      return;
+    }
+
+    if (filters.termType === "types" && filters.termValue) {
+      titleNode.textContent = `${labels.typeLabel}: ${filters.termValue}`;
+    }
+  }
+
   function renderList(root, records, labels, favoritesSet) {
     if (!records.length) {
       root.innerHTML = `<p>${escapeHtml(labels.noEntriesYet)}</p>`;
@@ -473,7 +499,7 @@
           <dt>${escapeHtml(labels.otherTopics)}</dt>
           <dd class="oa-chip-wrap">${topics.length ? topics.map((topic) => buildChipLink(topic, topicHref(topic))).join("") : "-"}</dd>
           <dt>${escapeHtml(labels.keywords)}</dt>
-          <dd class="oa-chip-wrap">${keywords.length ? keywords.map((k) => buildChipLink(k, termHref("keywords", k))).join("") : "-"}</dd>
+          <dd class="oa-chip-wrap">${keywords.length ? keywords.map((k) => buildChipLink(k, filteredItemsHref({ term_type: "keywords", term_value: k }))).join("") : "-"}</dd>
         </dl>
         <section class="oa-section oa-card">
           <h2 class="oa-section-title">${escapeHtml(labels.executiveSummary)}</h2>
@@ -1624,6 +1650,7 @@
           continue;
         }
 
+        updateItemsListHeading(root, filters, labels);
         renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
           renderList(node, pageItems, labels, favoriteSlugs);
         }, () => bindGlobalActions(user, access));

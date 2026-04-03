@@ -44,6 +44,10 @@
   translation: Primary topic
 - id: otherTopics
   translation: Other topics
+- id: keywordLabel
+  translation: Keyword
+- id: typeLabel
+  translation: Type
 - id: relatedEntries
   translation: Related Entries
 - id: noEntriesInTopic
