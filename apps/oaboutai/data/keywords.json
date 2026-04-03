@@ -2,12 +2,12 @@
   {
     "id": "regulation",
     "label": { "en": "Regulation", "zh-tw": "法規" },
-    "aliases": ["law", "compliance law"]
+    "aliases": ["law", "compliance law", "ai-legislation", "compliance", "licensing"]
   },
   {
     "id": "risk-management",
     "label": { "en": "Risk Management", "zh-tw": "風險管理" },
-    "aliases": ["risk control", "risk governance"]
+    "aliases": ["risk control", "risk governance", "threat-modeling", "human-oversight", "content-moderation"]
   },
   {
     "id": "model-evaluation",
@@ -17,7 +17,7 @@
   {
     "id": "red-teaming",
     "label": { "en": "Red Teaming", "zh-tw": "紅隊測試" },
-    "aliases": ["adversarial testing"]
+    "aliases": ["adversarial testing", "adversarial-ml"]
   },
   {
     "id": "incident-reporting",
@@ -37,12 +37,20 @@
   {
     "id": "safety-cases",
     "label": { "en": "Safety Cases", "zh-tw": "安全案例" },
-    "aliases": ["assurance cases"]
+    "aliases": ["assurance cases", "security-architecture", "usage-analytics"]
   },
   {
     "id": "governance-framework",
     "label": { "en": "Governance Framework", "zh-tw": "治理框架" },
-    "aliases": ["policy framework"]
+    "aliases": [
+      "policy framework",
+      "implementation-governance",
+      "defense-governance",
+      "enterprise-ai",
+      "enterprise-adoption",
+      "public-sector-ai",
+      "regional-innovation"
+    ]
   },
   {
     "id": "public-consultation",

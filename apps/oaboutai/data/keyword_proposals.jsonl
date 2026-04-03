@@ -1,8 +1,5 @@
 
 {"term":"agentic-ai","rationale":"Frequent concept in current corpus; currently mapped to governance-framework as closest proxy but lacks precise keyword for autonomous multi-step agent systems."}
-{"term":"threat-modeling","rationale":"Common security methodology in AI safety/governance entries; currently approximated by risk-management but deserves explicit taxonomy slot."}
-{"term":"adversarial-ml","rationale":"Important technical risk category; currently approximated by red-teaming, but scope is broader than testing practice."}
-{"term":"security-architecture","rationale":"Recurring concept in system-level controls and assurance; currently approximated by standards/governance-framework."}
 {"term":"ai-infrastructure","rationale":"High-frequency concept in current entries about compute/networking/data-center systems; currently approximated by governance-framework/standards."}
 {"term":"future-of-work","rationale":"Cross-cutting labor and productivity transformation theme in AI policy/governance discussions; currently approximated by governance-framework."}
 {"term":"geopolitics","rationale":"Frequent policy context around export controls, market access, and strategic diffusion; currently approximated by regulation/public-consultation."}
@@ -15,26 +12,14 @@
 {"term": "learning-by-doing", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "productivity", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "workforce-development", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "ai-legislation", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "ai-skills", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "automation", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "autonomous-weapons", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "compliance", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "content-moderation", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "defense-governance", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "diffusion", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "enterprise-adoption", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "enterprise-ai", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "geographic-inequality", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "human-oversight", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "implementation-governance", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "licensing", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "mass-surveillance", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "military-ai", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "nhs", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "open-source", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "public-sector-ai", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "regional-innovation", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "shadow-ai", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
-{"term": "usage-analytics", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
 {"term": "youth-safety", "rationale": "Auto-added by CI/content auto-resolver; mapped to existing fallback keyword `governance-framework`."}
