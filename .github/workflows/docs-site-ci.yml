@@ -36,6 +36,11 @@ jobs:
     env:
       APP_ID: ${{ github.event.inputs.app_id || 'oaboutai' }}
       COMPOSED_SITE: /tmp/oaboutai-site
+      OABOUTAI_DATA_REPO_URL: https://github.com/cclljj/OaboutAI_data
+      OABOUTAI_DATA_REPO_REF: main
+      OABOUTAI_DATA_REPO_TOKEN_ENV: OABOUTAI_DATA_REPO_TOKEN
+      OABOUTAI_DATA_REPO_SUBDIR: obsidian
+      OABOUTAI_DATA_REPO_TOKEN: ${{ secrets.OABOUTAI_DATA_REPO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -48,8 +53,23 @@ jobs:
       - name: Install validator dependency
         run: pip install pyyaml
 
+      - name: Check required private data token
+        run: |
+          if [ -z "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
+            echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
+            exit 1
+          fi
+
       - name: Compose site (core + app)
-        run: python scripts/compose_site.py --app-id "${APP_ID}" --output "${COMPOSED_SITE}" --clean
+        run: |
+          python scripts/compose_site.py \
+            --app-id "${APP_ID}" \
+            --output "${COMPOSED_SITE}" \
+            --clean \
+            --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
+            --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
+            --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
+            --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
 
       - name: Sync topic pages from topics.json
         run: python scripts/sync_topics.py
@@ -61,6 +81,14 @@ jobs:
 
       - name: Validate content metadata
         run: python scripts/validate_content.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Compile Obsidian articles to static JSON
+        run: python scripts/compile_obsidian_articles.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Remove raw Obsidian markdown before Hugo build
+        run: rm -rf data/obsidian
         working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Install Hugo Extended
@@ -89,6 +117,11 @@ jobs:
       COMPOSED_SITE: /tmp/oaboutai-site
       VERCEL_ORG_ID: team_RTKyG0Rcfpu4LYhgPpGRJqJK
       VERCEL_PROJECT_ID: prj_1e1JptyR4OdLQ7653OBGl40QL1nc
+      OABOUTAI_DATA_REPO_URL: https://github.com/cclljj/OaboutAI_data
+      OABOUTAI_DATA_REPO_REF: main
+      OABOUTAI_DATA_REPO_TOKEN_ENV: OABOUTAI_DATA_REPO_TOKEN
+      OABOUTAI_DATA_REPO_SUBDIR: obsidian
+      OABOUTAI_DATA_REPO_TOKEN: ${{ secrets.OABOUTAI_DATA_REPO_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -108,6 +141,13 @@ jobs:
             exit 1
           fi
 
+      - name: Check required private data token
+        run: |
+          if [ -z "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
+            echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
+            exit 1
+          fi
+
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
@@ -117,10 +157,26 @@ jobs:
         run: npm install -g vercel@latest
 
       - name: Compose site (core + app)
-        run: python scripts/compose_site.py --app-id "${APP_ID}" --output "${COMPOSED_SITE}" --clean
+        run: |
+          python scripts/compose_site.py \
+            --app-id "${APP_ID}" \
+            --output "${COMPOSED_SITE}" \
+            --clean \
+            --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
+            --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
+            --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
+            --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
 
       - name: Sync topic pages from topics.json
         run: python scripts/sync_topics.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Compile Obsidian articles to static JSON
+        run: python scripts/compile_obsidian_articles.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Remove raw Obsidian markdown before Vercel build
+        run: rm -rf data/obsidian
         working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Pull Vercel project settings
@@ -136,7 +192,7 @@ jobs:
           cat > vercel.json <<'JSON'
           {
             "$schema": "https://openapi.vercel.sh/vercel.json",
-            "buildCommand": "rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
+            "buildCommand": "rm -rf data/obsidian && rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
             "outputDirectory": "public",
             "rewrites": [
               {
