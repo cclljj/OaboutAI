@@ -22,6 +22,8 @@
   "keywords" (i18n "keywords")
   "primaryTopic" (i18n "primaryTopic")
   "otherTopics" (i18n "otherTopics")
+  "keywordLabel" (i18n "keywordLabel")
+  "typeLabel" (i18n "typeLabel")
   "executiveSummary" (i18n "executiveSummary")
   "detailedNotes" (i18n "detailedNotes")
   "takeAway" (i18n "takeAway")
@@ -93,6 +95,7 @@
   "adminActionError" (i18n "adminActionError")
 -}}
 <script id="oa-labels" type="application/json">{{ $labels | jsonify | safeHTML }}</script>
+<script id="oa-keyword-catalog" type="application/json">{{ site.Data.keywords | jsonify | safeHTML }}</script>
 
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 {{- $appScript := resources.Get "js/oa-app.js" -}}

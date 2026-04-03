@@ -152,6 +152,67 @@
     }
   }
 
+  function getKeywordCatalog() {
+    const node = document.getElementById("oa-keyword-catalog");
+    const parsed = node ? parseJsonAttr(node.textContent, []) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  }
+
+  function normalizeKeywordToken(value) {
+    return String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+  }
+
+  function buildKeywordAliasMap(catalog) {
+    const aliasMap = new Map();
+    const rows = Array.isArray(catalog) ? catalog : [];
+    for (const row of rows) {
+      const id = normalizeKeywordToken(row?.id || "");
+      if (!id) continue;
+      const aliases = [];
+      aliases.push(id);
+      if (Array.isArray(row?.aliases)) aliases.push(...row.aliases);
+      if (row?.label && typeof row.label === "object") aliases.push(...Object.values(row.label));
+
+      for (const alias of aliases) {
+        const key = normalizeKeywordToken(alias);
+        if (!key || aliasMap.has(key)) continue;
+        aliasMap.set(key, id);
+      }
+    }
+    return aliasMap;
+  }
+
+  function canonicalizeKeyword(value, aliasMap) {
+    const token = normalizeKeywordToken(value);
+    if (!token) return "";
+    if (aliasMap && aliasMap.has(token)) return aliasMap.get(token) || token;
+    return token;
+  }
+
+  function normalizeKeywords(values, aliasMap) {
+    if (!Array.isArray(values)) return [];
+    const output = [];
+    const seen = new Set();
+    for (const rawValue of values) {
+      const normalized = canonicalizeKeyword(rawValue, aliasMap);
+      if (!normalized || seen.has(normalized)) continue;
+      seen.add(normalized);
+      output.push(normalized);
+    }
+    return output;
+  }
+
+  function normalizeArticleRecord(record, aliasMap) {
+    if (!record || typeof record !== "object") return record;
+    return {
+      ...record,
+      keywords: normalizeKeywords(record.keywords, aliasMap)
+    };
+  }
+
   function getLabels() {
     const node = document.getElementById("oa-labels");
     const custom = node ? parseJsonAttr(node.textContent, {}) : {};
@@ -414,13 +475,14 @@
     root.innerHTML = `<p class="oa-page-subtitle">${escapeHtml(labels.loading)}</p>`;
   }
 
-  function updateItemsListHeading(root, filters, labels) {
+  function updateItemsListHeading(root, filters, labels, keywordAliasMap) {
     const shell = root.closest(".oa-shell");
     const titleNode = shell ? shell.querySelector(".oa-page-title") : null;
     if (!titleNode) return;
 
     if (filters.termType === "keywords" && filters.termValue) {
-      titleNode.textContent = `${labels.keywordLabel}: ${filters.termValue}`;
+      const canonicalKeyword = canonicalizeKeyword(filters.termValue, keywordAliasMap);
+      titleNode.textContent = `${labels.keywordLabel}: ${canonicalKeyword || filters.termValue}`;
       return;
     }
 
@@ -1077,7 +1139,7 @@
     `;
   }
 
-  function filterRecords(records, filters) {
+  function filterRecords(records, filters, keywordAliasMap) {
     let output = [...records];
     if (filters.topic) {
       output = output.filter((record) => {
@@ -1086,7 +1148,8 @@
       });
     }
     if (filters.termType === "keywords" && filters.termValue) {
-      output = output.filter((record) => Array.isArray(record.keywords) && record.keywords.includes(filters.termValue));
+      const canonicalKeyword = canonicalizeKeyword(filters.termValue, keywordAliasMap);
+      output = output.filter((record) => Array.isArray(record.keywords) && record.keywords.includes(canonicalKeyword));
     }
     if (filters.termType === "types" && filters.termValue) {
       output = output.filter((record) => record.source_type === filters.termValue);
@@ -1157,6 +1220,7 @@
     syncLanguageSwitchQueryParams();
 
     const labels = getLabels();
+    const keywordAliasMap = buildKeywordAliasMap(getKeywordCatalog());
     const roots = Array.from(document.querySelectorAll("[data-oa-protected-view]"));
     const supabaseUrl = document.querySelector('meta[name="oa-supabase-url"]')?.content || "";
     const supabaseAnonKey = document.querySelector('meta[name="oa-supabase-anon-key"]')?.content || "";
@@ -1277,7 +1341,8 @@
         .select(ARTICLE_COLUMNS)
         .eq("language", lang);
       if (error) return { rows: [], error };
-      return { rows: (data || []).sort(byNewest), error: null };
+      const rows = (data || []).map((row) => normalizeArticleRecord(row, keywordAliasMap));
+      return { rows: rows.sort(byNewest), error: null };
     }
 
     async function fetchArticleBySlug(slug, preferredLang) {
@@ -1288,8 +1353,9 @@
         .eq("slug", slug);
       if (error) return { row: null, error };
       const rows = data || [];
+      const normalizedRows = rows.map((row) => normalizeArticleRecord(row, keywordAliasMap));
       return {
-        row: rows.find((row) => normalizeLang(row.language) === preferredLang) || rows[0] || null,
+        row: normalizedRows.find((row) => normalizeLang(row.language) === preferredLang) || normalizedRows[0] || null,
         error: null
       };
     }
@@ -1626,7 +1692,7 @@
           continue;
         }
 
-        let scoped = filterRecords(articles, filters);
+        let scoped = filterRecords(articles, filters, keywordAliasMap);
 
         if (filters.view === "home_recent") {
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
@@ -1650,7 +1716,7 @@
           continue;
         }
 
-        updateItemsListHeading(root, filters, labels);
+        updateItemsListHeading(root, filters, labels, keywordAliasMap);
         renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
           renderList(node, pageItems, labels, favoriteSlugs);
         }, () => bindGlobalActions(user, access));

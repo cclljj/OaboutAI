@@ -228,3 +228,17 @@ Check:
 1. article rows exist
 2. `primary_topic`, `topics`, `keywords`, `source_type` fields are populated
 3. imported JSON fields are valid arrays for `topics` / `keywords`
+
+## 9. Normalize Existing Keywords
+
+Use this when historical `public.articles.keywords` contains mixed Chinese/English terms or mixed casing.
+
+1. Generate SQL from the current keyword catalog:
+
+```bash
+python3 scripts/generate_keyword_normalization_sql.py > docs/supabase_keyword_normalization.sql
+```
+
+2. Open `docs/supabase_keyword_normalization.sql` and run it in Supabase SQL Editor.
+3. Check the final query output (`unresolved_keyword`).
+4. If unresolved terms remain, add aliases to `apps/oaboutai/data/keywords.json`, regenerate SQL, and run again.
