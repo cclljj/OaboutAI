@@ -55,22 +55,11 @@ jobs:
 
       - name: Compose site (core + app)
         run: |
-          if [ -n "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
-            python scripts/compose_site.py \
-              --app-id "${APP_ID}" \
-              --output "${COMPOSED_SITE}" \
-              --clean \
-              --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
-              --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
-              --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
-              --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
-          else
-            echo "OABOUTAI_DATA_REPO_TOKEN is unavailable; composing without private data."
-            python scripts/compose_site.py \
-              --app-id "${APP_ID}" \
-              --output "${COMPOSED_SITE}" \
-              --clean
-          fi
+          echo "Validate job composes without private data repository."
+          python scripts/compose_site.py \
+            --app-id "${APP_ID}" \
+            --output "${COMPOSED_SITE}" \
+            --clean
 
       - name: Sync topic pages from topics.json
         run: python scripts/sync_topics.py
