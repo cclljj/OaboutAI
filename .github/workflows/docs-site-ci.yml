@@ -87,6 +87,10 @@ jobs:
         run: python scripts/compile_obsidian_articles.py
         working-directory: ${{ env.COMPOSED_SITE }}
 
+      - name: Remove raw Obsidian markdown before Hugo build
+        run: rm -rf data/obsidian
+        working-directory: ${{ env.COMPOSED_SITE }}
+
       - name: Install Hugo Extended
         run: |
           HUGO_VERSION="0.152.2"
@@ -171,6 +175,10 @@ jobs:
         run: python scripts/compile_obsidian_articles.py
         working-directory: ${{ env.COMPOSED_SITE }}
 
+      - name: Remove raw Obsidian markdown before Vercel build
+        run: rm -rf data/obsidian
+        working-directory: ${{ env.COMPOSED_SITE }}
+
       - name: Pull Vercel project settings
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ${{ env.COMPOSED_SITE }}
@@ -184,7 +192,7 @@ jobs:
           cat > vercel.json <<'JSON'
           {
             "$schema": "https://openapi.vercel.sh/vercel.json",
-            "buildCommand": "rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
+            "buildCommand": "rm -rf data/obsidian && rm -f data/keyword_proposals.jsonl && npx --yes hugo-bin --gc --minify",
             "outputDirectory": "public",
             "rewrites": [
               {

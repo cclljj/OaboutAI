@@ -6,8 +6,6 @@ import re
 from pathlib import Path
 from typing import Any
 
-import yaml
-
 from common_paths import resolve_site_paths
 
 PATHS = resolve_site_paths(Path(__file__))
@@ -23,11 +21,47 @@ def parse_markdown(path: Path) -> tuple[dict[str, Any], str]:
     match = FRONT_MATTER_PATTERN.match(raw)
     if not match:
         return {}, raw
-    front_matter = yaml.safe_load(match.group(1)) or {}
-    if not isinstance(front_matter, dict):
-        front_matter = {}
+    front_matter = parse_simple_front_matter(match.group(1))
     body = raw[match.end() :]
     return front_matter, body
+
+
+def parse_simple_front_matter(block: str) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    current_key = ""
+    for raw_line in block.splitlines():
+        line = raw_line.rstrip()
+        if not line.strip() or line.strip().startswith("#"):
+            continue
+        list_match = re.match(r"^\s*-\s*(.*)\s*$", line)
+        if list_match and current_key:
+            existing = result.get(current_key)
+            if not isinstance(existing, list):
+                existing = []
+                result[current_key] = existing
+            existing.append(unquote(list_match.group(1).strip()))
+            continue
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        current_key = key
+        if value == "":
+            result[key] = []
+            continue
+        if value == "[]":
+            result[key] = []
+            continue
+        result[key] = unquote(value)
+    return result
+
+
+def unquote(value: str) -> str:
+    token = value.strip()
+    if len(token) >= 2 and ((token[0] == token[-1] == '"') or (token[0] == token[-1] == "'")):
+        return token[1:-1]
+    return token
 
 
 def normalize_text(value: Any) -> str:

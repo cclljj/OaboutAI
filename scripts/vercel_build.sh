@@ -32,6 +32,7 @@ fi
 
 pushd "${COMPOSED_SITE}" >/dev/null
 python3 scripts/compile_obsidian_articles.py
+rm -rf data/obsidian
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 popd >/dev/null

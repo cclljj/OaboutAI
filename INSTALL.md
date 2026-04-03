@@ -80,6 +80,7 @@ python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
 python3 scripts/compile_obsidian_articles.py
+rm -rf data/obsidian
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 test -f public/index.html
