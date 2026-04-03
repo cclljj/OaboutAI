@@ -53,23 +53,29 @@ jobs:
       - name: Install validator dependency
         run: pip install pyyaml
 
-      - name: Check required private data token
-        run: |
-          if [ -z "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
-            echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
-            exit 1
-          fi
-
       - name: Compose site (core + app)
         run: |
-          python scripts/compose_site.py \
-            --app-id "${APP_ID}" \
-            --output "${COMPOSED_SITE}" \
-            --clean \
-            --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
-            --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
-            --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
-            --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
+          if [ -n "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
+            python scripts/compose_site.py \
+              --app-id "${APP_ID}" \
+              --output "${COMPOSED_SITE}" \
+              --clean \
+              --data-repo-url "${OABOUTAI_DATA_REPO_URL}" \
+              --data-repo-ref "${OABOUTAI_DATA_REPO_REF}" \
+              --data-repo-token-env "${OABOUTAI_DATA_REPO_TOKEN_ENV}" \
+              --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR}"
+          else
+            if [ "${{ github.event_name }}" = "pull_request" ]; then
+              echo "OABOUTAI_DATA_REPO_TOKEN is unavailable in PR context; composing without private data."
+            else
+              echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
+              exit 1
+            fi
+            python scripts/compose_site.py \
+              --app-id "${APP_ID}" \
+              --output "${COMPOSED_SITE}" \
+              --clean
+          fi
 
       - name: Sync topic pages from topics.json
         run: python scripts/sync_topics.py
