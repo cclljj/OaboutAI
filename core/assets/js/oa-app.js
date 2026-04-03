@@ -448,7 +448,8 @@
     const keywords = Array.isArray(record.keywords) ? record.keywords : [];
     const topics = Array.isArray(record.topics) ? record.topics : [];
     const attachments = Array.isArray(record.attachments) ? record.attachments : [];
-    const takeAway = formatTakeAway(record.takeaway_html);
+    const detailedNotes = formatMarkdownContent(record.detailed_notes);
+    const takeAway = formatMarkdownContent(record.takeaway_html, { stripH2: true });
     const sourceType = String(record.source_type || "").trim();
     const primaryTopic = String(record.primary_topic || "").trim();
 
@@ -470,9 +471,9 @@
           <dt>${escapeHtml(labels.primaryTopic)}</dt>
           <dd>${primaryTopic ? buildChipLink(primaryTopic, topicHref(primaryTopic)) : "-"}</dd>
           <dt>${escapeHtml(labels.otherTopics)}</dt>
-          <dd class="oa-chip-wrap">${topics.length ? topics.map((topic) => buildChip(topic)).join("") : "-"}</dd>
+          <dd class="oa-chip-wrap">${topics.length ? topics.map((topic) => buildChipLink(topic, topicHref(topic))).join("") : "-"}</dd>
           <dt>${escapeHtml(labels.keywords)}</dt>
-          <dd class="oa-chip-wrap">${keywords.length ? keywords.map((k) => buildChip(k)).join("") : "-"}</dd>
+          <dd class="oa-chip-wrap">${keywords.length ? keywords.map((k) => buildChipLink(k, termHref("keywords", k))).join("") : "-"}</dd>
         </dl>
         <section class="oa-section oa-card">
           <h2 class="oa-section-title">${escapeHtml(labels.executiveSummary)}</h2>
@@ -480,19 +481,19 @@
         </section>
         <section class="oa-section oa-card">
           <h2 class="oa-section-title">${escapeHtml(labels.detailedNotes)}</h2>
-          <p>${escapeHtml(record.detailed_notes || "")}</p>
+          <div class="oa-markdown">${detailedNotes || `<p>${escapeHtml(record.detailed_notes || "")}</p>`}</div>
         </section>
-        ${takeAway ? `<section class="oa-section oa-card"><h2 class="oa-section-title">${escapeHtml(labels.takeAway)}</h2><div class="oa-takeaway">${takeAway}</div></section>` : ""}
+        ${takeAway ? `<section class="oa-section oa-card"><h2 class="oa-section-title">${escapeHtml(labels.takeAway)}</h2><div class="oa-markdown oa-takeaway">${takeAway}</div></section>` : ""}
         ${attachments.length ? `<section class="oa-section oa-card"><h2 class="oa-section-title">${escapeHtml(labels.attachments)}</h2><ul>${attachments.map((a) => `<li>${escapeHtml(a)}</li>`).join("")}</ul></section>` : ""}
       </article>
     `;
   }
 
-  function formatTakeAway(value) {
+  function formatMarkdownContent(value, options = {}) {
     const raw = String(value || "");
     const cleaned = raw
       .split(/\r?\n/)
-      .filter((line) => !/^\s*##\s+/.test(line))
+      .filter((line) => !(options.stripH2 && /^\s*##\s+/.test(line)))
       .join("\n")
       .trim();
 
