@@ -109,7 +109,7 @@
 - id: accessPendingMessage
   translation: Your request is pending review.
 - id: accessDeniedMessage
-  translation: Your last request was not approved. You can submit a new reason below.
+  translation: Your access request still needs review. You can update your reason and submit again below.
 - id: accessApprovedMessage
   translation: Your access has been approved.
 - id: requestStatusPending

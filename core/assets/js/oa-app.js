@@ -52,7 +52,7 @@
       "Please briefly describe your role and why you need access to this archive.",
     submitAccessRequest: "Submit request",
     accessPendingMessage: "Your request is pending review.",
-    accessDeniedMessage: "Your last request was not approved. You can submit a new reason below.",
+    accessDeniedMessage: "Your access request still needs review. You can update your reason and submit again below.",
     accessApprovedMessage: "Your access has been approved.",
     requestStatusPending: "Pending",
     requestStatusApproved: "Approved",
@@ -278,6 +278,11 @@
     return `<span class="oa-chip${toneClass}">${escapeHtml(text)}</span>`;
   }
 
+  function buildChipLink(text, href, tone) {
+    const toneClass = tone ? ` oa-chip-${tone}` : "";
+    return `<a class="oa-chip oa-chip-link${toneClass}" href="${escapeHtml(href)}">${escapeHtml(text)}</a>`;
+  }
+
   function articleHref(slug) {
     const encoded = encodeURIComponent(String(slug || ""));
     const currentLang = normalizeLang(document.documentElement.lang);
@@ -289,6 +294,18 @@
     const currentLang = normalizeLang(document.documentElement.lang);
     const clean = String(path || "").replace(/^\/+/, "");
     return currentLang === "zh-tw" ? `/zh-tw/${clean}` : `/${clean}`;
+  }
+
+  function encodePathSegment(value) {
+    return encodeURIComponent(String(value || "").trim());
+  }
+
+  function topicHref(topicId) {
+    return languagePath(`topics/${encodePathSegment(topicId)}/`);
+  }
+
+  function termHref(termType, termValue) {
+    return languagePath(`${encodePathSegment(termType)}/${encodePathSegment(termValue)}/`);
   }
 
   function formatDateTime(value) {
@@ -432,6 +449,8 @@
     const topics = Array.isArray(record.topics) ? record.topics : [];
     const attachments = Array.isArray(record.attachments) ? record.attachments : [];
     const takeAway = formatTakeAway(record.takeaway_html);
+    const sourceType = String(record.source_type || "").trim();
+    const primaryTopic = String(record.primary_topic || "").trim();
 
     root.innerHTML = `
       <article class="oa-single">
@@ -443,13 +462,13 @@
           <dt>${escapeHtml(labels.sourceUrl)}</dt>
           <dd><a href="${escapeHtml(record.source_url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(record.source_url || "-")}</a></dd>
           <dt>${escapeHtml(labels.sourceType)}</dt>
-          <dd>${escapeHtml(record.source_type || "-")}</dd>
+          <dd>${sourceType ? buildChipLink(sourceType, termHref("types", sourceType)) : "-"}</dd>
           <dt>${escapeHtml(labels.sourceDate)}</dt>
           <dd>${escapeHtml(record.source_date || "-")}</dd>
           <dt>${escapeHtml(labels.submissionDate)}</dt>
           <dd>${escapeHtml(record.submission_date || "-")}</dd>
           <dt>${escapeHtml(labels.primaryTopic)}</dt>
-          <dd>${escapeHtml(record.primary_topic || "-")}</dd>
+          <dd>${primaryTopic ? buildChipLink(primaryTopic, topicHref(primaryTopic)) : "-"}</dd>
           <dt>${escapeHtml(labels.otherTopics)}</dt>
           <dd class="oa-chip-wrap">${topics.length ? topics.map((topic) => buildChip(topic)).join("") : "-"}</dd>
           <dt>${escapeHtml(labels.keywords)}</dt>
@@ -470,32 +489,102 @@
   }
 
   function formatTakeAway(value) {
-    const raw = String(value || "").trim();
-    if (!raw) return "";
-
-    const hasHtmlTag = /<[a-z][\s\S]*>/i.test(raw);
-    if (hasHtmlTag) {
-      return raw;
-    }
-
-    const lines = raw
+    const raw = String(value || "");
+    const cleaned = raw
       .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter(Boolean);
+      .filter((line) => !/^\s*##\s+/.test(line))
+      .join("\n")
+      .trim();
 
-    if (!lines.length) {
-      return "";
+    if (!cleaned) return "";
+
+    const blocks = [];
+    let paragraphLines = [];
+    let listType = "";
+    let listItems = [];
+
+    function flushParagraph() {
+      if (!paragraphLines.length) return;
+      const text = paragraphLines.join(" ").trim();
+      if (text) {
+        blocks.push(`<p>${renderInlineMarkdown(text)}</p>`);
+      }
+      paragraphLines = [];
     }
 
-    const bulletLike = /^([-*•]\s+|\d+[.)]\s+)/;
-    const normalized = lines.map((line) => line.replace(bulletLike, "").trim());
-    const shouldRenderList = lines.length > 1 || lines.every((line) => bulletLike.test(line));
-
-    if (shouldRenderList) {
-      return `<ul>${normalized.map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul>`;
+    function flushList() {
+      if (!listItems.length || !listType) return;
+      blocks.push(`<${listType}>${listItems.map((item) => `<li>${renderInlineMarkdown(item)}</li>`).join("")}</${listType}>`);
+      listItems = [];
+      listType = "";
     }
 
-    return `<p>${escapeHtml(raw)}</p>`;
+    for (const line of cleaned.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        flushList();
+        continue;
+      }
+
+      const unorderedMatch = trimmed.match(/^[-*•]\s+(.*)$/);
+      const orderedMatch = trimmed.match(/^\d+[.)]\s+(.*)$/);
+      if (unorderedMatch || orderedMatch) {
+        flushParagraph();
+        const nextListType = unorderedMatch ? "ul" : "ol";
+        if (listType && listType !== nextListType) {
+          flushList();
+        }
+        listType = nextListType;
+        listItems.push((unorderedMatch || orderedMatch)[1].trim());
+        continue;
+      }
+
+      flushList();
+      paragraphLines.push(trimmed);
+    }
+
+    flushParagraph();
+    flushList();
+    return blocks.join("");
+  }
+
+  function sanitizeHref(rawHref) {
+    const trimmed = String(rawHref || "").trim();
+    if (!trimmed) return "";
+    if (/^(https?:|mailto:)/i.test(trimmed)) return trimmed;
+    return "";
+  }
+
+  function renderInlineMarkdown(value) {
+    const source = String(value || "");
+    const tokenPattern = /(`([^`]+)`|\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|__([^_]+)__|\*([^*]+)\*|_([^_]+)_)/g;
+    let output = "";
+    let lastIndex = 0;
+
+    for (const match of source.matchAll(tokenPattern)) {
+      const index = match.index || 0;
+      output += escapeHtml(source.slice(lastIndex, index));
+
+      if (match[2] != null) {
+        output += `<code>${escapeHtml(match[2])}</code>`;
+      } else if (match[3] != null && match[4] != null) {
+        const href = sanitizeHref(match[4]);
+        const text = renderInlineMarkdown(match[3]);
+        output += href
+          ? `<a href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${text}</a>`
+          : text;
+      } else if (match[5] != null || match[6] != null) {
+        output += `<strong>${renderInlineMarkdown(match[5] || match[6] || "")}</strong>`;
+      } else if (match[7] != null || match[8] != null) {
+        output += `<em>${renderInlineMarkdown(match[7] || match[8] || "")}</em>`;
+      }
+
+      lastIndex = index + match[0].length;
+    }
+
+    output += escapeHtml(source.slice(lastIndex));
+    return output;
   }
 
   function renderSingleUnavailable(root, labels, slug, reason) {
@@ -517,7 +606,7 @@
       ? latestRequest.status === "approved"
         ? labels.requestStatusApproved
         : latestRequest.status === "denied"
-          ? labels.requestStatusDenied
+          ? labels.requestStatusPending
           : labels.requestStatusPending
       : "";
     const message = latestRequest
@@ -531,7 +620,7 @@
       ? latestRequest.status === "approved"
         ? "success"
         : latestRequest.status === "denied"
-          ? "danger"
+          ? "warning"
           : "warning"
       : "";
 
@@ -547,7 +636,7 @@
         <div class="oa-access-meta">
           <p><strong>${escapeHtml(labels.signedInAs)}</strong> ${escapeHtml(access.profile.email || "-")}</p>
           ${latestRequest ? `<p><strong>${escapeHtml(labels.requestSubmittedAt)}</strong> ${escapeHtml(formatDateTime(latestRequest.created_at))}</p>` : ""}
-          ${latestRequest?.reviewed_at ? `<p><strong>${escapeHtml(labels.requestReviewedAt)}</strong> ${escapeHtml(formatDateTime(latestRequest.reviewed_at))}</p>` : ""}
+          ${latestRequest?.reviewed_at && latestRequest.status !== "denied" ? `<p><strong>${escapeHtml(labels.requestReviewedAt)}</strong> ${escapeHtml(formatDateTime(latestRequest.reviewed_at))}</p>` : ""}
           ${latestRequest?.reason ? `<p><strong>${escapeHtml(labels.requestReason)}</strong> ${escapeHtml(latestRequest.reason)}</p>` : ""}
         </div>
         ${canSubmit ? `
@@ -580,6 +669,17 @@
         .filter((row) => row.role === "admin")
         .map((row) => row.user_id)
     );
+    const allowlistedEmails = new Set(
+      dashboard.allowlist
+        .map((row) => normalizeEmail(row.email))
+        .filter(Boolean)
+    );
+    const approvedRequestUserIds = new Set(
+      dashboard.requests
+        .filter((row) => row.status === "approved")
+        .map((row) => row.requester_user_id)
+        .filter(Boolean)
+    );
     const knownAdmins = dashboard.users.filter((user) => explicitAdminIds.has(user.id));
     const bootstrapEntry =
       dashboard.users.find((user) => normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL) ||
@@ -596,7 +696,17 @@
     }
 
     const allowlistRows = [...dashboard.allowlist].sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
-    const knownUsers = [...dashboard.users].sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
+    const knownUsers = dashboard.users
+      .filter((user) => {
+        const email = normalizeEmail(user.email);
+        return (
+          email === BOOTSTRAP_ADMIN_EMAIL
+          || explicitAdminIds.has(user.id)
+          || allowlistedEmails.has(email)
+          || approvedRequestUserIds.has(user.id)
+        );
+      })
+      .sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
 
     root.innerHTML = `
       <section class="oa-admin-grid">

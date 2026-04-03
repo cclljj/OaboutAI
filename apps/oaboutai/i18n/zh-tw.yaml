@@ -109,7 +109,7 @@
 - id: accessPendingMessage
   translation: 你的申請正在等待管理員審核。
 - id: accessDeniedMessage
-  translation: 你上次的申請未獲通過，可以重新填寫原因再送出。
+  translation: 你的存取申請仍在流程中；若需要補充說明，可以重新填寫原因後再送出。
 - id: accessApprovedMessage
   translation: 你的存取權限已經核准。
 - id: requestStatusPending
