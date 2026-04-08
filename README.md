@@ -57,7 +57,7 @@ Workflow: `.github/workflows/docs-site-ci.yml`
 3. Compile Obsidian artifacts
 4. Hugo build + output verification
 
-`deploy-vercel`（only `main` push）:
+`deploy-vercel`（`main` push 或 `workflow_dispatch`）:
 1. 檢查 `VERCEL_TOKEN`、`OABOUTAI_DATA_REPO_TOKEN`
 2. 驗證可讀取 `cclljj/OaboutAI_data`
 3. Compose with private data injection
@@ -98,7 +98,27 @@ Runtime/build env (Vercel or CI):
 - Regression checklist: [docs/system_test_checklist.md](docs/system_test_checklist.md)
 - Agent contract: [AGENTS.md](AGENTS.md)
 
+## Data-side setup (AI-agent friendly)
+
+When maintainers only update `cclljj/OaboutAI_data`, they must trigger OaboutAI CI/CD via dispatch.
+
+Required in `OaboutAI_data`:
+- Workflow file: `.github/workflows/trigger-oaboutai-cicd.yml`
+- Secret: `OABOUTAI_REPO_TRIGGER_TOKEN`
+- Token type: Fine-grained PAT (recommended)
+- Token target repo: `cclljj/OaboutAI`
+- Token minimum permissions:
+  - Actions: Read and write
+  - Contents: Read
+
+Quick verification steps:
+1. Push any change under `OaboutAI_data/obsidian/**`
+2. Confirm `trigger-oaboutai-cicd` run is successful (dispatch API should return HTTP 204)
+3. Confirm `cclljj/OaboutAI` receives `docs-site-ci` with event `workflow_dispatch`
+4. Confirm `deploy-vercel` job runs (not skipped)
+
 ## Security Notes
 
 - 不要將 `OABOUTAI_DATA_REPO_TOKEN` 設成 SSH key；必須是單行 PAT。
-- 若 token 更新後仍失敗，先看 workflow 的 `Verify private data repo access` step（會回報 HTTP 與 API 訊息）。
+- 不要將 `OABOUTAI_REPO_TRIGGER_TOKEN` 設成 SSH key；必須是可呼叫 Actions API 的 PAT。
+- 若 dispatch 回傳 `Resource not accessible by personal access token`（403），表示 trigger token 權限不足。

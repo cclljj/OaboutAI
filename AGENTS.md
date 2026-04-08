@@ -11,9 +11,9 @@ This repository is a composable Hugo monorepo:
 
 Current production delivery model:
 1. Hugo provides shell pages and navigation.
-2. Supabase provides protected article data.
-3. Google OAuth is required to read article content.
-4. Favorites are per-user in Supabase.
+2. Private content source is `cclljj/OaboutAI_data` (`obsidian/` subtree).
+3. CI compiles Obsidian markdown into build artifacts consumed by the site.
+4. Supabase handles auth/access control and user features (e.g., favorites).
 
 ## 2. Non-Negotiable Runtime Principles
 
@@ -38,20 +38,32 @@ Project-level:
 - `core/assets/js/oa-app.js`
 - `core/layouts/**` (shell templates)
 
-## 4. Supabase Contract
+## 4. Runtime Data + Supabase Contract
 
-Required tables:
-- `public.articles`
-- `public.favorites`
+Primary article source:
+- private repo `cclljj/OaboutAI_data`
+- default subdir: `obsidian`
 
-RLS requirements:
-- `articles`: authenticated users can `select`
-- `favorites`: only owner can `select/insert/delete`
+Required GitHub Actions secrets in OaboutAI:
+- `VERCEL_TOKEN`
+- `OABOUTAI_DATA_REPO_TOKEN` (read access to `cclljj/OaboutAI_data`)
 
 Required runtime env vars:
 - `HUGO_SUPABASE_URL`
 - `HUGO_SUPABASE_ANON_KEY`
 - `HUGO_SUPABASE_REDIRECT_URL`
+- `OABOUTAI_DATA_REPO_URL` (default: `https://github.com/cclljj/OaboutAI_data`)
+- `OABOUTAI_DATA_REPO_REF` (default: `main`)
+- `OABOUTAI_DATA_REPO_SUBDIR` (default: `obsidian`)
+
+Supabase tables used in current runtime:
+- `public.favorites`
+- `public.app_users`
+- `public.user_roles`
+- `public.access_allowlist`
+- `public.access_requests`
+
+Note: `public.articles` is legacy/optional and not the primary runtime source-of-truth for page content.
 
 ## 5. Content Governance
 
@@ -78,11 +90,24 @@ Required steps to mirror in local verification:
 6. `rm -f data/keyword_proposals.jsonl`
 7. `npx --yes hugo-bin --gc --minify`
 
-## 7. Legacy Ingestion Note
+## 7. Cross-repo CI trigger (for data-side updates)
 
-Legacy markdown ingestion workflow (`scripts/ingest_item.py`, OpenClaw docs) is retained for optional offline/staging workflows, but it is not the production source-of-truth for site-visible protected article body content.
+When content is updated only in `OaboutAI_data`, OaboutAI deployment must be triggered via dispatch.
 
-If the user asks to publish new article content now, default to Supabase data operations rather than committing article bundles under `apps/.../content/*/items/*`.
+Expected setup in `OaboutAI_data`:
+- workflow: `.github/workflows/trigger-oaboutai-cicd.yml`
+- secret: `OABOUTAI_REPO_TRIGGER_TOKEN` (fine-grained PAT)
+- required token permission on `cclljj/OaboutAI`:
+  - Actions: Read and write
+  - Contents: Read
+
+Expected behavior in OaboutAI:
+- `docs-site-ci` supports `workflow_dispatch`
+- `deploy-vercel` runs on `push main` OR `workflow_dispatch`
+
+Failure triage:
+- If dispatch returns 403 `Resource not accessible by personal access token`, fix trigger token scope/permissions.
+- If validate passes but deploy is skipped, check `deploy-vercel` job `if:` condition.
 
 ## 8. Anti-Patterns
 
