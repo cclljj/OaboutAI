@@ -31,10 +31,14 @@ fi
 "${compose_cmd[@]}"
 
 pushd "${COMPOSED_SITE}" >/dev/null
-python3 scripts/compile_obsidian_articles.py
 rm -rf data/obsidian
+rm -rf static/obsidian
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
+if [[ -e public/obsidian/articles.en.json || -e public/obsidian/articles.zh-tw.json ]]; then
+  echo "ERROR: public Obsidian article JSON detected in build output."
+  exit 1
+fi
 popd >/dev/null
 
 rm -rf public
