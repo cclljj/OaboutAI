@@ -106,6 +106,8 @@ jobs:
       OABOUTAI_DATA_REPO_REF: main
       OABOUTAI_DATA_REPO_SUBDIR: obsidian
       OABOUTAI_DATA_REPO_TOKEN: ${{ secrets.OABOUTAI_DATA_REPO_TOKEN }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -129,6 +131,17 @@ jobs:
         run: |
           if [ -z "${OABOUTAI_DATA_REPO_TOKEN}" ]; then
             echo "Missing GitHub secret: OABOUTAI_DATA_REPO_TOKEN"
+            exit 1
+          fi
+
+      - name: Check required Supabase sync secrets
+        run: |
+          if [ -z "${SUPABASE_URL}" ]; then
+            echo "Missing GitHub secret: SUPABASE_URL"
+            exit 1
+          fi
+          if [ -z "${SUPABASE_SERVICE_ROLE_KEY}" ]; then
+            echo "Missing GitHub secret: SUPABASE_SERVICE_ROLE_KEY"
             exit 1
           fi
 
@@ -189,6 +202,13 @@ jobs:
 
       - name: Sync topic pages from topics.json
         run: python scripts/sync_topics.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Sync Obsidian private data into Supabase articles
+        run: |
+          python scripts/sync_obsidian_to_supabase.py \
+            --supabase-url "${SUPABASE_URL}" \
+            --service-role-key "${SUPABASE_SERVICE_ROLE_KEY}"
         working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Remove raw/private Obsidian sources before Vercel build
