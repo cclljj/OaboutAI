@@ -99,6 +99,16 @@ create table if not exists public.favorites (
   primary key (user_id, article_slug)
 );
 
+create table if not exists public.article_deletion_logs (
+  id bigserial primary key,
+  slug text not null,
+  language text not null,
+  title text,
+  deleted_at timestamptz not null default now(),
+  deleted_by_user_id uuid,
+  deleted_by_account text not null default 'N/A'
+);
+
 create index if not exists idx_articles_language on public.articles(language);
 create index if not exists idx_articles_source_date on public.articles(source_date desc);
 create index if not exists idx_articles_keywords on public.articles using gin (keywords);
@@ -111,6 +121,8 @@ create unique index if not exists idx_access_requests_pending_unique
   where status = 'pending';
 create index if not exists idx_favorites_user on public.favorites(user_id);
 create index if not exists idx_favorites_slug on public.favorites(article_slug);
+create index if not exists idx_article_deletion_logs_deleted_at on public.article_deletion_logs(deleted_at desc);
+create index if not exists idx_article_deletion_logs_slug_lang on public.article_deletion_logs(slug, language);
 
 create or replace function public.has_role(target_role text)
 returns boolean
@@ -154,6 +166,34 @@ as $$
     );
 $$;
 
+create or replace function public.audit_article_delete()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+declare
+  email_claim text := nullif(lower(coalesce(auth.jwt() ->> 'email', '')), '');
+begin
+  insert into public.article_deletion_logs (
+    slug,
+    language,
+    title,
+    deleted_at,
+    deleted_by_user_id,
+    deleted_by_account
+  )
+  values (
+    old.slug,
+    old.language,
+    old.title,
+    now(),
+    auth.uid(),
+    coalesce(email_claim, auth.uid()::text, 'N/A')
+  );
+  return old;
+end;
+$$;
+
 drop trigger if exists trg_articles_set_updated_at on public.articles;
 create trigger trg_articles_set_updated_at
 before update on public.articles
@@ -169,12 +209,18 @@ create trigger trg_access_requests_set_updated_at
 before update on public.access_requests
 for each row execute function public.set_updated_at();
 
+drop trigger if exists trg_articles_audit_delete on public.articles;
+create trigger trg_articles_audit_delete
+after delete on public.articles
+for each row execute function public.audit_article_delete();
+
 alter table public.articles enable row level security;
 alter table public.app_users enable row level security;
 alter table public.user_roles enable row level security;
 alter table public.access_allowlist enable row level security;
 alter table public.access_requests enable row level security;
 alter table public.favorites enable row level security;
+alter table public.article_deletion_logs enable row level security;
 
 drop policy if exists "authenticated can read articles" on public.articles;
 drop policy if exists "approved users can read articles" on public.articles;
@@ -183,6 +229,13 @@ create policy "approved users can read articles"
   for select
   to authenticated
   using (public.is_approved_user());
+
+drop policy if exists "admins can delete articles" on public.articles;
+create policy "admins can delete articles"
+  on public.articles
+  for delete
+  to authenticated
+  using (public.has_role('admin'));
 
 drop policy if exists "users can read own app profile" on public.app_users;
 create policy "users can read own app profile"
@@ -302,3 +355,10 @@ create policy "owner can delete favorites"
   for delete
   to authenticated
   using (public.is_approved_user() and auth.uid() = user_id);
+
+drop policy if exists "admins can read article deletion logs" on public.article_deletion_logs;
+create policy "admins can read article deletion logs"
+  on public.article_deletion_logs
+  for select
+  to authenticated
+  using (public.has_role('admin'));

@@ -36,6 +36,11 @@
     searchTypeToStart: "Start typing to search.",
     save: "Save",
     saved: "Saved",
+    delete: "Delete",
+    deleteConfirm: "Are you sure you want to delete this entry?",
+    deleteConfirmFinal: "Please confirm again. This action cannot be undone.",
+    deleteSuccess: "Entry deleted.",
+    deleteError: "Unable to delete this entry right now.",
     remove: "Remove",
     openArticle: "Open",
     sortBy: "Sort by",
@@ -409,7 +414,12 @@
     return `<button class="oa-favorite-btn ${isSaved ? "is-saved" : ""}" type="button" data-oa-favorite-toggle data-slug="${escapeHtml(slug)}">${escapeHtml(text)}</button>`;
   }
 
-  function renderCard(record, labels, favoritesSet) {
+  function deleteButton(record, labels, options = {}) {
+    if (!options.canDelete) return "";
+    return `<button class="oa-delete-btn" type="button" data-oa-article-delete data-slug="${escapeHtml(record.slug)}" data-language="${escapeHtml(record.language || "")}" data-title="${escapeHtml(record.title || record.slug)}">${escapeHtml(labels.delete)}</button>`;
+  }
+
+  function renderCard(record, labels, favoritesSet, options = {}) {
     const isSaved = favoritesSet.has(record.slug);
     const topicList = [];
     if (record.primary_topic) topicList.push(record.primary_topic);
@@ -428,7 +438,10 @@
       <article class="oa-entry-card">
         <div class="oa-entry-card-head">
           <h3><a class="oa-entry-title" href="${articleHref(record.slug)}">${escapeHtml(record.title || record.slug)}</a></h3>
-          ${favoriteButton(record.slug, isSaved, labels)}
+          <div class="oa-entry-actions">
+            ${favoriteButton(record.slug, isSaved, labels)}
+            ${deleteButton(record, labels, options)}
+          </div>
         </div>
         <p class="oa-meta">${chips.join("")}</p>
         <p class="oa-summary">${escapeHtml(record.executive_summary || "")}</p>
@@ -475,15 +488,15 @@
     }
   }
 
-  function renderList(root, records, labels, favoritesSet) {
+  function renderList(root, records, labels, favoritesSet, options = {}) {
     if (!records.length) {
       root.innerHTML = `<p>${escapeHtml(labels.noEntriesYet)}</p>`;
       return;
     }
-    root.innerHTML = records.map((r) => renderCard(r, labels, favoritesSet)).join("\n");
+    root.innerHTML = records.map((r) => renderCard(r, labels, favoritesSet, options)).join("\n");
   }
 
-  function renderArchive(root, records, labels, favoritesSet) {
+  function renderArchive(root, records, labels, favoritesSet, options = {}) {
     if (!records.length) {
       root.innerHTML = `<p>${escapeHtml(labels.noEntriesYet)}</p>`;
       return;
@@ -502,7 +515,7 @@
         <section class="oa-section">
           <h2 class="oa-section-title">${escapeHtml(month)} ${buildChip(String(entries.length))}</h2>
           <div class="oa-entry-list">
-            ${entries.map((r) => renderCard(r, labels, favoritesSet)).join("\n")}
+            ${entries.map((r) => renderCard(r, labels, favoritesSet, options)).join("\n")}
           </div>
         </section>
       `);
@@ -990,7 +1003,7 @@
     rerender();
   }
 
-  function applySearch(root, records, labels, favoritesSet) {
+  function applySearch(root, records, labels, favoritesSet, options = {}) {
     root.innerHTML = `
       <section class="oa-search-page">
         <div class="oa-search-input-wrap">
@@ -1030,7 +1043,7 @@
       }
 
       status.textContent = `${matched.length} results`;
-      result.innerHTML = matched.map((record) => renderCard(record, labels, favoritesSet)).join("\n");
+      result.innerHTML = matched.map((record) => renderCard(record, labels, favoritesSet, options)).join("\n");
     });
   }
 
@@ -1456,6 +1469,32 @@
       await renderViews();
     }
 
+    async function deleteArticle(record, user, access) {
+      if (!record?.slug || !record?.language || !user?.id || !access?.isAdmin) return;
+
+      const title = String(record.title || record.slug || "").trim();
+      const firstConfirmation = `${labels.deleteConfirm}\n\n${title || record.slug}`;
+      if (!window.confirm(firstConfirmation)) return;
+      if (!window.confirm(labels.deleteConfirmFinal)) return;
+
+      const { error } = await client
+        .from("articles")
+        .delete()
+        .eq("slug", record.slug)
+        .eq("language", normalizeLang(record.language));
+
+      if (error) {
+        const details = String(error.message || "").trim();
+        window.alert(details ? `${labels.deleteError}\n${details}` : labels.deleteError);
+        return;
+      }
+
+      favoriteSlugs.delete(record.slug);
+      articleCache.delete(normalizeLang(record.language));
+      window.alert(labels.deleteSuccess);
+      await renderViews();
+    }
+
     async function fetchAdminDashboard() {
       const [requestsResult, allowlistResult, usersResult, rolesResult] = await Promise.all([
         client.from("access_requests").select("id,requester_user_id,email,reason,status,created_at,reviewed_at,reviewer_user_id").order("created_at", { ascending: false }),
@@ -1580,6 +1619,21 @@
       document.querySelectorAll("[data-oa-favorite-toggle]").forEach((btn) => {
         btn.onclick = () => toggleFavorite(btn.dataset.slug || "", user?.id || "");
       });
+      document.querySelectorAll("[data-oa-article-delete]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!user || !access?.isAdmin) return;
+          const slug = btn.dataset.slug || "";
+          const language = btn.dataset.language || "";
+          const title = btn.dataset.title || slug;
+          if (!slug || !language) return;
+          btn.disabled = true;
+          try {
+            await deleteArticle({ slug, language, title }, user, access);
+          } finally {
+            btn.disabled = false;
+          }
+        };
+      });
       document.querySelectorAll("[data-oa-access-request-form]").forEach((form) => {
         form.onsubmit = async (event) => {
           event.preventDefault();
@@ -1663,6 +1717,7 @@
       const needsProtectedContent = access.isApproved && roots.some((root) => collectFilters(root).view !== "admin");
       const articleResult = needsProtectedContent ? await fetchArticles(lang) : { rows: [], error: null };
       const articles = articleResult.rows;
+      const renderOptions = { canDelete: access.isAdmin };
       favoriteSlugs = needsProtectedContent ? await loadFavorites(user.id) : new Set();
 
       let adminDashboard = null;
@@ -1713,7 +1768,7 @@
         }
 
         if (filters.view === "search") {
-          applySearch(root, articles, labels, favoriteSlugs);
+          applySearch(root, articles, labels, favoriteSlugs, renderOptions);
           continue;
         }
 
@@ -1731,7 +1786,7 @@
 
         if (filters.view === "home_recent") {
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
-            renderList(node, pageItems, labels, favoriteSlugs);
+            renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
@@ -1739,21 +1794,21 @@
         if (filters.view === "favorites") {
           scoped = scoped.filter((record) => favoriteSlugs.has(record.slug));
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
-            renderList(node, pageItems, labels, favoriteSlugs);
+            renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
 
         if (filters.view === "archive") {
           renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
-            renderArchive(node, pageItems, labels, favoriteSlugs);
+            renderArchive(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
 
         updateItemsListHeading(root, filters, labels, keywordAliasMap);
         renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
-          renderList(node, pageItems, labels, favoriteSlugs);
+          renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
         }, () => bindGlobalActions(user, access));
       }
 

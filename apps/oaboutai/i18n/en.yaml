@@ -98,6 +98,16 @@
   translation: Save
 - id: saved
   translation: Saved
+- id: delete
+  translation: Delete
+- id: deleteConfirm
+  translation: Are you sure you want to delete this entry?
+- id: deleteConfirmFinal
+  translation: Please confirm again. This action cannot be undone.
+- id: deleteSuccess
+  translation: Entry deleted.
+- id: deleteError
+  translation: Unable to delete this entry right now.
 - id: adminPanel
   translation: Admin
 - id: accessApprovalRequired

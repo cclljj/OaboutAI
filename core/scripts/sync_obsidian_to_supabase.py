@@ -50,6 +50,22 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Parse and validate input only; do not send writes to Supabase.",
     )
+    parser.add_argument(
+        "--delete-missing",
+        action="store_true",
+        help="Delete rows in Supabase public.articles that are absent from Obsidian source.",
+    )
+    parser.add_argument(
+        "--prune-favorites",
+        action="store_true",
+        help="Delete favorites rows whose article_slug belongs to deleted articles.",
+    )
+    parser.add_argument(
+        "--delete-batch-size",
+        type=int,
+        default=200,
+        help="Rows per delete request batch.",
+    )
     return parser.parse_args()
 
 
@@ -203,25 +219,197 @@ def upsert_rows(supabase_url: str, service_role_key: str, rows: list[dict[str, A
             raise RuntimeError(f"Supabase upsert returned unexpected status: {status}")
 
 
+def postgrest_quote(value: str) -> str:
+    escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def chunk_strings(values: list[str], size: int) -> list[list[str]]:
+    return [values[index : index + size] for index in range(0, len(values), size)]
+
+
+def supabase_headers(service_role_key: str) -> dict[str, str]:
+    return {
+        "apikey": service_role_key,
+        "Authorization": f"Bearer {service_role_key}",
+        "Content-Type": "application/json",
+    }
+
+
+def fetch_existing_article_keys(supabase_url: str, service_role_key: str, page_size: int = 1000) -> set[tuple[str, str]]:
+    endpoint = f"{supabase_url.rstrip('/')}/rest/v1/articles?select=slug,language"
+    headers = supabase_headers(service_role_key)
+    keys: set[tuple[str, str]] = set()
+    start = 0
+
+    while True:
+        end = start + page_size - 1
+        request_headers = headers | {"Range-Unit": "items", "Range": f"{start}-{end}"}
+        request = urllib.request.Request(endpoint, method="GET", headers=request_headers)
+        try:
+            with urllib.request.urlopen(request) as response:
+                status = response.getcode()
+                body = response.read().decode("utf-8")
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Supabase fetch existing keys failed (HTTP {exc.code}): {body}") from exc
+
+        if status != 200:
+            raise RuntimeError(f"Supabase fetch existing keys returned unexpected status: {status}")
+
+        rows = json.loads(body)
+        if not isinstance(rows, list):
+            raise RuntimeError("Supabase fetch existing keys returned unexpected payload format.")
+
+        for row in rows:
+            slug = normalize_text(row.get("slug"))
+            language = normalize_text(row.get("language"))
+            if slug and language:
+                keys.add((slug, language))
+
+        if len(rows) < page_size:
+            break
+        start += page_size
+
+    return keys
+
+
+def delete_missing_articles(
+    supabase_url: str,
+    service_role_key: str,
+    missing_keys: set[tuple[str, str]],
+    delete_batch_size: int,
+) -> int:
+    if not missing_keys:
+        return 0
+
+    headers = supabase_headers(service_role_key) | {"Prefer": "return=minimal"}
+    base_endpoint = f"{supabase_url.rstrip('/')}/rest/v1/articles"
+    deleted = 0
+    grouped: dict[str, list[str]] = {}
+    for slug, language in sorted(missing_keys):
+        grouped.setdefault(language, []).append(slug)
+
+    for language, slugs in grouped.items():
+        for batch in chunk_strings(slugs, delete_batch_size):
+            quoted = ",".join(postgrest_quote(slug) for slug in batch)
+            query = urllib.parse.urlencode({
+                "language": f"eq.{language}",
+                "slug": f"in.({quoted})",
+            })
+            endpoint = f"{base_endpoint}?{query}"
+            request = urllib.request.Request(endpoint, method="DELETE", headers=headers)
+            try:
+                with urllib.request.urlopen(request) as response:
+                    status = response.getcode()
+            except urllib.error.HTTPError as exc:
+                body = exc.read().decode("utf-8", errors="replace")
+                raise RuntimeError(f"Supabase delete missing articles failed (HTTP {exc.code}): {body}") from exc
+            if status not in (200, 204):
+                raise RuntimeError(f"Supabase delete missing articles returned unexpected status: {status}")
+            deleted += len(batch)
+    return deleted
+
+
+def prune_favorites_for_deleted_slugs(
+    supabase_url: str,
+    service_role_key: str,
+    deleted_slugs: set[str],
+    delete_batch_size: int,
+) -> int:
+    if not deleted_slugs:
+        return 0
+
+    headers = supabase_headers(service_role_key) | {"Prefer": "return=minimal"}
+    base_endpoint = f"{supabase_url.rstrip('/')}/rest/v1/favorites"
+    pruned = 0
+
+    for batch in chunk_strings(sorted(deleted_slugs), delete_batch_size):
+        quoted = ",".join(postgrest_quote(slug) for slug in batch)
+        query = urllib.parse.urlencode({"article_slug": f"in.({quoted})"})
+        endpoint = f"{base_endpoint}?{query}"
+        request = urllib.request.Request(endpoint, method="DELETE", headers=headers)
+        try:
+            with urllib.request.urlopen(request) as response:
+                status = response.getcode()
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Supabase prune favorites failed (HTTP {exc.code}): {body}") from exc
+        if status not in (200, 204):
+            raise RuntimeError(f"Supabase prune favorites returned unexpected status: {status}")
+        pruned += len(batch)
+    return pruned
+
+
 def main() -> int:
     args = parse_args()
     obsidian_root = args.obsidian_root.resolve()
     rows = collect_rows(obsidian_root)
     print(f"Prepared {len(rows)} rows from {obsidian_root}")
 
-    if args.dry_run:
+    if args.dry_run and not args.delete_missing:
         print("Dry run complete.")
         return 0
 
-    if not args.supabase_url:
+    needs_supabase = (not args.dry_run) or args.delete_missing
+    if needs_supabase and not args.supabase_url:
         raise SystemExit("ERROR: --supabase-url (or SUPABASE_URL env) is required.")
-    if not args.service_role_key:
+    if needs_supabase and not args.service_role_key:
         raise SystemExit("ERROR: --service-role-key (or SUPABASE_SERVICE_ROLE_KEY env) is required.")
     if args.batch_size <= 0:
         raise SystemExit("ERROR: --batch-size must be > 0.")
+    if args.delete_batch_size <= 0:
+        raise SystemExit("ERROR: --delete-batch-size must be > 0.")
+
+    source_keys = {
+        (normalize_text(row.get("slug")), normalize_text(row.get("language")))
+        for row in rows
+        if normalize_text(row.get("slug")) and normalize_text(row.get("language"))
+    }
+    existing_keys: set[tuple[str, str]] = set()
+    missing_keys: set[tuple[str, str]] = set()
+    if args.delete_missing:
+        existing_keys = fetch_existing_article_keys(args.supabase_url, args.service_role_key)
+        missing_keys = existing_keys - source_keys
+        preview = ", ".join(f"{slug}:{lang}" for slug, lang in sorted(missing_keys)[:20])
+        if missing_keys:
+            print(f"Will delete {len(missing_keys)} missing article rows (preview: {preview})")
+        else:
+            print("No missing article rows to delete.")
+
+    if args.dry_run:
+        if args.delete_missing and args.prune_favorites:
+            missing_slugs = {slug for slug, _ in missing_keys}
+            print(f"Will prune favorites for {len(missing_slugs)} deleted slugs.")
+        elif args.prune_favorites:
+            print("Will prune favorites for 0 deleted slugs (delete-missing disabled).")
+        print("Dry run complete.")
+        return 0
 
     upsert_rows(args.supabase_url, args.service_role_key, rows, args.batch_size)
     print(f"Upserted {len(rows)} rows into Supabase public.articles")
+
+    deleted_count = 0
+    deleted_slugs: set[str] = set()
+    if args.delete_missing:
+        deleted_count = delete_missing_articles(
+            args.supabase_url,
+            args.service_role_key,
+            missing_keys,
+            args.delete_batch_size,
+        )
+        deleted_slugs = {slug for slug, _ in missing_keys}
+        print(f"Deleted {deleted_count} missing rows from Supabase public.articles")
+
+    if args.prune_favorites:
+        pruned_count = prune_favorites_for_deleted_slugs(
+            args.supabase_url,
+            args.service_role_key,
+            deleted_slugs,
+            args.delete_batch_size,
+        )
+        print(f"Pruned favorites for {pruned_count} deleted slugs")
+
     return 0
 
 

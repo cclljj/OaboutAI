@@ -208,7 +208,9 @@ jobs:
         run: |
           python scripts/sync_obsidian_to_supabase.py \
             --supabase-url "${SUPABASE_URL}" \
-            --service-role-key "${SUPABASE_SERVICE_ROLE_KEY}"
+            --service-role-key "${SUPABASE_SERVICE_ROLE_KEY}" \
+            --delete-missing \
+            --prune-favorites
         working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Remove raw/private Obsidian sources before Vercel build
