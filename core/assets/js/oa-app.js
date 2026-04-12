@@ -122,6 +122,25 @@
   const VALID_SORT_BY = new Set(["source_date", "submission_date"]);
   const VALID_SORT_ORDER = new Set(["asc", "desc"]);
   const VALID_PAGE_SIZES = new Set([20, 50, 100]);
+  const ARTICLE_LIST_FIELDS = [
+    "slug",
+    "language",
+    "title",
+    "source_url",
+    "source_type",
+    "source_date",
+    "submission_date",
+    "executive_summary",
+    "keywords",
+    "primary_topic",
+    "topics",
+    "attachments"
+  ].join(",");
+  const ARTICLE_DETAIL_FIELDS = [
+    ARTICLE_LIST_FIELDS,
+    "detailed_notes",
+    "takeaway_html"
+  ].join(",");
 
   function normalizeLang(value) {
     const lower = String(value || "en").toLowerCase();
@@ -440,7 +459,7 @@
     }
 
     return `
-      <article class="oa-entry-card">
+      <article class="oa-entry-card" data-oa-entry-card data-slug="${escapeHtml(record.slug)}" data-language="${escapeHtml(record.language || "")}">
         <div class="oa-entry-card-head">
           <h3><a class="oa-entry-title" href="${articleHref(record.slug)}">${escapeHtml(record.title || record.slug)}</a></h3>
           <div class="oa-entry-actions">
@@ -1042,6 +1061,111 @@
     rerender();
   }
 
+  async function fetchArticlePageFromSupabase(client, keywordAliasMap, lang, filters, state, favoritesSet) {
+    const key = normalizeLang(lang);
+    const favoritesOnly = filters.view === "favorites";
+    const favoriteList = Array.from(favoritesSet || []);
+    if (favoritesOnly && !favoriteList.length) {
+      return { rows: [], total: 0 };
+    }
+
+    let query = client
+      .from("articles")
+      .select(ARTICLE_LIST_FIELDS, { count: "exact" })
+      .eq("language", key);
+
+    if (filters.topic) {
+      const topic = String(filters.topic || "").trim();
+      if (topic) {
+        query = query.or(`primary_topic.eq.${topic},topics.cs.${JSON.stringify([topic])}`);
+      }
+    }
+    if (filters.termType === "keywords" && filters.termValue) {
+      const canonicalKeyword = canonicalizeKeyword(filters.termValue, keywordAliasMap);
+      if (!canonicalKeyword) return { rows: [], total: 0 };
+      query = query.contains("keywords", [canonicalKeyword]);
+    }
+    if (filters.termType === "types" && filters.termValue) {
+      query = query.eq("source_type", filters.termValue);
+    }
+    if (favoritesOnly) {
+      query = query.in("slug", favoriteList);
+    }
+
+    const sortField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
+    const ascending = state.sortOrder === "asc";
+    const start = Math.max(0, (state.page - 1) * state.pageSize);
+    const end = start + state.pageSize - 1;
+    query = query
+      .order(sortField, { ascending, nullsFirst: false })
+      .order("slug", { ascending: true })
+      .range(start, end);
+
+    const { data, error, count } = await query;
+    if (error) throw error;
+    return {
+      rows: (Array.isArray(data) ? data : []).map((row) => normalizeArticleRecord(row, keywordAliasMap)),
+      total: Number(count || 0)
+    };
+  }
+
+  function renderServerCollectionView(root, labels, state, fetchPage, renderPageItems, afterRender) {
+    const controls = mountCollectionControls(root, labels, state, rerender);
+    if (!controls) return;
+
+    let requestId = 0;
+    async function rerender() {
+      const thisRequest = ++requestId;
+      controls.bySelect.value = state.sortBy;
+      controls.orderSelect.value = state.sortOrder;
+      controls.pageSizeSelect.value = String(state.pageSize);
+      controls.prevBtn.disabled = true;
+      controls.nextBtn.disabled = true;
+      if (controls.statusNode) {
+        controls.statusNode.textContent = labels.loading;
+      }
+
+      try {
+        const pageData = await fetchPage({ ...state });
+        if (thisRequest !== requestId) return;
+        const totalPages = Math.max(1, Math.ceil(pageData.total / state.pageSize));
+        const safePage = Math.min(Math.max(state.page, 1), totalPages);
+
+        if (safePage !== state.page) {
+          state.page = safePage;
+          const correctedData = await fetchPage({ ...state });
+          if (thisRequest !== requestId) return;
+          renderPageItems(controls.listRoot, correctedData.rows);
+          if (controls.statusNode) {
+            controls.statusNode.textContent = formatPageText(labels.pageStatus, state.page, totalPages);
+          }
+        } else {
+          renderPageItems(controls.listRoot, pageData.rows);
+          if (controls.statusNode) {
+            controls.statusNode.textContent = formatPageText(labels.pageStatus, state.page, totalPages);
+          }
+        }
+
+        controls.prevBtn.disabled = state.page <= 1;
+        controls.nextBtn.disabled = state.page >= totalPages;
+        updateListStateInUrl(state);
+        if (typeof afterRender === "function") {
+          afterRender();
+        }
+      } catch (_error) {
+        if (thisRequest !== requestId) return;
+        controls.listRoot.innerHTML = `<p>${escapeHtml(labels.noEntriesYet)}</p>`;
+        controls.prevBtn.disabled = true;
+        controls.nextBtn.disabled = true;
+        if (controls.statusNode) {
+          controls.statusNode.textContent = formatPageText(labels.pageStatus, 1, 1);
+        }
+      }
+    }
+
+    rerender();
+  }
+
   function applySearch(root, records, labels, favoritesSet, options = {}) {
     root.innerHTML = `
       <section class="oa-search-page">
@@ -1060,7 +1184,7 @@
 
     const searchable = records.map((record) => ({
       ...record,
-      _text: [record.title, record.executive_summary, record.detailed_notes, record.slug].join(" ").toLowerCase()
+      _text: [record.title || "", record.executive_summary || "", record.detailed_notes || "", record.slug || ""].join(" ").toLowerCase()
     }));
 
     input.addEventListener("input", () => {
@@ -1371,22 +1495,6 @@
 
     let favoriteSlugs = new Set();
     const articleCache = new Map();
-    const ARTICLE_SELECT_FIELDS = [
-      "slug",
-      "language",
-      "title",
-      "source_url",
-      "source_type",
-      "source_date",
-      "submission_date",
-      "executive_summary",
-      "detailed_notes",
-      "takeaway_html",
-      "keywords",
-      "primary_topic",
-      "topics",
-      "attachments"
-    ].join(",");
 
     async function fetchArticlesFromSupabase(lang) {
       const key = normalizeLang(lang);
@@ -1396,7 +1504,7 @@
 
       const { data, error } = await client
         .from("articles")
-        .select(ARTICLE_SELECT_FIELDS)
+        .select(ARTICLE_LIST_FIELDS)
         .eq("language", key)
         .order("source_date", { ascending: false, nullsFirst: false })
         .order("submission_date", { ascending: false, nullsFirst: false });
@@ -1427,7 +1535,7 @@
       for (const lang of languages) {
         const { data, error } = await client
           .from("articles")
-          .select(ARTICLE_SELECT_FIELDS)
+          .select(ARTICLE_DETAIL_FIELDS)
           .eq("language", lang)
           .eq("slug", slug)
           .limit(1);
@@ -1496,6 +1604,27 @@
       return new Set((data || []).map((row) => row.article_slug));
     }
 
+    function updateFavoriteButtonsForSlug(slug) {
+      const isSaved = favoriteSlugs.has(slug);
+      const text = isSaved ? labels.saved : labels.save;
+      document.querySelectorAll("[data-oa-favorite-toggle]").forEach((btn) => {
+        if ((btn.dataset.slug || "") !== slug) return;
+        btn.classList.toggle("is-saved", isSaved);
+        btn.textContent = text;
+      });
+    }
+
+    function removeEntryCardFromDom(slug, language) {
+      const normalizedLang = normalizeLang(language);
+      document.querySelectorAll("[data-oa-entry-card]").forEach((node) => {
+        const nodeSlug = node.getAttribute("data-slug") || "";
+        const nodeLang = normalizeLang(node.getAttribute("data-language") || "");
+        if (nodeSlug === slug && nodeLang === normalizedLang) {
+          node.remove();
+        }
+      });
+    }
+
     async function toggleFavorite(slug, userId) {
       if (!slug || !userId) return;
       if (favoriteSlugs.has(slug)) {
@@ -1505,7 +1634,15 @@
         await client.from("favorites").insert({ user_id: userId, article_slug: slug });
         favoriteSlugs.add(slug);
       }
-      await renderViews();
+      updateFavoriteButtonsForSlug(slug);
+      const isFavoritesPage = roots.some((root) => collectFilters(root).view === "favorites");
+      if (isFavoritesPage && !favoriteSlugs.has(slug)) {
+        document.querySelectorAll("[data-oa-entry-card]").forEach((node) => {
+          if ((node.getAttribute("data-slug") || "") === slug) {
+            node.remove();
+          }
+        });
+      }
     }
 
     async function deleteArticle(record, user, access) {
@@ -1529,9 +1666,14 @@
       }
 
       favoriteSlugs.delete(record.slug);
-      articleCache.delete(normalizeLang(record.language));
+      const cacheKey = normalizeLang(record.language);
+      if (articleCache.has(cacheKey)) {
+        const cachedRows = articleCache.get(cacheKey) || [];
+        articleCache.set(cacheKey, cachedRows.filter((row) => !(row.slug === record.slug && normalizeLang(row.language) === cacheKey)));
+      }
+      updateFavoriteButtonsForSlug(record.slug);
+      removeEntryCardFromDom(record.slug, record.language);
       window.alert(labels.deleteSuccess);
-      await renderViews();
     }
 
     async function fetchAdminDashboard() {
@@ -1756,7 +1898,11 @@
 
       const lang = normalizeLang(document.documentElement.lang);
       const needsProtectedContent = access.isApproved && roots.some((root) => collectFilters(root).view !== "admin");
-      const articleResult = needsProtectedContent ? await fetchArticles(lang) : { rows: [], error: null };
+      const hasCatalogViews = roots.some((root) => {
+        const view = collectFilters(root).view;
+        return view === "search" || view === "topics_catalog" || view === "terms_catalog";
+      });
+      const articleResult = needsProtectedContent && hasCatalogViews ? await fetchArticles(lang) : { rows: [], error: null };
       const articles = articleResult.rows;
       const renderOptions = { canDelete: access.isAdmin };
       favoriteSlugs = needsProtectedContent ? await loadFavorites(user.id) : new Set();
@@ -1823,32 +1969,37 @@
           continue;
         }
 
-        let scoped = filterRecords(articles, filters, keywordAliasMap);
-
         if (filters.view === "home_recent") {
-          renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+          renderServerCollectionView(root, labels, listState, async (stateSnapshot) => {
+            return fetchArticlePageFromSupabase(client, keywordAliasMap, lang, filters, stateSnapshot, favoriteSlugs);
+          }, (node, pageItems) => {
             renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
 
         if (filters.view === "favorites") {
-          scoped = scoped.filter((record) => favoriteSlugs.has(record.slug));
-          renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+          renderServerCollectionView(root, labels, listState, async (stateSnapshot) => {
+            return fetchArticlePageFromSupabase(client, keywordAliasMap, lang, filters, stateSnapshot, favoriteSlugs);
+          }, (node, pageItems) => {
             renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
 
         if (filters.view === "archive") {
-          renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+          renderServerCollectionView(root, labels, listState, async (stateSnapshot) => {
+            return fetchArticlePageFromSupabase(client, keywordAliasMap, lang, filters, stateSnapshot, favoriteSlugs);
+          }, (node, pageItems) => {
             renderArchive(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
 
         updateItemsListHeading(root, filters, labels, keywordAliasMap);
-        renderCollectionView(root, scoped, labels, listState, (node, pageItems) => {
+        renderServerCollectionView(root, labels, listState, async (stateSnapshot) => {
+          return fetchArticlePageFromSupabase(client, keywordAliasMap, lang, filters, stateSnapshot, favoriteSlugs);
+        }, (node, pageItems) => {
           renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
         }, () => bindGlobalActions(user, access));
       }

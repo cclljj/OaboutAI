@@ -111,6 +111,8 @@ create table if not exists public.article_deletion_logs (
 
 create index if not exists idx_articles_language on public.articles(language);
 create index if not exists idx_articles_source_date on public.articles(source_date desc);
+create index if not exists idx_articles_lang_source_submission
+  on public.articles(language, source_date desc, submission_date desc);
 create index if not exists idx_articles_keywords on public.articles using gin (keywords);
 create index if not exists idx_articles_topics on public.articles using gin (topics);
 create unique index if not exists idx_app_users_email_lower on public.app_users(email);
