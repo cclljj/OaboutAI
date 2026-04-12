@@ -164,7 +164,7 @@ def parse_article(path: Path, lang: str) -> dict[str, Any]:
     sections = parse_sections(body)
     slug = normalize_text(front_matter.get("slug")) or path.stem
 
-    return {
+    record = {
         "slug": slug,
         "language": normalize_text(front_matter.get("language")) or lang,
         "title": normalize_text(front_matter.get("title")),
@@ -180,6 +180,17 @@ def parse_article(path: Path, lang: str) -> dict[str, Any]:
         "topics": normalize_string_list(front_matter.get("topics")),
         "attachments": normalize_string_list(front_matter.get("attachments")),
     }
+    missing_sections = [
+        field
+        for field in ("executive_summary", "detailed_notes", "takeaway_html")
+        if not normalize_text(record.get(field))
+    ]
+    if missing_sections:
+        raise ValueError(
+            f"{path}: missing required sections/fields {missing_sections}. "
+            "Expected `## Executive Summary`, `## Detailed Notes`, and `## Take-away`."
+        )
+    return record
 
 
 def collect_rows(obsidian_root: Path) -> list[dict[str, Any]]:
@@ -344,7 +355,10 @@ def prune_favorites_for_deleted_slugs(
 def main() -> int:
     args = parse_args()
     obsidian_root = args.obsidian_root.resolve()
-    rows = collect_rows(obsidian_root)
+    try:
+        rows = collect_rows(obsidian_root)
+    except ValueError as exc:
+        raise SystemExit(f"ERROR: {exc}") from exc
     print(f"Prepared {len(rows)} rows from {obsidian_root}")
 
     if args.dry_run and not args.delete_missing:

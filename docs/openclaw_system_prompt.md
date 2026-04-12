@@ -36,6 +36,11 @@
 - keyword IDs 只能來自 `apps/<app-id>/data/keywords.json`
 - topic IDs 只能來自 `apps/<app-id>/data/topics.json`
 - 保持 EN + zh-tw 內容對應同一個 slug
+- 兩種語言都必須具備三段正文（標題需完全一致）：
+  - `## Executive Summary`
+  - `## Detailed Notes`
+  - `## Take-away`
+- 相容性規則：Supabase 欄位仍使用 `takeaway_html` 名稱，但內容是 `## Take-away` 的 markdown
 
 ## 3) 建議流程
 

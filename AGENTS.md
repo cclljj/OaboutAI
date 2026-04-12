@@ -12,8 +12,8 @@ This repository is a composable Hugo monorepo:
 Current production delivery model:
 1. Hugo provides shell pages and navigation.
 2. Private content source is `cclljj/OaboutAI_data` (`obsidian/` subtree).
-3. CI compiles Obsidian markdown into build artifacts consumed by the site.
-4. Supabase handles auth/access control and user features (e.g., favorites).
+3. CI validates and parses Obsidian markdown, then syncs records into Supabase `public.articles`.
+4. Frontend reads content from Supabase `public.articles`; Supabase also handles auth/access control and user features (e.g., favorites).
 
 ## 2. Non-Negotiable Runtime Principles
 
@@ -57,13 +57,21 @@ Required runtime env vars:
 - `OABOUTAI_DATA_REPO_SUBDIR` (default: `obsidian`)
 
 Supabase tables used in current runtime:
+- `public.articles` (runtime article content)
 - `public.favorites`
 - `public.app_users`
 - `public.user_roles`
 - `public.access_allowlist`
 - `public.access_requests`
 
-Note: `public.articles` is legacy/optional and not the primary runtime source-of-truth for page content.
+Canonical Obsidian body contract (required in `obsidian/en/*.md` and `obsidian/zh-tw/*.md`):
+- `## Executive Summary`
+- `## Detailed Notes`
+- `## Take-away`
+
+Compatibility note:
+- Supabase column name remains `takeaway_html` for backward compatibility.
+- Stored value is markdown content parsed from the `## Take-away` section.
 
 ## 5. Content Governance
 

@@ -557,6 +557,7 @@
     const keywords = Array.isArray(record.keywords) ? record.keywords : [];
     const topics = Array.isArray(record.topics) ? record.topics : [];
     const attachments = Array.isArray(record.attachments) ? record.attachments : [];
+    const executiveSummary = formatMarkdownContent(record.executive_summary);
     const detailedNotes = formatMarkdownContent(record.detailed_notes);
     const takeAway = formatMarkdownContent(record.takeaway_html, { stripH2: true });
     const sourceType = String(record.source_type || "").trim();
@@ -586,7 +587,7 @@
         </dl>
         <section class="oa-section oa-card">
           <h2 class="oa-section-title">${escapeHtml(labels.executiveSummary)}</h2>
-          <p>${escapeHtml(record.executive_summary || "")}</p>
+          <div class="oa-markdown">${executiveSummary || `<p>${escapeHtml(record.executive_summary || "")}</p>`}</div>
         </section>
         <section class="oa-section oa-card">
           <h2 class="oa-section-title">${escapeHtml(labels.detailedNotes)}</h2>

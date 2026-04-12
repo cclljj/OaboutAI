@@ -6,7 +6,8 @@ This document is kept for teams that still draft content as markdown bundles bef
 
 - Production page content is served from Supabase `public.articles`.
 - Public GitHub no longer needs to store article markdown bundles under `apps/.../content/*/items/*`.
-- If you run this workflow, treat output as staging data, then import to Supabase.
+- Data flow: `OaboutAI_data/obsidian/*.md` -> validate/parse -> upsert `public.articles` -> frontend query.
+- If you run this workflow, treat output as staging data, then import/upsert to Supabase.
 
 ## Supported Inputs
 
@@ -42,6 +43,7 @@ Edit `/tmp/oaboutai_draft.json`:
 - `title.en`, `title.zh-tw`
 - `executive_summary.en`, `executive_summary.zh-tw`
 - `detailed_notes.en`, `detailed_notes.zh-tw`
+- `takeaway_html.en`, `takeaway_html.zh-tw` (markdown content for `## Take-away`)
 - `keywords`, `topics`, `source_date`
 
 ### 3. Dry run
@@ -88,6 +90,10 @@ Operational reference:
 - keyword IDs must come from `apps/<app-id>/data/keywords.json`
 - topic IDs must come from `apps/<app-id>/data/topics.json`
 - keep EN + zh-tw parity for the same slug in data pipelines
+- canonical body sections must exist in both languages:
+  - `## Executive Summary`
+  - `## Detailed Notes`
+  - `## Take-away`
 
 ## Copyright-Safe Note
 

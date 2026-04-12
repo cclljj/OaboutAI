@@ -20,7 +20,7 @@ Production: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 - Frontend shell: Hugo（頁面框架、導覽、版型）
 - Auth, access control, favorites: Supabase Auth + RLS tables
 - Content source: private repo `cclljj/OaboutAI_data`（Obsidian markdown）
-- Build artifact: `static/obsidian/articles.en.json`、`static/obsidian/articles.zh-tw.json`
+- Pipeline: private Obsidian markdown -> validate/parse -> upsert `public.articles` -> frontend query
 
 關鍵原則：
 - 未登入不應直接暴露受保護內容流程。
@@ -67,14 +67,20 @@ Workflow: `.github/workflows/docs-site-ci.yml`
 ## Supabase Tables In Current Runtime
 
 Required:
+- `public.articles`（runtime content）
 - `public.favorites`
 - `public.app_users`
 - `public.user_roles`
 - `public.access_allowlist`
 - `public.access_requests`
 
-Legacy / optional:
-- `public.articles` (kept only for historical export/analysis tooling; not required for runtime page rendering)
+Obsidian section contract (required for each EN/zh-TW file):
+- `## Executive Summary`
+- `## Detailed Notes`
+- `## Take-away`
+
+Compatibility note:
+- DB column keeps `takeaway_html` name for backward compatibility, while value is markdown parsed from `## Take-away`.
 
 ## Required Secrets / Env
 

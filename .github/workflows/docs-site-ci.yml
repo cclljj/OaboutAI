@@ -204,6 +204,14 @@ jobs:
         run: python scripts/sync_topics.py
         working-directory: ${{ env.COMPOSED_SITE }}
 
+      - name: Auto-resolve common metadata issues
+        run: python scripts/auto_resolve_content_issues.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
+      - name: Validate content metadata
+        run: python scripts/validate_content.py
+        working-directory: ${{ env.COMPOSED_SITE }}
+
       - name: Sync Obsidian private data into Supabase articles
         run: |
           python scripts/sync_obsidian_to_supabase.py \

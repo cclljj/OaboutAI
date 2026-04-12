@@ -5,7 +5,12 @@ Day-2 operational runbook for OaboutAI runtime content.
 ## 1. Source of Truth
 
 Production article content is read from:
-- private repo Obsidian markdown (`OaboutAI_data/obsidian/*`) compiled into static JSON
+- Supabase `public.articles`
+
+Write path for production content:
+- private repo Obsidian markdown (`OaboutAI_data/obsidian/*`)
+- CI compose + validate + parse
+- upsert to `public.articles` via `scripts/sync_obsidian_to_supabase.py`
 
 Per-user saved items are read from:
 - `public.favorites`
@@ -16,7 +21,14 @@ Access control state is read from:
 - `public.access_allowlist`
 - `public.access_requests`
 
-Public GitHub content bundles are **not** the production source of protected article body content.
+Canonical Obsidian body contract (required):
+- `## Executive Summary`
+- `## Detailed Notes`
+- `## Take-away`
+
+Compatibility note:
+- `public.articles.takeaway_html` keeps its column name for backward compatibility.
+- Value is markdown content parsed from `## Take-away`.
 
 ## 2. Schema + RLS Bootstrap
 
@@ -37,14 +49,7 @@ Bootstrap admin:
 - `cclljj@gmail.com` is always treated as an admin by policy, even before a `user_roles` row exists.
 - Additional admins are stored in `public.user_roles`.
 
-## 3. Legacy Optional Table (`public.articles`)
-
-`public.articles` is no longer required for runtime page rendering in the Obsidian pipeline.
-Keep it only if you still need historical SQL workflows (imports, reporting, keyword normalization scripts).
-
-If you keep using this table, keep canonical language values: `en`, `zh-tw`.
-
-## 4. Legacy Import / Upsert Patterns
+## 3. Import / Upsert Patterns
 
 Use one of these:
 1. Supabase dashboard CSV import
@@ -81,7 +86,7 @@ do update set
   updated_at = now();
 ```
 
-## 5. Health Checks
+## 4. Health Checks
 
 ### 5.1 Favorites ownership sanity
 
@@ -129,7 +134,7 @@ from public.access_allowlist
 order by email;
 ```
 
-## 6. Runtime Env Vars
+## 5. Runtime Env Vars
 
 Set in Vercel project:
 - `HUGO_SUPABASE_URL`
@@ -139,9 +144,7 @@ Set in Vercel project:
 If these are missing, UI will show:
 - `Supabase is not configured yet...`
 
-## 7. Common Incidents
-
-## 7. Access Control Flow
+## 6. Access Control Flow
 
 ### 7.1 Whitelist path
 
@@ -164,19 +167,19 @@ Important:
 - Approval email sending is intentionally **not** implemented in this phase.
 - Protected article data is guarded by approval-aware RLS; login alone is not enough.
 
-## 8. Common Incidents
+## 7. Common Incidents
 
 ### 8.1 Login works, but no content appears
 
 Check:
-1. `static/obsidian/articles.<lang>.json` exists and contains records
+1. matching rows exist in `public.articles` for target language
 2. user is approved via admin role, allowlist, or an `approved` request
 3. env vars are present in current deployment
 
 ### 8.2 `/item/?slug=...` shows empty
 
 Check:
-1. slug exists in `static/obsidian/articles.<lang>.json`
+1. slug exists in `public.articles` for `en` or `zh-tw`
 2. slug spelling in URL is exact
 3. logged-in user is approved
 
@@ -194,7 +197,7 @@ Check:
 2. `primary_topic`, `topics`, `keywords`, `source_type` fields are populated
 3. imported JSON fields are valid arrays for `topics` / `keywords`
 
-## 9. Legacy: Normalize Existing Keywords in `public.articles`
+## 8. Legacy: Normalize Existing Keywords in `public.articles`
 
 Use this when historical `public.articles.keywords` contains mixed Chinese/English terms or mixed casing.
 

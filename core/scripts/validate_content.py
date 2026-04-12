@@ -23,6 +23,7 @@ REQUIRED_FIELDS = {
     "submission_date",
     "executive_summary",
     "detailed_notes",
+    "takeaway_html",
     "keywords",
     "primary_topic",
     "topics",
@@ -142,6 +143,8 @@ def validate_record(
         errors.append(f"{rel}: missing `executive_summary` (front matter or `## Executive Summary` section)")
     if not str(fm.get("detailed_notes") or body_sections.get("detailed_notes") or "").strip():
         errors.append(f"{rel}: missing `detailed_notes` (front matter or `## Detailed Notes` section)")
+    if not str(fm.get("takeaway_html") or body_sections.get("takeaway_html") or "").strip():
+        errors.append(f"{rel}: missing `takeaway_html` (front matter or `## Take-away` section)")
 
     attachments = fm.get("attachments")
     if attachments is not None:

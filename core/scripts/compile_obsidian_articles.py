@@ -117,7 +117,7 @@ def parse_article(path: Path, lang: str) -> dict[str, Any]:
     slug = normalize_text(front_matter.get("slug")) or path.stem
     language = normalize_text(front_matter.get("language")) or lang
 
-    return {
+    record = {
         "slug": slug,
         "language": language,
         "title": normalize_text(front_matter.get("title")),
@@ -133,13 +133,26 @@ def parse_article(path: Path, lang: str) -> dict[str, Any]:
         "topics": normalize_string_list(front_matter.get("topics")),
         "attachments": normalize_string_list(front_matter.get("attachments")),
     }
+    missing_sections = [
+        field
+        for field in ("executive_summary", "detailed_notes", "takeaway_html")
+        if not normalize_text(record.get(field))
+    ]
+    if missing_sections:
+        raise ValueError(
+            f"{path}: missing required sections/fields {missing_sections}. "
+            "Expected `## Executive Summary`, `## Detailed Notes`, and `## Take-away`."
+        )
+    return record
 
 
 def compile_language(lang: str) -> list[dict[str, Any]]:
     lang_root = OBSIDIAN_ROOT / lang
     if not lang_root.exists():
         return []
-    rows = [parse_article(path, lang) for path in sorted(lang_root.glob("*.md"))]
+    rows: list[dict[str, Any]] = []
+    for path in sorted(lang_root.glob("*.md")):
+        rows.append(parse_article(path, lang))
     rows.sort(key=lambda row: (row.get("source_date") or "", row.get("submission_date") or ""), reverse=True)
     return rows
 
@@ -149,7 +162,10 @@ def main() -> int:
     total = 0
 
     for lang in SUPPORTED_LANGS:
-        rows = compile_language(lang)
+        try:
+            rows = compile_language(lang)
+        except ValueError as exc:
+            raise SystemExit(f"ERROR: {exc}") from exc
         out_path = STATIC_OUT / f"articles.{lang}.json"
         out_path.write_text(json.dumps(rows, ensure_ascii=False), encoding="utf-8")
         total += len(rows)
