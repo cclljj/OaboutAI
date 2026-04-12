@@ -573,7 +573,7 @@
           <dt>${escapeHtml(labels.sourceUrl)}</dt>
           <dd><a href="${escapeHtml(record.source_url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(record.source_url || "-")}</a></dd>
           <dt>${escapeHtml(labels.sourceType)}</dt>
-          <dd>${sourceType ? buildChipLink(sourceType, termHref("types", sourceType)) : "-"}</dd>
+          <dd>${sourceType ? buildChipLink(sourceType, filteredItemsHref({ term_type: "types", term_value: sourceType })) : "-"}</dd>
           <dt>${escapeHtml(labels.sourceDate)}</dt>
           <dd>${escapeHtml(record.source_date || "-")}</dd>
           <dt>${escapeHtml(labels.submissionDate)}</dt>
