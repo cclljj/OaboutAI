@@ -44,7 +44,7 @@ cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
-python3 scripts/compile_obsidian_articles.py
+python3 scripts/sync_obsidian_to_supabase.py --dry-run
 ```
 
 Notes:
@@ -60,7 +60,8 @@ python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oab
   --data-repo-subdir "${OABOUTAI_DATA_REPO_SUBDIR:-obsidian}"
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
-python3 scripts/compile_obsidian_articles.py
+python3 scripts/auto_resolve_content_issues.py
+python3 scripts/validate_content.py
 npx --yes hugo-bin server -D
 ```
 
@@ -79,7 +80,7 @@ cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
 python3 scripts/auto_resolve_content_issues.py
 python3 scripts/validate_content.py
-python3 scripts/compile_obsidian_articles.py
+python3 scripts/sync_obsidian_to_supabase.py --dry-run
 rm -rf data/obsidian
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
@@ -94,12 +95,10 @@ Run in Supabase SQL editor:
 - `docs/supabase_schema.sql`
 
 This creates:
+- `public.articles` (runtime article content)
 - `public.favorites` (per-user favorites)
 - `public.app_users` / `public.user_roles` / `public.access_allowlist` / `public.access_requests` (access control)
 - RLS policies for approval-aware access and owner-only favorites CRUD
-
-Legacy / optional:
-- `public.articles` (no longer required for runtime rendering in Obsidian pipeline; keep only if you still run historical export/analysis SQL)
 
 ### 6.2 Configure Google OAuth
 
@@ -142,14 +141,12 @@ export OABOUTAI_DATA_REPO_TOKEN="<github-token>"
 
 ## 7. Load / Refresh Article Data
 
-Current model reads article bodies from Obsidian markdown stored in a private data repository and compiled into static JSON at build time.
+Current model reads article bodies from Supabase `public.articles`.
 
 Primary approach:
 1. Maintain article markdown in private repo `OaboutAI_data` under `obsidian/en` + `obsidian/zh-tw`.
-2. CI/build compiles these markdown files into static JSON artifacts.
-
-Legacy approach (optional):
-1. Keep using `public.articles` import/upsert only if you need historical SQL workflows.
+2. CI compose + validate markdown.
+3. CI runs `scripts/sync_obsidian_to_supabase.py` to upsert into `public.articles`.
 
 Reference operations and checklist:
 - `docs/supabase_operations.md`
@@ -165,8 +162,8 @@ Reference operations and checklist:
 
 Pipeline behavior:
 - compose site
-- sync topics
-- validate shell content
+- sync topics + auto resolve + metadata validation
+- sync Obsidian content into Supabase `public.articles`
 - Hugo build
 - deploy composed output to Vercel
 
@@ -176,7 +173,9 @@ Pipeline behavior:
 python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
-python3 scripts/compile_obsidian_articles.py
+python3 scripts/auto_resolve_content_issues.py
+python3 scripts/validate_content.py
+python3 scripts/sync_obsidian_to_supabase.py --dry-run
 npm install -g vercel@latest
 vercel pull --yes --environment=production
 rm -f data/keyword_proposals.jsonl

@@ -41,7 +41,8 @@ Production: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean
 cd /tmp/oaboutai-site
 python3 scripts/sync_topics.py
-python3 scripts/compile_obsidian_articles.py
+python3 scripts/auto_resolve_content_issues.py
+python3 scripts/validate_content.py
 npx --yes hugo-bin server -D
 ```
 
@@ -54,15 +55,16 @@ Workflow: `.github/workflows/docs-site-ci.yml`
 `validate-and-build`:
 1. Compose site（不依賴 private data）
 2. Sync topics / metadata checks
-3. Compile Obsidian artifacts
 4. Hugo build + output verification
 
 `deploy-vercel`（`main` push 或 `workflow_dispatch`）:
 1. 檢查 `VERCEL_TOKEN`、`OABOUTAI_DATA_REPO_TOKEN`
 2. 驗證可讀取 `cclljj/OaboutAI_data`
 3. Compose with private data injection
-4. Build + deploy to Vercel production
-5. Post-deploy smoke tests
+4. Sync topics + auto resolve + validate content metadata
+5. Upsert Obsidian content to Supabase `public.articles`
+6. Build + deploy to Vercel production
+7. Post-deploy smoke tests
 
 ## Supabase Tables In Current Runtime
 

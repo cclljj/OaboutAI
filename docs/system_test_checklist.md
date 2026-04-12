@@ -28,7 +28,8 @@ Major milestones completed:
 ## 2. Current System Baseline
 
 Runtime source of truth:
-- `data/obsidian/*/*.md` (in private repo during build) -> `static/obsidian/articles.<lang>.json`
+- `public.articles` (content served at runtime)
+- write path: private `OaboutAI_data/obsidian/*/*.md` -> validate/parse -> upsert `public.articles`
 - `public.favorites` (Supabase): per-user favorites
 
 Static site role:
@@ -48,7 +49,7 @@ Run locally before push:
 3. `python3 scripts/sync_topics.py`
 4. `python3 scripts/auto_resolve_content_issues.py`
 5. `python3 scripts/validate_content.py`
-6. `python3 scripts/compile_obsidian_articles.py`
+6. `python3 scripts/sync_obsidian_to_supabase.py --dry-run`
 7. `rm -f data/keyword_proposals.jsonl`
 8. `npx --yes hugo-bin --gc --minify`
 
@@ -174,8 +175,8 @@ Automated in CI:
 - check `core/layouts/_default/item-query.html` exists and deployed.
 
 2. Symptom: login works but no content.
-- likely cause: missing/invalid `static/obsidian/articles.<lang>.json` build output.
-- run local pre-deploy checks and confirm `python3 scripts/compile_obsidian_articles.py` output.
+- likely cause: `public.articles` missing data, or metadata validation blocked sync.
+- run local pre-deploy checks and confirm `python3 scripts/sync_obsidian_to_supabase.py --dry-run` succeeds.
 
 3. Symptom: keyword/type click -> 404.
 - likely cause: drill-down linked to static term pages.

@@ -3,10 +3,10 @@
 -- Run in Supabase SQL editor.
 --
 -- Current production notes:
--- 1) Runtime content is served from Obsidian build artifacts, not directly from `public.articles`.
+-- 1) Runtime content is read from `public.articles`.
 -- 2) `public.favorites`, `public.app_users`, `public.user_roles`, `public.access_allowlist`,
 --    and `public.access_requests` remain runtime-critical.
--- 3) `public.articles` is retained as a legacy optional table for historical SQL workflows.
+-- 3) Obsidian markdown is validated and synced into `public.articles` during CI.
 
 create extension if not exists pgcrypto;
 
