@@ -102,6 +102,11 @@
     adminEmail: "Email",
     adminDisplayName: "Name",
     adminNoDisplayName: "Unnamed user",
+    adminDeletionLogs: "Deletion logs",
+    adminNoDeletionLogs: "No deletion logs yet.",
+    adminDeletedAt: "Deleted at",
+    adminDeletedBy: "Deleted by",
+    adminDeletedEntry: "Entry",
     adminActionSuccess: "Saved.",
     adminActionError: "Unable to save that change right now."
   };
@@ -793,6 +798,7 @@
         );
       })
       .sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
+    const deletionLogs = Array.isArray(dashboard.deletionLogs) ? dashboard.deletionLogs : [];
 
     root.innerHTML = `
       <section class="oa-admin-grid">
@@ -922,6 +928,39 @@
               </table>
             </div>
           ` : `<p>${escapeHtml(labels.adminNoKnownUsers)}</p>`}
+        </section>
+
+        <section class="oa-card oa-admin-card">
+          <h2 class="oa-section-title">${escapeHtml(labels.adminDeletionLogs)}</h2>
+          ${deletionLogs.length ? `
+            <div class="oa-admin-table-wrap">
+              <table class="oa-admin-table">
+                <thead>
+                  <tr>
+                    <th>${escapeHtml(labels.adminDeletedAt)}</th>
+                    <th>${escapeHtml(labels.adminDeletedBy)}</th>
+                    <th>${escapeHtml(labels.adminDeletedEntry)}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${deletionLogs.map((row) => {
+                    const deletedBy = String(row.deleted_by_account || "").trim() || "N/A";
+                    const slug = String(row.slug || "").trim() || "N/A";
+                    const language = String(row.language || "").trim() || "N/A";
+                    const title = String(row.title || "").trim();
+                    const entry = title ? `${title} (${slug}, ${language})` : `${slug} (${language})`;
+                    return `
+                      <tr>
+                        <td>${escapeHtml(formatDateTime(row.deleted_at))}</td>
+                        <td>${escapeHtml(deletedBy)}</td>
+                        <td>${escapeHtml(entry)}</td>
+                      </tr>
+                    `;
+                  }).join("")}
+                </tbody>
+              </table>
+            </div>
+          ` : `<p>${escapeHtml(labels.adminNoDeletionLogs)}</p>`}
         </section>
       </section>
     `;
@@ -1496,18 +1535,20 @@
     }
 
     async function fetchAdminDashboard() {
-      const [requestsResult, allowlistResult, usersResult, rolesResult] = await Promise.all([
+      const [requestsResult, allowlistResult, usersResult, rolesResult, deletionLogsResult] = await Promise.all([
         client.from("access_requests").select("id,requester_user_id,email,reason,status,created_at,reviewed_at,reviewer_user_id").order("created_at", { ascending: false }),
         client.from("access_allowlist").select("email,created_at,created_by").order("email", { ascending: true }),
         client.from("app_users").select("id,email,display_name,avatar_url,last_seen_at,created_at").order("last_seen_at", { ascending: false }),
-        client.from("user_roles").select("user_id,role,created_at")
+        client.from("user_roles").select("user_id,role,created_at"),
+        client.from("article_deletion_logs").select("slug,language,title,deleted_at,deleted_by_account").order("deleted_at", { ascending: false }).limit(200)
       ]);
 
       return {
         requests: requestsResult.data || [],
         allowlist: allowlistResult.data || [],
         users: usersResult.data || [],
-        roles: rolesResult.data || []
+        roles: rolesResult.data || [],
+        deletionLogs: deletionLogsResult.data || []
       };
     }
 

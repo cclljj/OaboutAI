@@ -208,6 +208,16 @@
   translation: 名稱
 - id: adminNoDisplayName
   translation: 未命名使用者
+- id: adminDeletionLogs
+  translation: 刪除紀錄
+- id: adminNoDeletionLogs
+  translation: 目前沒有刪除紀錄。
+- id: adminDeletedAt
+  translation: 刪除時間
+- id: adminDeletedBy
+  translation: 刪除帳號
+- id: adminDeletedEntry
+  translation: 條目
 - id: adminActionSuccess
   translation: 已儲存。
 - id: adminActionError

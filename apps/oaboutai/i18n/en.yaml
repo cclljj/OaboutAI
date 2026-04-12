@@ -208,6 +208,16 @@
   translation: Name
 - id: adminNoDisplayName
   translation: Unnamed user
+- id: adminDeletionLogs
+  translation: Deletion logs
+- id: adminNoDeletionLogs
+  translation: No deletion logs yet.
+- id: adminDeletedAt
+  translation: Deleted at
+- id: adminDeletedBy
+  translation: Deleted by
+- id: adminDeletedEntry
+  translation: Entry
 - id: adminActionSuccess
   translation: Saved.
 - id: adminActionError
