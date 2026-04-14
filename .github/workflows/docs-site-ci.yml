@@ -5,6 +5,7 @@ on:
     paths:
       - "core/**"
       - "apps/**"
+      - "api/**"
       - "scripts/**"
       - "docs/**"
       - "README.md"
@@ -16,6 +17,7 @@ on:
     paths:
       - "core/**"
       - "apps/**"
+      - "api/**"
       - "scripts/**"
       - "docs/**"
       - "README.md"
