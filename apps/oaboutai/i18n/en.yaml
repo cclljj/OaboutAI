@@ -218,6 +218,14 @@
   translation: Deleted by
 - id: adminDeletedEntry
   translation: Entry
+- id: adminDeleteUser
+  translation: Delete user
+- id: adminDeleteUserConfirm
+  translation: Are you sure you want to remove this user profile from the app directory?
+- id: adminDeleteUserConfirmFinal
+  translation: Please confirm again. The user can be added back automatically after signing in again.
+- id: adminDeleteUserBlocked
+  translation: You cannot delete your own account or the bootstrap admin from this list.
 - id: adminActionSuccess
   translation: Saved.
 - id: adminActionError

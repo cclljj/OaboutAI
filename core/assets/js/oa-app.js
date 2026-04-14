@@ -107,6 +107,10 @@
     adminDeletedAt: "Deleted at",
     adminDeletedBy: "Deleted by",
     adminDeletedEntry: "Entry",
+    adminDeleteUser: "Delete user",
+    adminDeleteUserConfirm: "Are you sure you want to remove this user profile from the app directory?",
+    adminDeleteUserConfirmFinal: "Please confirm again. The user can be added back automatically after signing in again.",
+    adminDeleteUserBlocked: "You cannot delete your own account or the bootstrap admin from this list.",
     adminActionSuccess: "Saved.",
     adminActionError: "Unable to save that change right now."
   };
@@ -938,9 +942,14 @@
                       <td>${escapeHtml(user.email || "-")}</td>
                       <td>${escapeHtml(formatDateTime(user.last_seen_at || user.created_at))}</td>
                       <td>
-                        ${explicitAdminIds.has(user.id) || normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL
-                          ? buildChip(labels.adminPanel, "success")
-                          : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-promote="${escapeHtml(user.id)}">${escapeHtml(labels.adminMakeAdmin)}</button>`}
+                        <div class="oa-inline-actions">
+                          ${explicitAdminIds.has(user.id) || normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL
+                            ? buildChip(labels.adminPanel, "success")
+                            : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-promote="${escapeHtml(user.id)}">${escapeHtml(labels.adminMakeAdmin)}</button>`}
+                          ${normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL || user.id === access.profile.id
+                            ? ""
+                            : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-user-delete="${escapeHtml(user.id)}" data-oa-user-delete-email="${escapeHtml(user.email || "")}">${escapeHtml(labels.adminDeleteUser)}</button>`}
+                        </div>
                       </td>
                     </tr>
                   `).join("")}
@@ -1817,6 +1826,28 @@
       }
     }
 
+    async function removeKnownUser(userId, email, currentUser) {
+      const normalizedEmail = normalizeEmail(email);
+      if (!userId) return;
+      if (!currentUser?.id) return;
+      if (userId === currentUser.id || normalizedEmail === BOOTSTRAP_ADMIN_EMAIL) {
+        window.alert(labels.adminDeleteUserBlocked);
+        return;
+      }
+
+      const firstConfirmation = `${labels.adminDeleteUserConfirm}\n\n${normalizedEmail || userId}`;
+      if (!window.confirm(firstConfirmation)) return;
+      if (!window.confirm(labels.adminDeleteUserConfirmFinal)) return;
+
+      const { error } = await client.from("app_users").delete().eq("id", userId);
+      if (error) {
+        const details = String(error.message || "").trim();
+        window.alert(details ? `${labels.adminActionError}\n${details}` : labels.adminActionError);
+        return;
+      }
+      await renderViews();
+    }
+
     function bindGlobalActions(user, access) {
       document.querySelectorAll("[data-oa-sign-in]").forEach((btn) => {
         btn.onclick = () => {
@@ -1888,6 +1919,21 @@
         btn.onclick = async () => {
           if (!access?.isAdmin) return;
           await removeAdmin(btn.dataset.oaAdminRemove || "");
+        };
+      });
+      document.querySelectorAll("[data-oa-user-delete]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!user || !access?.isAdmin) return;
+          btn.disabled = true;
+          try {
+            await removeKnownUser(
+              btn.dataset.oaUserDelete || "",
+              btn.dataset.oaUserDeleteEmail || "",
+              user
+            );
+          } finally {
+            btn.disabled = false;
+          }
         };
       });
       document.querySelectorAll("[data-oa-admin-refresh]").forEach((btn) => {
