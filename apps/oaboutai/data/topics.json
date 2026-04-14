@@ -31,5 +31,27 @@
       "en": "Methods and evidence for reducing severe model failure and misuse risk.",
       "zh-tw": "降低模型嚴重失效與誤用風險的方法與證據。"
     }
+  },
+  {
+    "id": "agentic-ai",
+    "title": {
+      "en": "Agentic AI",
+      "zh-tw": "代理式 AI"
+    },
+    "description": {
+      "en": "Autonomous and semi-autonomous AI agents, orchestration patterns, and operational controls.",
+      "zh-tw": "自主與半自主 AI 代理的能力、編排模式與營運控管。"
+    }
+  },
+  {
+    "id": "physical-ai",
+    "title": {
+      "en": "Physical AI",
+      "zh-tw": "物理 AI"
+    },
+    "description": {
+      "en": "AI systems interacting with the physical world, including robotics, embodied intelligence, and real-world safety.",
+      "zh-tw": "與實體世界互動的 AI 系統，包含機器人、具身智能與實體安全。"
+    }
   }
 ]
