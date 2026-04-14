@@ -35,6 +35,14 @@ Production: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 - `docs/`: schema、操作手冊、系統測試清單
 - `.github/workflows/docs-site-ci.yml`: CI/CD 主流程
 
+## Current Top-level Topics
+
+- AI Policy（AI 政策）
+- AI Governance（AI 治理）
+- AI Safety（AI 安全）
+- Agentic AI（代理式 AI）
+- Physical AI（物理 AI）
+
 ## Local Development
 
 ```bash
