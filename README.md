@@ -37,6 +37,8 @@ Production: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 
 ## Current Top-level Topics
 
+Current count: `5`
+
 - AI Policy（AI 政策）
 - AI Governance（AI 治理）
 - AI Safety（AI 安全）

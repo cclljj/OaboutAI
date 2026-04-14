@@ -31,6 +31,7 @@ Runtime source of truth:
 - `public.articles` (content served at runtime)
 - write path: private `OaboutAI_data/obsidian/*/*.md` -> validate/parse -> upsert `public.articles`
 - `public.favorites` (Supabase): per-user favorites
+- top-level topics source: `apps/oaboutai/data/topics.json` (current expected count: `5`)
 
 Static site role:
 - Hugo renders shell/layout/navigation only

@@ -35,6 +35,12 @@
   - other readable files -> `other`
 - keyword IDs 只能來自 `apps/<app-id>/data/keywords.json`
 - topic IDs 只能來自 `apps/<app-id>/data/topics.json`
+- 目前允許的頂層 topic IDs（共 5 個）:
+  - `ai-policy`
+  - `ai-governance`
+  - `ai-safety`
+  - `agentic-ai`
+  - `physical-ai`
 - 保持 EN + zh-tw 內容對應同一個 slug
 - 兩種語言都必須具備三段正文（標題需完全一致）：
   - `## Executive Summary`

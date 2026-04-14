@@ -83,6 +83,12 @@ Compatibility note:
 Topics:
 - source of truth: `apps/<app-id>/data/topics.json`
 - max 10 top-level topics
+- current top-level topics (5):
+  1. `ai-policy` -> `AI Policy` / `AI 政策`
+  2. `ai-governance` -> `AI Governance` / `AI 治理`
+  3. `ai-safety` -> `AI Safety` / `AI 安全`
+  4. `agentic-ai` -> `Agentic AI` / `代理式 AI`
+  5. `physical-ai` -> `Physical AI` / `物理 AI`
 
 Keywords:
 - source of truth: `apps/<app-id>/data/keywords.json`

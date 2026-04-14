@@ -89,6 +89,7 @@ Operational reference:
 
 - keyword IDs must come from `apps/<app-id>/data/keywords.json`
 - topic IDs must come from `apps/<app-id>/data/topics.json`
+- current top-level topic IDs (5): `ai-policy`, `ai-governance`, `ai-safety`, `agentic-ai`, `physical-ai`
 - keep EN + zh-tw parity for the same slug in data pipelines
 - canonical body sections must exist in both languages:
   - `## Executive Summary`
