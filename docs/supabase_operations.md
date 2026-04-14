@@ -140,6 +140,9 @@ Set in Vercel project:
 - `HUGO_SUPABASE_URL`
 - `HUGO_SUPABASE_ANON_KEY`
 - `HUGO_SUPABASE_REDIRECT_URL`
+- `RESEND_API_KEY`
+- `OABOUTAI_ADMIN_NOTIFY_EMAIL` (optional, default `cclljj@gmail.com`)
+- `OABOUTAI_RESEND_FROM` (optional, default `OaboutAI <onboarding@resend.dev>`)
 
 If these are missing, UI will show:
 - `Supabase is not configured yet...`
@@ -159,12 +162,14 @@ If these are missing, UI will show:
 2. Front-end upserts a row into `public.app_users`
 3. If the email is not allowlisted and the user is not an admin, the UI shows a request form
 4. Submitting the form inserts a `pending` row into `public.access_requests`
-5. Admin reviews it in `/admin/`
-6. If approved, the next refresh/session check grants access
-7. If denied, the user remains blocked and may submit a new request later
+5. Frontend posts notification payload to `/api/access-request-notify` (non-blocking)
+6. Vercel function sends admin email via Resend
+7. Admin reviews it in `/admin/`
+8. If approved, the next refresh/session check grants access
+9. If denied, the user remains blocked and may submit a new request later
 
 Important:
-- Approval email sending is intentionally **not** implemented in this phase.
+- Notification delivery is intentionally non-blocking; request submission still succeeds even if email delivery fails.
 - Protected article data is guarded by approval-aware RLS; login alone is not enough.
 
 ## 7. Common Incidents

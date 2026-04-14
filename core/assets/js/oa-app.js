@@ -1709,6 +1709,21 @@
       await client.auth.signOut();
     }
 
+    async function notifyAdminAccessRequest(payload) {
+      try {
+        await fetch("/api/access-request-notify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload),
+          keepalive: true
+        });
+      } catch (_error) {
+        // Do not block request submission UI when notification delivery fails.
+      }
+    }
+
     async function submitAccessRequest(form, user) {
       const feedback = form.querySelector("[data-oa-feedback]");
       const reason = String(new FormData(form).get("reason") || "").trim();
@@ -1718,16 +1733,29 @@
       }
       setFeedback(feedback, "", false);
       const profile = getUserProfile(user);
-      const { error } = await client.from("access_requests").insert({
-        requester_user_id: user.id,
-        email: profile.email,
-        reason,
-        status: "pending"
-      });
+      const { data, error } = await client
+        .from("access_requests")
+        .insert({
+          requester_user_id: user.id,
+          email: profile.email,
+          reason,
+          status: "pending"
+        })
+        .select("id,created_at")
+        .single();
       if (error) {
         setFeedback(feedback, error.message || labels.requestSubmitError, true);
         return;
       }
+      void notifyAdminAccessRequest({
+        requestId: data?.id || "",
+        requesterUserId: user.id,
+        email: profile.email,
+        reason,
+        language: normalizeLang(document.documentElement.lang || "en"),
+        submittedAt: data?.created_at || new Date().toISOString(),
+        adminUrl: `${window.location.origin}${languagePath("admin/")}`
+      });
       await renderViews();
     }
 
