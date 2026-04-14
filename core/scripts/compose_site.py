@@ -171,6 +171,9 @@ def main() -> int:
         data_repo_token_env=args.data_repo_token_env,
         data_repo_subdir=args.data_repo_subdir,
     )
+    api_root = repo_root / "api"
+    if api_root.exists():
+        shutil.copytree(api_root, output_root / "api", dirs_exist_ok=True)
     vercel_config = repo_root / "vercel.json"
     if vercel_config.exists():
         shutil.copy2(vercel_config, output_root / "vercel.json")
