@@ -267,6 +267,13 @@ create policy "users can update own app profile"
     or public.has_role('admin')
   );
 
+drop policy if exists "admins can delete app profile" on public.app_users;
+create policy "admins can delete app profile"
+  on public.app_users
+  for delete
+  to authenticated
+  using (public.has_role('admin'));
+
 drop policy if exists "users can read roles" on public.user_roles;
 create policy "users can read roles"
   on public.user_roles
