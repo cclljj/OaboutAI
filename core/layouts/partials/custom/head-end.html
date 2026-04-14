@@ -1,6 +1,10 @@
 {{- $supabaseURL := site.Params.supabase.url | default (getenv "HUGO_SUPABASE_URL") | default "" -}}
 {{- $supabaseAnonKey := site.Params.supabase.anonKey | default (getenv "HUGO_SUPABASE_ANON_KEY") | default "" -}}
 {{- $supabaseRedirectURL := site.Params.supabase.redirectUrl | default (getenv "HUGO_SUPABASE_REDIRECT_URL") | default "" -}}
+{{- $vercelAnalyticsFlag := lower (printf "%v" (site.Params.vercelAnalyticsEnabled | default (getenv "HUGO_VERCEL_ANALYTICS_ENABLED") | default "true")) -}}
+{{- $vercelSpeedInsightsFlag := lower (printf "%v" (site.Params.vercelSpeedInsightsEnabled | default (getenv "HUGO_VERCEL_SPEED_INSIGHTS_ENABLED") | default "true")) -}}
+{{- $enableVercelAnalytics := and hugo.IsProduction (not (in (slice "0" "false" "off" "no") $vercelAnalyticsFlag)) -}}
+{{- $enableVercelSpeedInsights := and hugo.IsProduction (not (in (slice "0" "false" "off" "no") $vercelSpeedInsightsFlag)) -}}
 
 <meta name="oa-supabase-url" content="{{ $supabaseURL }}">
 <meta name="oa-supabase-anon-key" content="{{ $supabaseAnonKey }}">
@@ -113,3 +117,9 @@
   {{- $appScript = $appScript | minify | fingerprint -}}
 {{- end -}}
 <script defer src="{{ $appScript.RelPermalink }}" {{ with $appScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
+{{- if $enableVercelAnalytics }}
+<script defer src="/_vercel/insights/script.js"></script>
+{{- end }}
+{{- if $enableVercelSpeedInsights }}
+<script defer src="/_vercel/speed-insights/script.js"></script>
+{{- end }}

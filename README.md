@@ -94,6 +94,11 @@ Runtime/build env (Vercel or CI):
 - `HUGO_SUPABASE_URL`
 - `HUGO_SUPABASE_ANON_KEY`
 - `HUGO_SUPABASE_REDIRECT_URL`
+- `RESEND_API_KEY`
+- `OABOUTAI_ADMIN_NOTIFY_EMAIL`（default: `cclljj@gmail.com`）
+- `OABOUTAI_RESEND_FROM`（optional；default: `OaboutAI <onboarding@resend.dev>`）
+- `HUGO_VERCEL_ANALYTICS_ENABLED`（optional；default: `true`）
+- `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED`（optional；default: `true`）
 - `OABOUTAI_DATA_REPO_URL`（default: `https://github.com/cclljj/OaboutAI_data`）
 - `OABOUTAI_DATA_REPO_REF`（default: `main`）
 - `OABOUTAI_DATA_REPO_SUBDIR`（default: `obsidian`）

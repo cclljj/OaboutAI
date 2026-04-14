@@ -120,6 +120,11 @@ Set these variables in Vercel project settings:
 - `HUGO_SUPABASE_URL=https://<project-ref>.supabase.co`
 - `HUGO_SUPABASE_ANON_KEY=<anon-public-key>`
 - `HUGO_SUPABASE_REDIRECT_URL=https://oaboutai.vercel.app`
+- `RESEND_API_KEY=<resend-api-key>`
+- `OABOUTAI_ADMIN_NOTIFY_EMAIL=<admin-email-to-receive-access-request-alerts>`
+- `OABOUTAI_RESEND_FROM=OaboutAI <onboarding@resend.dev>` (optional)
+- `HUGO_VERCEL_ANALYTICS_ENABLED=true` (optional)
+- `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED=true` (optional)
 - `OABOUTAI_DATA_REPO_URL=https://github.com/cclljj/OaboutAI_data`
 - `OABOUTAI_DATA_REPO_REF=main`
 - `OABOUTAI_DATA_REPO_TOKEN_ENV=OABOUTAI_DATA_REPO_TOKEN`
@@ -132,6 +137,11 @@ For local shell testing, you can export them before running Hugo:
 export HUGO_SUPABASE_URL="https://<project-ref>.supabase.co"
 export HUGO_SUPABASE_ANON_KEY="<anon-public-key>"
 export HUGO_SUPABASE_REDIRECT_URL="http://localhost:1313"
+export RESEND_API_KEY="<resend-api-key>"
+export OABOUTAI_ADMIN_NOTIFY_EMAIL="<admin-email>"
+export OABOUTAI_RESEND_FROM="OaboutAI <onboarding@resend.dev>"
+export HUGO_VERCEL_ANALYTICS_ENABLED="true"
+export HUGO_VERCEL_SPEED_INSIGHTS_ENABLED="true"
 export OABOUTAI_DATA_REPO_URL="https://github.com/cclljj/OaboutAI_data"
 export OABOUTAI_DATA_REPO_REF="main"
 export OABOUTAI_DATA_REPO_TOKEN_ENV="OABOUTAI_DATA_REPO_TOKEN"
