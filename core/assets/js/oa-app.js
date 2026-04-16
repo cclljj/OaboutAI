@@ -576,11 +576,34 @@
 
   function renderAvatar(profile, sizeClass) {
     const label = profile.displayName || profile.email || "User";
+    const initials = getInitials(label);
     const avatarSrc = sanitizeImageSrc(profile.avatar);
     if (avatarSrc) {
-      return `<img class="oa-account-avatar ${sizeClass || ""}" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(label)}">`;
+      return `<img class="oa-account-avatar ${sizeClass || ""}" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(label)}" data-oa-avatar-img data-oa-avatar-initials="${escapeHtml(initials)}">`;
     }
-    return `<span class="oa-account-avatar oa-account-avatar-fallback ${sizeClass || ""}" aria-hidden="true">${escapeHtml(getInitials(label))}</span>`;
+    return `<span class="oa-account-avatar oa-account-avatar-fallback ${sizeClass || ""}" aria-hidden="true">${escapeHtml(initials)}</span>`;
+  }
+
+  function bindAvatarFallbacks(scope) {
+    const root = scope && typeof scope.querySelectorAll === "function" ? scope : document;
+    root.querySelectorAll("img[data-oa-avatar-img]").forEach((img) => {
+      if (img.dataset.oaAvatarBound === "true") return;
+      img.dataset.oaAvatarBound = "true";
+      const initials = String(img.dataset.oaAvatarInitials || "U").trim() || "U";
+      const swapToFallback = () => {
+        if (!img.isConnected) return;
+        const fallback = document.createElement("span");
+        const sizeClass = img.classList.contains("oa-account-avatar-sm") ? " oa-account-avatar-sm" : "";
+        fallback.className = `oa-account-avatar oa-account-avatar-fallback${sizeClass}`;
+        fallback.setAttribute("aria-hidden", "true");
+        fallback.textContent = initials;
+        img.replaceWith(fallback);
+      };
+      img.addEventListener("error", swapToFallback, { once: true });
+      if (img.complete && img.naturalWidth === 0) {
+        swapToFallback();
+      }
+    });
   }
 
   function favoriteButton(slug, isSaved, labels) {
@@ -1871,6 +1894,7 @@
             </div>
           `;
         }
+        bindAvatarFallbacks(node);
       });
     }
 
