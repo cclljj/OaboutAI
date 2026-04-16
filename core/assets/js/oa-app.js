@@ -533,6 +533,11 @@
     const shell = root.closest(".oa-shell");
     const titleNode = shell ? shell.querySelector(".oa-page-title") : null;
     if (!titleNode) return;
+    if (!titleNode.dataset.oaBaseTitle) {
+      titleNode.dataset.oaBaseTitle = String(titleNode.textContent || "").trim();
+    }
+    const baseTitle = titleNode.dataset.oaBaseTitle;
+    titleNode.textContent = baseTitle;
 
     if (filters.termType === "keywords" && filters.termValue) {
       const canonicalKeyword = canonicalizeKeyword(filters.termValue, keywordAliasMap);
@@ -542,6 +547,12 @@
 
     if (filters.termType === "types" && filters.termValue) {
       titleNode.textContent = `${labels.typeLabel}: ${filters.termValue}`;
+      return;
+    }
+
+    if (filters.view === "archive" && filters.month) {
+      titleNode.textContent = `${baseTitle} · ${filters.month}`;
+      return;
     }
   }
 
@@ -2126,6 +2137,7 @@
         }
 
         if (filters.view === "archive") {
+          updateItemsListHeading(root, filters, labels, keywordAliasMap);
           if (!filters.month) {
             renderArchiveMonthIndex(root, articles, labels);
             continue;
