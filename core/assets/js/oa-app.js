@@ -210,6 +210,16 @@
     return token;
   }
 
+  function shouldUseKeywordAliasFallback(canonicalKeyword, inputValue, aliasMap) {
+    if (!canonicalKeyword) return false;
+    if (canonicalKeyword !== normalizeKeywordToken(inputValue)) return true;
+    if (!(aliasMap instanceof Map)) return false;
+    for (const [alias, id] of aliasMap.entries()) {
+      if (id === canonicalKeyword && alias !== canonicalKeyword) return true;
+    }
+    return false;
+  }
+
   function normalizeKeywords(values, aliasMap) {
     if (!Array.isArray(values)) return [];
     const output = [];
@@ -1141,6 +1151,10 @@
     const key = normalizeLang(lang);
     const favoritesOnly = filters.view === "favorites";
     const favoriteList = Array.from(favoritesSet || []);
+    const sortField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
+    const ascending = state.sortOrder === "asc";
+    const start = Math.max(0, (state.page - 1) * state.pageSize);
+    const end = start + state.pageSize - 1;
     if (favoritesOnly && !favoriteList.length) {
       return { rows: [], total: 0 };
     }
@@ -1149,6 +1163,7 @@
       .from("articles")
       .select(ARTICLE_LIST_FIELDS, { count: "exact" })
       .eq("language", key);
+    let canonicalKeywordFilter = "";
 
     if (filters.topic) {
       const topic = String(filters.topic || "").trim();
@@ -1157,9 +1172,9 @@
       }
     }
     if (filters.termType === "keywords" && filters.termValue) {
-      const canonicalKeyword = canonicalizeKeyword(filters.termValue, keywordAliasMap);
-      if (!canonicalKeyword) return { rows: [], total: 0 };
-      query = query.contains("keywords", [canonicalKeyword]);
+      canonicalKeywordFilter = canonicalizeKeyword(filters.termValue, keywordAliasMap);
+      if (!canonicalKeywordFilter) return { rows: [], total: 0 };
+      query = query.contains("keywords", [canonicalKeywordFilter]);
     }
     if (filters.termType === "types" && filters.termValue) {
       query = query.eq("source_type", filters.termValue);
@@ -1175,10 +1190,6 @@
       }
     }
 
-    const sortField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
-    const ascending = state.sortOrder === "asc";
-    const start = Math.max(0, (state.page - 1) * state.pageSize);
-    const end = start + state.pageSize - 1;
     query = query
       .order(sortField, { ascending, nullsFirst: false })
       .order("slug", { ascending: true })
@@ -1186,6 +1197,56 @@
 
     const { data, error, count } = await query;
     if (error) throw error;
+    if (filters.termType === "keywords" && canonicalKeywordFilter && Number(count || 0) === 0) {
+      if (!shouldUseKeywordAliasFallback(canonicalKeywordFilter, filters.termValue, keywordAliasMap)) {
+        return { rows: [], total: 0 };
+      }
+
+      let fallbackQuery = client
+        .from("articles")
+        .select(ARTICLE_LIST_FIELDS)
+        .eq("language", key);
+      if (filters.topic) {
+        const topic = String(filters.topic || "").trim();
+        if (topic) {
+          fallbackQuery = fallbackQuery.or(`primary_topic.eq.${topic},topics.cs.${JSON.stringify([topic])}`);
+        }
+      }
+      if (favoritesOnly) {
+        fallbackQuery = fallbackQuery.in("slug", favoriteList);
+      }
+      if (filters.month) {
+        const monthStart = `${filters.month}-01`;
+        const monthEnd = `${nextArchiveMonth(filters.month)}-01`;
+        if (monthEnd) {
+          fallbackQuery = fallbackQuery.gte("source_date", monthStart).lt("source_date", monthEnd);
+        }
+      }
+      fallbackQuery = fallbackQuery
+        .order(sortField, { ascending, nullsFirst: false })
+        .order("slug", { ascending: true });
+      const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+      if (fallbackError) throw fallbackError;
+      const keywordCanonicalCache = new Map();
+      const canonicalizeCached = (value) => {
+        const keyValue = String(value ?? "");
+        if (keywordCanonicalCache.has(keyValue)) return keywordCanonicalCache.get(keyValue) || "";
+        const canonical = canonicalizeKeyword(value, keywordAliasMap);
+        keywordCanonicalCache.set(keyValue, canonical);
+        return canonical;
+      };
+      const matchedRows = [];
+      for (const row of Array.isArray(fallbackData) ? fallbackData : []) {
+        const keywords = Array.isArray(row?.keywords) ? row.keywords : [];
+        const hasKeyword = keywords.some((value) => canonicalizeCached(value) === canonicalKeywordFilter);
+        if (!hasKeyword) continue;
+        matchedRows.push(normalizeArticleRecord(row, keywordAliasMap));
+      }
+      return {
+        rows: matchedRows.slice(start, end + 1),
+        total: matchedRows.length
+      };
+    }
     return {
       rows: (Array.isArray(data) ? data : []).map((row) => normalizeArticleRecord(row, keywordAliasMap)),
       total: Number(count || 0)
