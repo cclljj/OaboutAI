@@ -31,11 +31,6 @@
     <ul class="hx:flex hx:flex-col hx:gap-1 hx:md:hidden">
       <!-- Nav -->
       {{ template "sidebar-main" (dict "context" site.Home "pageURL" $pageURL "page" $context "toc" true) -}}
-      <li>
-        <div class="oa-auth-controls oa-auth-controls-mobile" data-oa-auth-controls>
-          <span class="oa-auth-message">{{ i18n "loadingProtectedContent" }}</span>
-        </div>
-      </li>
       {{ template "sidebar-footer" }}
     </ul>
 
