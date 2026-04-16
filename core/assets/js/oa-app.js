@@ -1153,6 +1153,7 @@
       .from("articles")
       .select(ARTICLE_LIST_FIELDS, { count: "exact" })
       .eq("language", key);
+    let canonicalKeywordFilter = "";
 
     if (filters.topic) {
       const topic = String(filters.topic || "").trim();
@@ -1161,9 +1162,9 @@
       }
     }
     if (filters.termType === "keywords" && filters.termValue) {
-      const canonicalKeyword = canonicalizeKeyword(filters.termValue, keywordAliasMap);
-      if (!canonicalKeyword) return { rows: [], total: 0 };
-      query = query.contains("keywords", [canonicalKeyword]);
+      canonicalKeywordFilter = canonicalizeKeyword(filters.termValue, keywordAliasMap);
+      if (!canonicalKeywordFilter) return { rows: [], total: 0 };
+      query = query.contains("keywords", [canonicalKeywordFilter]);
     }
     if (filters.termType === "types" && filters.termValue) {
       query = query.eq("source_type", filters.termValue);
@@ -1186,7 +1187,14 @@
 
     const { data, error, count } = await query;
     if (error) throw error;
-    if (filters.termType === "keywords" && filters.termValue && Number(count || 0) === 0) {
+    if (filters.termType === "keywords" && canonicalKeywordFilter && Number(count || 0) === 0) {
+      const hasAliasFallbackCandidate = canonicalKeywordFilter !== normalizeKeywordToken(filters.termValue)
+        || (keywordAliasMap instanceof Map
+          && Array.from(keywordAliasMap.entries()).some(([alias, id]) => id === canonicalKeywordFilter && alias !== canonicalKeywordFilter));
+      if (!hasAliasFallbackCandidate) {
+        return { rows: [], total: 0 };
+      }
+
       let fallbackQuery = client
         .from("articles")
         .select(ARTICLE_LIST_FIELDS)
@@ -1212,11 +1220,16 @@
         .order("slug", { ascending: true });
       const { data: fallbackData, error: fallbackError } = await fallbackQuery;
       if (fallbackError) throw fallbackError;
-      const normalizedRows = (Array.isArray(fallbackData) ? fallbackData : []).map((row) => normalizeArticleRecord(row, keywordAliasMap));
-      const filteredRows = filterRecords(normalizedRows, filters, keywordAliasMap);
+      const matchedRows = [];
+      for (const row of Array.isArray(fallbackData) ? fallbackData : []) {
+        const keywords = Array.isArray(row?.keywords) ? row.keywords : [];
+        const hasKeyword = keywords.some((value) => canonicalizeKeyword(value, keywordAliasMap) === canonicalKeywordFilter);
+        if (!hasKeyword) continue;
+        matchedRows.push(normalizeArticleRecord(row, keywordAliasMap));
+      }
       return {
-        rows: filteredRows.slice(start, end + 1),
-        total: filteredRows.length
+        rows: matchedRows.slice(start, end + 1),
+        total: matchedRows.length
       };
     }
     return {
