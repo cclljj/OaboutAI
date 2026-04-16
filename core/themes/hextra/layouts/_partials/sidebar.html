@@ -131,10 +131,10 @@
         {{- continue -}}
       {{- end -}}
 
-      {{- /* Normalize page-backed entries so we keep nested tree behavior. */ -}}
+      {{- /* Mobile menu should mirror navbar links: keep page-backed entries as leaf links. */ -}}
       {{- with $menuItem.Page -}}
         {{- if ne .Params.sidebar.exclude true -}}
-          {{- $mainMenuEntries = $mainMenuEntries | append (dict "type" "page" "item" . "title" $menuTitle) -}}
+          {{- $mainMenuEntries = $mainMenuEntries | append (dict "type" "url" "link" .RelPermalink "title" $menuTitle) -}}
         {{- end -}}
         {{- continue -}}
       {{- end -}}
