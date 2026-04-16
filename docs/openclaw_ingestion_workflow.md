@@ -18,6 +18,7 @@ This document is kept for teams that still draft content as markdown bundles bef
 - PPT/PPTX
 - MD/TXT
 - other readable files
+- multiple URLs/files in one request (batch)
 
 ## Source Type Mapping
 
@@ -25,6 +26,15 @@ This document is kept for teams that still draft content as markdown bundles bef
 - non-YouTube URL -> `webpage`
 - `.pdf` -> `pdf`
 - all other readable files -> `other`
+
+## Bot-Blocked Source Fallback
+
+For sources blocked by anti-bot controls (for example `reuters.com`):
+1. search by title + site name
+2. use a syndicated mirror page to extract full text
+3. keep `source_url` as the original canonical URL
+
+Ask user only when key metadata (especially `source_date`) cannot be determined.
 
 ## Legacy Draft Flow
 
@@ -90,11 +100,16 @@ Operational reference:
 - keyword IDs must come from `apps/<app-id>/data/keywords.json`
 - topic IDs must come from `apps/<app-id>/data/topics.json`
 - current top-level topic IDs (5): `ai-policy`, `ai-governance`, `ai-safety`, `agentic-ai`, `physical-ai`
+- `primary_topic` must not appear in `topics`
+- keyword IDs are not valid topic IDs
 - keep EN + zh-tw parity for the same slug in data pipelines
 - canonical body sections must exist in both languages:
   - `## Executive Summary`
   - `## Detailed Notes`
   - `## Take-away`
+
+Batch handling rule:
+- when ingesting multiple items, finish generating all EN/zh-tw files first, then push together in a single commit.
 
 ## Copyright-Safe Note
 

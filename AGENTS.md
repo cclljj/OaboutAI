@@ -92,9 +92,28 @@ Topics:
 
 Keywords:
 - source of truth: `apps/<app-id>/data/keywords.json`
+- preferred official IDs:
+  - `regulation`
+  - `risk-management`
+  - `model-evaluation`
+  - `red-teaming`
+  - `incident-reporting`
+  - `audit`
+  - `standards`
+  - `safety-cases`
+  - `governance-framework`
+  - `public-consultation`
+  - `sovereign-ai`
+- additional descriptive hyphenated keywords are allowed when needed.
+- aliases in `keywords.json` must map to canonical keyword IDs.
 - if no exact keyword exists:
   1. map to closest existing id
   2. append proposal to `apps/<app-id>/data/keyword_proposals.jsonl`
+
+Topic validation rules:
+- `primary_topic` and every entry in `topics` MUST be one of the 5 exact topic IDs above.
+- `primary_topic` MUST NOT appear in `topics`.
+- keyword IDs are never valid topic values.
 
 ## 6. Build + CI Gate
 

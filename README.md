@@ -94,6 +94,27 @@ Obsidian section contract (required for each EN/zh-TW file):
 Compatibility note:
 - DB column keeps `takeaway_html` name for backward compatibility, while value is markdown parsed from `## Take-away`.
 
+## Taxonomy Rules (Data Ingest)
+
+Topic IDs must be exact and only from:
+- `ai-policy`
+- `ai-governance`
+- `ai-safety`
+- `agentic-ai`
+- `physical-ai`
+
+Keyword IDs source of truth:
+- `apps/oaboutai/data/keywords.json`
+
+Preferred official keyword IDs:
+- `regulation`, `risk-management`, `model-evaluation`, `red-teaming`, `incident-reporting`
+- `audit`, `standards`, `safety-cases`, `governance-framework`, `public-consultation`, `sovereign-ai`
+
+Validation rules:
+- `primary_topic` must not appear in `topics`.
+- keyword IDs are never valid topic values.
+- keyword aliases should map to canonical IDs defined in `keywords.json`.
+
 ## Required Secrets / Env
 
 GitHub Actions secrets:

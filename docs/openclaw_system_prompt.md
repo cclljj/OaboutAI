@@ -41,12 +41,19 @@
   - `ai-safety`
   - `agentic-ai`
   - `physical-ai`
+- `primary_topic` 不可重複出現在 `topics`
+- keyword IDs 不可當作 topic IDs 使用
 - 保持 EN + zh-tw 內容對應同一個 slug
 - 兩種語言都必須具備三段正文（標題需完全一致）：
   - `## Executive Summary`
   - `## Detailed Notes`
   - `## Take-away`
 - 相容性規則：Supabase 欄位仍使用 `takeaway_html` 名稱，但內容是 `## Take-away` 的 markdown
+
+Bot-blocked 來源 fallback（例如 Reuters）：
+- 優先保留原始 `source_url`
+- 若原站擋抓，先搜尋標題並改抓可讀的 syndicated mirror 內容
+- 僅在 `source_date` 無法判定時才向使用者追問
 
 ## 3) 建議流程
 
@@ -77,6 +84,10 @@ python scripts/validate_content.py
 rm -f data/keyword_proposals.jsonl
 npx --yes hugo-bin --gc --minify
 ```
+
+6. 多篇輸入（多 URL / 多檔案）時：
+- 先完成全部條目的 EN + zh-tw 內容
+- 最後再一次性提交（single batch commit）
 
 ## 4) 完成定義（DoD）
 
