@@ -11,6 +11,17 @@ document.addEventListener('DOMContentLoaded', function () {
     return menu.querySelector('svg').classList.contains('open');
   }
 
+  function syncMobileSidebarInteractivity() {
+    if (mobileQuery.matches) {
+      const open = isMenuOpen();
+      sidebarContainer.style.pointerEvents = open ? 'auto' : 'none';
+      sidebarContainer.style.zIndex = open ? '30' : '15';
+    } else {
+      sidebarContainer.style.pointerEvents = '';
+      sidebarContainer.style.zIndex = '';
+    }
+  }
+
   // On mobile, the sidebar is off-screen so hide it from assistive tech
   function syncAriaHidden() {
     if (mobileQuery.matches) {
@@ -18,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       sidebarContainer.removeAttribute('aria-hidden');
     }
+    syncMobileSidebarInteractivity();
   }
 
   // Set initial state
