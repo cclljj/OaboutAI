@@ -34,7 +34,7 @@ jobs:
       HUGO_VERSION: 0.156.0
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 # fetch all history for .GitInfo and .Lastmod
           fetch-tags: true
@@ -65,7 +65,7 @@ jobs:
           ./build.sh "${{ steps.pages.outputs.base_url }}"
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./public
 
