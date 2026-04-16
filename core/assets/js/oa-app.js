@@ -210,6 +210,16 @@
     return token;
   }
 
+  function shouldUseKeywordAliasFallback(canonicalKeyword, inputValue, aliasMap) {
+    if (!canonicalKeyword) return false;
+    if (canonicalKeyword !== normalizeKeywordToken(inputValue)) return true;
+    if (!(aliasMap instanceof Map)) return false;
+    for (const [alias, id] of aliasMap.entries()) {
+      if (id === canonicalKeyword && alias !== canonicalKeyword) return true;
+    }
+    return false;
+  }
+
   function normalizeKeywords(values, aliasMap) {
     if (!Array.isArray(values)) return [];
     const output = [];
@@ -1188,10 +1198,7 @@
     const { data, error, count } = await query;
     if (error) throw error;
     if (filters.termType === "keywords" && canonicalKeywordFilter && Number(count || 0) === 0) {
-      const hasAliasFallbackCandidate = canonicalKeywordFilter !== normalizeKeywordToken(filters.termValue)
-        || (keywordAliasMap instanceof Map
-          && Array.from(keywordAliasMap.entries()).some(([alias, id]) => id === canonicalKeywordFilter && alias !== canonicalKeywordFilter));
-      if (!hasAliasFallbackCandidate) {
+      if (!shouldUseKeywordAliasFallback(canonicalKeywordFilter, filters.termValue, keywordAliasMap)) {
         return { rows: [], total: 0 };
       }
 
@@ -1220,10 +1227,18 @@
         .order("slug", { ascending: true });
       const { data: fallbackData, error: fallbackError } = await fallbackQuery;
       if (fallbackError) throw fallbackError;
+      const keywordCanonicalCache = new Map();
+      const canonicalizeCached = (value) => {
+        const keyValue = String(value ?? "");
+        if (keywordCanonicalCache.has(keyValue)) return keywordCanonicalCache.get(keyValue) || "";
+        const canonical = canonicalizeKeyword(value, keywordAliasMap);
+        keywordCanonicalCache.set(keyValue, canonical);
+        return canonical;
+      };
       const matchedRows = [];
       for (const row of Array.isArray(fallbackData) ? fallbackData : []) {
         const keywords = Array.isArray(row?.keywords) ? row.keywords : [];
-        const hasKeyword = keywords.some((value) => canonicalizeKeyword(value, keywordAliasMap) === canonicalKeywordFilter);
+        const hasKeyword = keywords.some((value) => canonicalizeCached(value) === canonicalKeywordFilter);
         if (!hasKeyword) continue;
         matchedRows.push(normalizeArticleRecord(row, keywordAliasMap));
       }
