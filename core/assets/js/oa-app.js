@@ -227,14 +227,62 @@
     const token = normalizeKeywordToken(value);
     if (!token) return "";
     if (aliasMap && aliasMap.has(token)) return aliasMap.get(token) || token;
+    if (aliasMap instanceof Map) {
+      const variants = [
+        token.replace(/[-_]+/g, " "),
+        token.replace(/\s+/g, "-"),
+        token.replace(/\s+/g, "_")
+      ];
+      for (const variant of variants) {
+        const normalized = normalizeKeywordToken(variant);
+        if (!normalized) continue;
+        if (aliasMap.has(normalized)) return aliasMap.get(normalized) || normalized;
+      }
+    }
     return token;
   }
 
+  function collectKeywordTokens(value, output = []) {
+    if (value == null) return output;
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        collectKeywordTokens(item, output);
+      }
+      return output;
+    }
+    const valueType = typeof value;
+    if (valueType === "string" || valueType === "number") {
+      output.push(String(value));
+      return output;
+    }
+    if (valueType !== "object") return output;
+
+    const row = /** @type {Record<string, unknown>} */ (value);
+    const directKeys = ["id", "key", "slug", "value", "name", "keyword"];
+    for (const key of directKeys) {
+      const candidate = row[key];
+      if (typeof candidate === "string" || typeof candidate === "number") {
+        output.push(String(candidate));
+      }
+    }
+    if (typeof row.label === "string" || typeof row.label === "number") {
+      output.push(String(row.label));
+    } else if (row.label && typeof row.label === "object") {
+      for (const candidate of Object.values(/** @type {Record<string, unknown>} */ (row.label))) {
+        if (typeof candidate === "string" || typeof candidate === "number") {
+          output.push(String(candidate));
+        }
+      }
+    }
+    return output;
+  }
+
   function normalizeKeywords(values, aliasMap) {
-    if (!Array.isArray(values)) return [];
+    const rawKeywords = collectKeywordTokens(values, []);
+    if (!rawKeywords.length) return [];
     const output = [];
     const seen = new Set();
-    for (const rawValue of values) {
+    for (const rawValue of rawKeywords) {
       const normalized = canonicalizeKeyword(rawValue, aliasMap);
       if (!normalized || seen.has(normalized)) continue;
       seen.add(normalized);
@@ -1349,36 +1397,62 @@
       return { rows: [], total: 0 };
     }
 
-    let query = client
-      .from("articles")
-      .select(ARTICLE_LIST_FIELDS, { count: "exact" })
-      .eq("language", key);
-    let canonicalKeywordFilter = "";
+    const buildScopedQuery = (includeCount) => {
+      let scopedQuery = client
+        .from("articles");
+      scopedQuery = includeCount
+        ? scopedQuery.select(ARTICLE_LIST_FIELDS, { count: "exact" })
+        : scopedQuery.select(ARTICLE_LIST_FIELDS);
+      scopedQuery = scopedQuery.eq("language", key);
 
-    if (filters.topic) {
-      const topic = String(filters.topic || "").trim();
-      if (topic) {
-        query = query.or(`primary_topic.eq.${topic},topics.cs.${JSON.stringify([topic])}`);
+      if (filters.topic) {
+        const topic = String(filters.topic || "").trim();
+        if (topic) {
+          scopedQuery = scopedQuery.or(`primary_topic.eq.${topic},topics.cs.${JSON.stringify([topic])}`);
+        }
       }
-    }
+      if (filters.termType === "types" && filters.termValue) {
+        scopedQuery = scopedQuery.eq("source_type", filters.termValue);
+      }
+      if (favoritesOnly) {
+        scopedQuery = scopedQuery.in("slug", favoriteList);
+      }
+      if (filters.month) {
+        const monthStart = `${filters.month}-01`;
+        const monthEnd = `${nextArchiveMonth(filters.month)}-01`;
+        if (monthEnd) {
+          scopedQuery = scopedQuery.gte("source_date", monthStart).lt("source_date", monthEnd);
+        }
+      }
+      return scopedQuery;
+    };
+
+    let canonicalKeywordFilter = "";
     if (filters.termType === "keywords" && filters.termValue) {
       canonicalKeywordFilter = canonicalizeKeyword(filters.termValue, keywordAliasMap);
       if (!canonicalKeywordFilter) return { rows: [], total: 0 };
-      query = query.contains("keywords", [canonicalKeywordFilter]);
-    }
-    if (filters.termType === "types" && filters.termValue) {
-      query = query.eq("source_type", filters.termValue);
-    }
-    if (favoritesOnly) {
-      query = query.in("slug", favoriteList);
-    }
-    if (filters.month) {
-      const monthStart = `${filters.month}-01`;
-      const monthEnd = `${nextArchiveMonth(filters.month)}-01`;
-      if (monthEnd) {
-        query = query.gte("source_date", monthStart).lt("source_date", monthEnd);
+      const keywordQuery = buildScopedQuery(false)
+        .order(sortField, { ascending, nullsFirst: false })
+        .order("slug", { ascending: true });
+      const { data: keywordRows, error: keywordError } = await keywordQuery;
+      if (keywordError) throw keywordError;
+
+      const matchedRows = [];
+      for (const row of Array.isArray(keywordRows) ? keywordRows : []) {
+        const normalized = normalizeKeywords(row?.keywords, keywordAliasMap);
+        if (!normalized.includes(canonicalKeywordFilter)) continue;
+        matchedRows.push({
+          ...row,
+          keywords: normalized
+        });
       }
+      return {
+        rows: matchedRows.slice(start, end + 1),
+        total: matchedRows.length
+      };
     }
+
+    let query = buildScopedQuery(true);
 
     query = query
       .order(sortField, { ascending, nullsFirst: false })
@@ -1387,52 +1461,6 @@
 
     const { data, error, count } = await query;
     if (error) throw error;
-    if (filters.termType === "keywords" && canonicalKeywordFilter && Number(count || 0) === 0) {
-      let fallbackQuery = client
-        .from("articles")
-        .select(ARTICLE_LIST_FIELDS)
-        .eq("language", key);
-      if (filters.topic) {
-        const topic = String(filters.topic || "").trim();
-        if (topic) {
-          fallbackQuery = fallbackQuery.or(`primary_topic.eq.${topic},topics.cs.${JSON.stringify([topic])}`);
-        }
-      }
-      if (favoritesOnly) {
-        fallbackQuery = fallbackQuery.in("slug", favoriteList);
-      }
-      if (filters.month) {
-        const monthStart = `${filters.month}-01`;
-        const monthEnd = `${nextArchiveMonth(filters.month)}-01`;
-        if (monthEnd) {
-          fallbackQuery = fallbackQuery.gte("source_date", monthStart).lt("source_date", monthEnd);
-        }
-      }
-      fallbackQuery = fallbackQuery
-        .order(sortField, { ascending, nullsFirst: false })
-        .order("slug", { ascending: true });
-      const { data: fallbackData, error: fallbackError } = await fallbackQuery;
-      if (fallbackError) throw fallbackError;
-      const keywordCanonicalCache = new Map();
-      const canonicalizeCached = (value) => {
-        const keyValue = String(value ?? "");
-        if (keywordCanonicalCache.has(keyValue)) return keywordCanonicalCache.get(keyValue) || "";
-        const canonical = canonicalizeKeyword(value, keywordAliasMap);
-        keywordCanonicalCache.set(keyValue, canonical);
-        return canonical;
-      };
-      const matchedRows = [];
-      for (const row of Array.isArray(fallbackData) ? fallbackData : []) {
-        const keywords = Array.isArray(row?.keywords) ? row.keywords : [];
-        const hasKeyword = keywords.some((value) => canonicalizeCached(value) === canonicalKeywordFilter);
-        if (!hasKeyword) continue;
-        matchedRows.push(normalizeArticleRecord(row, keywordAliasMap));
-      }
-      return {
-        rows: matchedRows.slice(start, end + 1),
-        total: matchedRows.length
-      };
-    }
     return {
       rows: (Array.isArray(data) ? data : []).map((row) => normalizeArticleRecord(row, keywordAliasMap)),
       total: Number(count || 0)
