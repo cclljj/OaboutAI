@@ -3,4 +3,4 @@ title: "Monthly Archive"
 layout: "monthly"
 ---
 
-Browse all archived entries with sorting and pagination.
+Browse month links from newest to oldest, then open a month to view only that month's entries.
