@@ -533,8 +533,10 @@
     const shell = root.closest(".oa-shell");
     const titleNode = shell ? shell.querySelector(".oa-page-title") : null;
     if (!titleNode) return;
-    const baseTitle = String(titleNode.dataset.oaBaseTitle || titleNode.textContent || "").trim();
-    titleNode.dataset.oaBaseTitle = baseTitle;
+    if (!titleNode.dataset.oaBaseTitle) {
+      titleNode.dataset.oaBaseTitle = String(titleNode.textContent || "").trim();
+    }
+    const baseTitle = titleNode.dataset.oaBaseTitle;
     titleNode.textContent = baseTitle;
 
     if (filters.termType === "keywords" && filters.termValue) {
@@ -550,6 +552,7 @@
 
     if (filters.view === "archive" && filters.month) {
       titleNode.textContent = `${baseTitle} · ${filters.month}`;
+      return;
     }
   }
 
