@@ -1,4 +1,5 @@
 {{ define "main" }}
+{{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" false) }}
 <div class="oa-shell">
   <h1 class="oa-page-title">{{ .Title }}</h1>
   <p class="oa-page-subtitle">{{ i18n "newestFirst" }}</p>

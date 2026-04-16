@@ -3,7 +3,11 @@
 document.addEventListener('DOMContentLoaded', function () {
   const menu = document.querySelector('.hextra-hamburger-menu');
   const sidebarContainer = document.querySelector('.hextra-sidebar-container');
-  if (!menu || !sidebarContainer) return;
+  if (!menu) return;
+  if (!sidebarContainer) {
+    menu.classList.add('hx:hidden');
+    return;
+  }
   const mobileQuery = window.matchMedia('(max-width: 767px)');
   let lastPointerAt = 0;
 

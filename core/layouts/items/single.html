@@ -1,5 +1,6 @@
 {{ define "main" }}
 {{ $bundleSlug := .File.Dir | strings.TrimSuffix "/" | path.Base }}
+{{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" false) }}
 <div class="oa-shell">
   <div
     class="oa-single-shell"
