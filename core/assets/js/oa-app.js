@@ -112,7 +112,27 @@
     adminDeleteUserConfirmFinal: "Please confirm again. The user can be added back automatically after signing in again.",
     adminDeleteUserBlocked: "You cannot delete your own account or the bootstrap admin from this list.",
     adminActionSuccess: "Saved.",
-    adminActionError: "Unable to save that change right now."
+    adminActionError: "Unable to save that change right now.",
+    adminTabOverview: "Overview",
+    adminTabAccess: "Access",
+    adminTabUsers: "Users",
+    adminTabContent: "Content",
+    adminSystemUsage: "System usage",
+    adminTotalArticles: "Total articles",
+    adminTotalUsers: "Total users",
+    adminTotalAdmins: "Total admins",
+    adminActiveUsers7d: "Active users (7 days)",
+    adminLoginEvents7d: "Login events (7 days)",
+    adminLoginEventsUnavailable: "Login event tracking is not enabled yet (table `login_events`).",
+    adminArticlesDaily: "Daily new articles (30 days)",
+    adminUsersDaily: "Daily new users (30 days)",
+    adminLoginsDaily: "Daily logins (30 days)",
+    adminArticlesByType: "Articles by type",
+    adminArticlesByKeyword: "Top keywords",
+    adminStatDate: "Date",
+    adminStatCount: "Count",
+    adminStatName: "Name",
+    adminStatNone: "No data yet."
   };
 
   const SORT_BY_KEY = "sort_by";
@@ -208,16 +228,6 @@
     if (!token) return "";
     if (aliasMap && aliasMap.has(token)) return aliasMap.get(token) || token;
     return token;
-  }
-
-  function shouldUseKeywordAliasFallback(canonicalKeyword, inputValue, aliasMap) {
-    if (!canonicalKeyword) return false;
-    if (canonicalKeyword !== normalizeKeywordToken(inputValue)) return true;
-    if (!(aliasMap instanceof Map)) return false;
-    for (const [alias, id] of aliasMap.entries()) {
-      if (id === canonicalKeyword && alias !== canonicalKeyword) return true;
-    }
-    return false;
   }
 
   function normalizeKeywords(values, aliasMap) {
@@ -441,6 +451,54 @@
     const parsed = new Date(value);
     if (Number.isNaN(parsed.getTime())) return String(value);
     return parsed.toLocaleString();
+  }
+
+  function formatDateOnly(value) {
+    if (!value) return "";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      const token = String(value).slice(0, 10);
+      return /^\d{4}-\d{2}-\d{2}$/.test(token) ? token : "";
+    }
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const day = String(parsed.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function buildRecentDailyCounts(values, days = 30) {
+    const counts = new Map();
+    const now = new Date();
+    for (let i = 0; i < days; i += 1) {
+      const date = new Date(now);
+      date.setDate(now.getDate() - i);
+      const key = formatDateOnly(date.toISOString());
+      if (key) counts.set(key, 0);
+    }
+    for (const value of values) {
+      const key = formatDateOnly(value);
+      if (!key || !counts.has(key)) continue;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => String(b[0]).localeCompare(String(a[0])))
+      .map(([date, count]) => ({ date, count }));
+  }
+
+  function buildTopCounts(values, limit = 12) {
+    const counts = new Map();
+    for (const raw of values) {
+      const key = String(raw || "").trim();
+      if (!key) continue;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count;
+        return a.name.localeCompare(b.name);
+      })
+      .slice(0, limit);
   }
 
   function getUserProfile(user) {
@@ -853,6 +911,80 @@
     `;
   }
 
+  function renderAdminStatsTable(labels, rows, nameLabel) {
+    if (!rows.length) {
+      return `<p>${escapeHtml(labels.adminStatNone)}</p>`;
+    }
+    const nameHeader = nameLabel || labels.adminStatName;
+    return `
+      <div class="oa-admin-table-wrap">
+        <table class="oa-admin-table">
+          <thead>
+            <tr>
+              <th>${escapeHtml(nameHeader)}</th>
+              <th>${escapeHtml(labels.adminStatCount)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((row) => `
+              <tr>
+                <td>${escapeHtml(row.name || row.date || "-")}</td>
+                <td>${escapeHtml(String(row.count || 0))}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function buildAdminStats(dashboard, explicitAdminIds) {
+    const articles = Array.isArray(dashboard.articles) ? dashboard.articles : [];
+    const users = Array.isArray(dashboard.users) ? dashboard.users : [];
+    const requests = Array.isArray(dashboard.requests) ? dashboard.requests : [];
+    const loginEvents = Array.isArray(dashboard.loginEvents) ? dashboard.loginEvents : [];
+    const hasLoginEvents = Boolean(dashboard.hasLoginEvents);
+    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+    const explicitAdminCount = new Set([...explicitAdminIds]).size;
+    const bootstrapUser = users.find((row) => normalizeEmail(row.email) === BOOTSTRAP_ADMIN_EMAIL) || null;
+    const bootstrapAlreadyCounted = bootstrapUser?.id ? explicitAdminIds.has(bootstrapUser.id) : false;
+    const totalAdmins = explicitAdminCount + (bootstrapAlreadyCounted ? 0 : 1);
+    const activeUsers7d = users.filter((row) => parseDate(row.last_seen_at) >= sevenDaysAgo).length;
+    const loginEvents7d = loginEvents.filter((row) => parseDate(row.occurred_at) >= sevenDaysAgo).length;
+    const pendingRequests = requests.filter((row) => row.status === "pending").length;
+
+    const articleDates = articles.map((row) => row.submission_date || row.created_at).filter(Boolean);
+    const userDates = users.map((row) => row.created_at).filter(Boolean);
+    const loginDates = loginEvents.map((row) => row.occurred_at).filter(Boolean);
+    const articleTypes = articles.map((row) => row.source_type).filter(Boolean);
+    const articleKeywords = [];
+    for (const row of articles) {
+      const keywords = Array.isArray(row.keywords) ? row.keywords : [];
+      for (const keyword of keywords) {
+        const token = normalizeKeywordToken(keyword);
+        if (token) articleKeywords.push(token);
+      }
+    }
+
+    return {
+      summary: [
+        { label: "adminTotalArticles", value: articles.length },
+        { label: "adminTotalUsers", value: users.length },
+        { label: "adminTotalAdmins", value: totalAdmins },
+        { label: "adminActiveUsers7d", value: activeUsers7d },
+        { label: "adminLoginEvents7d", value: hasLoginEvents ? loginEvents7d : "-" },
+        { label: "adminPendingRequests", value: pendingRequests }
+      ],
+      hasLoginEvents,
+      dailyArticles: buildRecentDailyCounts(articleDates, 30),
+      dailyUsers: buildRecentDailyCounts(userDates, 30),
+      dailyLogins: hasLoginEvents ? buildRecentDailyCounts(loginDates, 30) : [],
+      byType: buildTopCounts(articleTypes, 20),
+      byKeyword: buildTopCounts(articleKeywords, 20)
+    };
+  }
+
   function renderAdminDashboard(root, labels, dashboard, access) {
     const pendingRequests = dashboard.requests.filter((row) => row.status === "pending");
     const explicitAdminIds = new Set(
@@ -899,19 +1031,73 @@
       })
       .sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
     const deletionLogs = Array.isArray(dashboard.deletionLogs) ? dashboard.deletionLogs : [];
+    const stats = buildAdminStats(dashboard, explicitAdminIds);
 
     root.innerHTML = `
-      <section class="oa-admin-grid">
-        <section class="oa-card oa-admin-card">
+      <section class="oa-admin-shell" data-oa-admin-tabs>
+        <div class="oa-admin-card oa-card">
           <div class="oa-admin-card-head">
             <div>
-              <h2 class="oa-section-title">${escapeHtml(labels.adminPendingRequests)}</h2>
+              <h2 class="oa-section-title">${escapeHtml(labels.adminPanel)}</h2>
               <p class="oa-page-subtitle">${escapeHtml(labels.adminDashboardDescription)}</p>
+              <p class="oa-page-subtitle">${escapeHtml(labels.signedInAs)} ${escapeHtml(access.profile.email || "-")}</p>
             </div>
             <button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-refresh>${escapeHtml(labels.adminRefresh)}</button>
           </div>
-          <p class="oa-page-subtitle">${escapeHtml(labels.signedInAs)} ${escapeHtml(access.profile.email || "-")}</p>
-          ${pendingRequests.length ? `
+          <nav class="oa-admin-tabs" role="tablist" aria-label="${escapeHtml(labels.adminPanel)}">
+            <button class="oa-btn oa-btn-secondary is-active" type="button" role="tab" aria-selected="true" data-oa-admin-tab="overview">${escapeHtml(labels.adminTabOverview)}</button>
+            <button class="oa-btn oa-btn-secondary" type="button" role="tab" aria-selected="false" data-oa-admin-tab="access">${escapeHtml(labels.adminTabAccess)}</button>
+            <button class="oa-btn oa-btn-secondary" type="button" role="tab" aria-selected="false" data-oa-admin-tab="users">${escapeHtml(labels.adminTabUsers)}</button>
+            <button class="oa-btn oa-btn-secondary" type="button" role="tab" aria-selected="false" data-oa-admin-tab="content">${escapeHtml(labels.adminTabContent)}</button>
+          </nav>
+        </div>
+
+        <section class="oa-admin-grid oa-admin-panel is-active" data-oa-admin-panel="overview">
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminSystemUsage)}</h2>
+            <div class="oa-admin-metric-grid">
+              ${stats.summary.map((item) => `
+                <article class="oa-admin-metric-card">
+                  <div class="oa-admin-metric-label">${escapeHtml(labels[item.label] || item.label)}</div>
+                  <div class="oa-admin-metric-value">${escapeHtml(String(item.value))}</div>
+                </article>
+              `).join("")}
+            </div>
+            ${stats.hasLoginEvents ? "" : `<p class="oa-page-subtitle">${escapeHtml(labels.adminLoginEventsUnavailable)}</p>`}
+          </section>
+
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesDaily)}</h2>
+            ${renderAdminStatsTable(labels, stats.dailyArticles.map((row) => ({ name: row.date, count: row.count })), labels.adminStatDate)}
+          </section>
+
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminUsersDaily)}</h2>
+            ${renderAdminStatsTable(labels, stats.dailyUsers.map((row) => ({ name: row.date, count: row.count })), labels.adminStatDate)}
+          </section>
+
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminLoginsDaily)}</h2>
+            ${stats.hasLoginEvents
+              ? renderAdminStatsTable(labels, stats.dailyLogins.map((row) => ({ name: row.date, count: row.count })), labels.adminStatDate)
+              : `<p>${escapeHtml(labels.adminLoginEventsUnavailable)}</p>`}
+          </section>
+
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesByType)}</h2>
+            ${renderAdminStatsTable(labels, stats.byType, labels.adminStatName)}
+          </section>
+
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesByKeyword)}</h2>
+            ${renderAdminStatsTable(labels, stats.byKeyword, labels.adminStatName)}
+          </section>
+        </section>
+
+        <section class="oa-admin-grid oa-admin-panel" data-oa-admin-panel="access" hidden>
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminPendingRequests)}</h2>
+            ${pendingRequests.length ? `
             <div class="oa-admin-table-wrap">
               <table class="oa-admin-table">
                 <thead>
@@ -940,103 +1126,107 @@
               </table>
             </div>
           ` : `<p>${escapeHtml(labels.adminNoPendingRequests)}</p>`}
-        </section>
+          </section>
 
-        <section class="oa-card oa-admin-card">
-          <h2 class="oa-section-title">${escapeHtml(labels.adminAllowlist)}</h2>
-          <form class="oa-stack" data-oa-allowlist-form>
-            <label class="oa-form-label" for="oa-allowlist-email">${escapeHtml(labels.adminEmail)}</label>
-            <div class="oa-inline-form">
-              <input
-                id="oa-allowlist-email"
-                class="oa-input"
-                type="email"
-                name="email"
-                placeholder="${escapeHtml(labels.adminAllowlistPlaceholder)}"
-                required
-              >
-              <button class="oa-btn oa-btn-primary" type="submit">${escapeHtml(labels.adminAddAllowlist)}</button>
-            </div>
-            <p class="oa-inline-feedback" data-oa-feedback></p>
-          </form>
-          ${allowlistRows.length ? `
-            <ul class="oa-admin-list">
-              ${allowlistRows.map((row) => `
-                <li class="oa-admin-list-item">
-                  <div>
-                    <strong>${escapeHtml(row.email)}</strong>
-                    <div class="oa-page-subtitle">${escapeHtml(formatDateTime(row.created_at))}</div>
-                  </div>
-                  <button class="oa-btn oa-btn-secondary" type="button" data-oa-allowlist-remove="${escapeHtml(row.email)}">${escapeHtml(labels.remove)}</button>
-                </li>
-              `).join("")}
-            </ul>
-          ` : `<p>${escapeHtml(labels.adminAllowlistEmpty)}</p>`}
-        </section>
-
-        <section class="oa-card oa-admin-card">
-          <h2 class="oa-section-title">${escapeHtml(labels.adminAdmins)}</h2>
-          ${adminRows.length ? `
-            <ul class="oa-admin-list">
-              ${adminRows.map((row) => `
-                <li class="oa-admin-list-item">
-                  <div class="oa-account-row">
-                    ${renderAvatar({ avatar: row.avatar_url || "", displayName: row.display_name || row.email || "", email: row.email || "" }, "oa-account-avatar-sm")}
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminAllowlist)}</h2>
+            <form class="oa-stack" data-oa-allowlist-form>
+              <label class="oa-form-label" for="oa-allowlist-email">${escapeHtml(labels.adminEmail)}</label>
+              <div class="oa-inline-form">
+                <input
+                  id="oa-allowlist-email"
+                  class="oa-input"
+                  type="email"
+                  name="email"
+                  placeholder="${escapeHtml(labels.adminAllowlistPlaceholder)}"
+                  required
+                >
+                <button class="oa-btn oa-btn-primary" type="submit">${escapeHtml(labels.adminAddAllowlist)}</button>
+              </div>
+              <p class="oa-inline-feedback" data-oa-feedback></p>
+            </form>
+            ${allowlistRows.length ? `
+              <ul class="oa-admin-list">
+                ${allowlistRows.map((row) => `
+                  <li class="oa-admin-list-item">
                     <div>
-                      <strong>${escapeHtml(row.display_name || row.email || labels.adminNoDisplayName)}</strong>
-                      <div class="oa-page-subtitle">${escapeHtml(row.email || "-")}</div>
-                      <div class="oa-chip-wrap">
-                        ${row.isBootstrap ? buildChip(labels.adminBootstrap, "success") : ""}
-                        ${row.isExplicit ? buildChip(labels.adminExplicitRole) : ""}
+                      <strong>${escapeHtml(row.email)}</strong>
+                      <div class="oa-page-subtitle">${escapeHtml(formatDateTime(row.created_at))}</div>
+                    </div>
+                    <button class="oa-btn oa-btn-secondary" type="button" data-oa-allowlist-remove="${escapeHtml(row.email)}">${escapeHtml(labels.remove)}</button>
+                  </li>
+                `).join("")}
+              </ul>
+            ` : `<p>${escapeHtml(labels.adminAllowlistEmpty)}</p>`}
+          </section>
+        </section>
+
+        <section class="oa-admin-grid oa-admin-panel" data-oa-admin-panel="users" hidden>
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminAdmins)}</h2>
+            ${adminRows.length ? `
+              <ul class="oa-admin-list">
+                ${adminRows.map((row) => `
+                  <li class="oa-admin-list-item">
+                    <div class="oa-account-row">
+                      ${renderAvatar({ avatar: row.avatar_url || "", displayName: row.display_name || row.email || "", email: row.email || "" }, "oa-account-avatar-sm")}
+                      <div>
+                        <strong>${escapeHtml(row.display_name || row.email || labels.adminNoDisplayName)}</strong>
+                        <div class="oa-page-subtitle">${escapeHtml(row.email || "-")}</div>
+                        <div class="oa-chip-wrap">
+                          ${row.isBootstrap ? buildChip(labels.adminBootstrap, "success") : ""}
+                          ${row.isExplicit ? buildChip(labels.adminExplicitRole) : ""}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  ${row.isExplicit ? `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-remove="${escapeHtml(row.id)}">${escapeHtml(labels.adminRemoveAdmin)}</button>` : ""}
-                </li>
-              `).join("")}
-            </ul>
-          ` : `<p>${escapeHtml(labels.adminNoAdmins)}</p>`}
-        </section>
+                    ${row.isExplicit ? `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-remove="${escapeHtml(row.id)}">${escapeHtml(labels.adminRemoveAdmin)}</button>` : ""}
+                  </li>
+                `).join("")}
+              </ul>
+            ` : `<p>${escapeHtml(labels.adminNoAdmins)}</p>`}
+          </section>
 
-        <section class="oa-card oa-admin-card">
-          <h2 class="oa-section-title">${escapeHtml(labels.adminKnownUsers)}</h2>
-          ${knownUsers.length ? `
-            <div class="oa-admin-table-wrap">
-              <table class="oa-admin-table">
-                <thead>
-                  <tr>
-                    <th>${escapeHtml(labels.adminDisplayName)}</th>
-                    <th>${escapeHtml(labels.adminEmail)}</th>
-                    <th>${escapeHtml(labels.adminLastSeen)}</th>
-                    <th>${escapeHtml(labels.requestActions)}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${knownUsers.map((user) => `
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminKnownUsers)}</h2>
+            ${knownUsers.length ? `
+              <div class="oa-admin-table-wrap">
+                <table class="oa-admin-table">
+                  <thead>
                     <tr>
-                      <td>${escapeHtml(user.display_name || labels.adminNoDisplayName)}</td>
-                      <td>${escapeHtml(user.email || "-")}</td>
-                      <td>${escapeHtml(formatDateTime(user.last_seen_at || user.created_at))}</td>
-                      <td>
-                        <div class="oa-inline-actions">
-                          ${explicitAdminIds.has(user.id) || normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL
-                            ? buildChip(labels.adminPanel, "success")
-                            : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-promote="${escapeHtml(user.id)}">${escapeHtml(labels.adminMakeAdmin)}</button>`}
-                          ${normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL || user.id === access.profile.id
-                            ? ""
-                            : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-user-delete="${escapeHtml(user.id)}" data-oa-user-delete-email="${escapeHtml(user.email || "")}">${escapeHtml(labels.adminDeleteUser)}</button>`}
-                        </div>
-                      </td>
+                      <th>${escapeHtml(labels.adminDisplayName)}</th>
+                      <th>${escapeHtml(labels.adminEmail)}</th>
+                      <th>${escapeHtml(labels.adminLastSeen)}</th>
+                      <th>${escapeHtml(labels.requestActions)}</th>
                     </tr>
-                  `).join("")}
-                </tbody>
-              </table>
-            </div>
-          ` : `<p>${escapeHtml(labels.adminNoKnownUsers)}</p>`}
+                  </thead>
+                  <tbody>
+                    ${knownUsers.map((user) => `
+                      <tr>
+                        <td>${escapeHtml(user.display_name || labels.adminNoDisplayName)}</td>
+                        <td>${escapeHtml(user.email || "-")}</td>
+                        <td>${escapeHtml(formatDateTime(user.last_seen_at || user.created_at))}</td>
+                        <td>
+                          <div class="oa-inline-actions">
+                            ${explicitAdminIds.has(user.id) || normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL
+                              ? buildChip(labels.adminPanel, "success")
+                              : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-admin-promote="${escapeHtml(user.id)}">${escapeHtml(labels.adminMakeAdmin)}</button>`}
+                            ${normalizeEmail(user.email) === BOOTSTRAP_ADMIN_EMAIL || user.id === access.profile.id
+                              ? ""
+                              : `<button class="oa-btn oa-btn-secondary" type="button" data-oa-user-delete="${escapeHtml(user.id)}" data-oa-user-delete-email="${escapeHtml(user.email || "")}">${escapeHtml(labels.adminDeleteUser)}</button>`}
+                          </div>
+                        </td>
+                      </tr>
+                    `).join("")}
+                  </tbody>
+                </table>
+              </div>
+            ` : `<p>${escapeHtml(labels.adminNoKnownUsers)}</p>`}
+          </section>
         </section>
 
-        <section class="oa-card oa-admin-card">
-          <h2 class="oa-section-title">${escapeHtml(labels.adminDeletionLogs)}</h2>
+        <section class="oa-admin-grid oa-admin-panel" data-oa-admin-panel="content" hidden>
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminDeletionLogs)}</h2>
           ${deletionLogs.length ? `
             <div class="oa-admin-table-wrap">
               <table class="oa-admin-table">
@@ -1198,10 +1388,6 @@
     const { data, error, count } = await query;
     if (error) throw error;
     if (filters.termType === "keywords" && canonicalKeywordFilter && Number(count || 0) === 0) {
-      if (!shouldUseKeywordAliasFallback(canonicalKeywordFilter, filters.termValue, keywordAliasMap)) {
-        return { rows: [], total: 0 };
-      }
-
       let fallbackQuery = client
         .from("articles")
         .select(ARTICLE_LIST_FIELDS)
@@ -1703,13 +1889,23 @@
     async function upsertCurrentUser(user) {
       const profile = getUserProfile(user);
       if (!user?.id || !profile.email) return;
+      const nowIso = new Date().toISOString();
       await client.from("app_users").upsert({
         id: user.id,
         email: profile.email,
         display_name: profile.displayName || null,
         avatar_url: profile.avatar || null,
-        last_seen_at: new Date().toISOString()
+        last_seen_at: nowIso
       }, { onConflict: "id" });
+      // Best-effort login event tracking for admin analytics.
+      try {
+        await client.from("login_events").insert({
+          user_id: user.id,
+          occurred_at: nowIso
+        });
+      } catch (_error) {
+        // login_events is optional until schema migration is applied.
+      }
     }
 
     async function loadAccessContext(user) {
@@ -1822,20 +2018,26 @@
     }
 
     async function fetchAdminDashboard() {
-      const [requestsResult, allowlistResult, usersResult, rolesResult, deletionLogsResult] = await Promise.all([
+      const [requestsResult, allowlistResult, usersResult, rolesResult, deletionLogsResult, articlesResult, loginEventsResult] = await Promise.all([
         client.from("access_requests").select("id,requester_user_id,email,reason,status,created_at,reviewed_at,reviewer_user_id").order("created_at", { ascending: false }),
         client.from("access_allowlist").select("email,created_at,created_by").order("email", { ascending: true }),
         client.from("app_users").select("id,email,display_name,avatar_url,last_seen_at,created_at").order("last_seen_at", { ascending: false }),
         client.from("user_roles").select("user_id,role,created_at"),
-        client.from("article_deletion_logs").select("slug,language,title,deleted_at,deleted_by_account").order("deleted_at", { ascending: false }).limit(200)
+        client.from("article_deletion_logs").select("slug,language,title,deleted_at,deleted_by_account").order("deleted_at", { ascending: false }).limit(200),
+        client.from("articles").select("slug,source_type,submission_date,created_at,keywords"),
+        client.from("login_events").select("user_id,occurred_at").order("occurred_at", { ascending: false }).limit(5000)
       ]);
+      const hasLoginEvents = !loginEventsResult.error;
 
       return {
         requests: requestsResult.data || [],
         allowlist: allowlistResult.data || [],
         users: usersResult.data || [],
         roles: rolesResult.data || [],
-        deletionLogs: deletionLogsResult.data || []
+        deletionLogs: deletionLogsResult.data || [],
+        articles: articlesResult.data || [],
+        loginEvents: hasLoginEvents ? (loginEventsResult.data || []) : [],
+        hasLoginEvents
       };
     }
 
@@ -1983,7 +2185,39 @@
       await renderViews();
     }
 
+    function bindAdminTabs() {
+      document.querySelectorAll("[data-oa-admin-tabs]").forEach((container) => {
+        const buttons = Array.from(container.querySelectorAll("[data-oa-admin-tab]"));
+        const panels = Array.from(container.querySelectorAll("[data-oa-admin-panel]"));
+        if (!buttons.length || !panels.length) return;
+
+        const setActive = (key) => {
+          buttons.forEach((button) => {
+            const isActive = (button.dataset.oaAdminTab || "") === key;
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("aria-selected", isActive ? "true" : "false");
+          });
+          panels.forEach((panel) => {
+            const isActive = (panel.dataset.oaAdminPanel || "") === key;
+            panel.classList.toggle("is-active", isActive);
+            panel.hidden = !isActive;
+          });
+        };
+
+        const initial = (buttons.find((button) => button.classList.contains("is-active"))?.dataset.oaAdminTab || buttons[0].dataset.oaAdminTab || "overview");
+        setActive(initial);
+        buttons.forEach((button) => {
+          button.onclick = () => {
+            const key = button.dataset.oaAdminTab || "";
+            if (!key) return;
+            setActive(key);
+          };
+        });
+      });
+    }
+
     function bindGlobalActions(user, access) {
+      bindAdminTabs();
       document.querySelectorAll("[data-oa-sign-in]").forEach((btn) => {
         btn.onclick = () => {
           signIn();

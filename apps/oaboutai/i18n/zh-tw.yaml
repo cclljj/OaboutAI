@@ -230,3 +230,43 @@
   translation: 已儲存。
 - id: adminActionError
   translation: 目前無法儲存這項變更。
+- id: adminTabOverview
+  translation: 總覽
+- id: adminTabAccess
+  translation: 存取管理
+- id: adminTabUsers
+  translation: 使用者管理
+- id: adminTabContent
+  translation: 內容管理
+- id: adminSystemUsage
+  translation: 系統使用狀況
+- id: adminTotalArticles
+  translation: 文章總數
+- id: adminTotalUsers
+  translation: 使用者總數
+- id: adminTotalAdmins
+  translation: 管理員總數
+- id: adminActiveUsers7d
+  translation: 近 7 天活躍使用者
+- id: adminLoginEvents7d
+  translation: 近 7 天登入次數
+- id: adminLoginEventsUnavailable
+  translation: 尚未啟用登入事件追蹤（需建立 `login_events` 資料表）。
+- id: adminArticlesDaily
+  translation: 每日新增文章（近 30 天）
+- id: adminUsersDaily
+  translation: 每日新增使用者（近 30 天）
+- id: adminLoginsDaily
+  translation: 每日登入次數（近 30 天）
+- id: adminArticlesByType
+  translation: 依文章類型統計
+- id: adminArticlesByKeyword
+  translation: 熱門關鍵字
+- id: adminStatDate
+  translation: 日期
+- id: adminStatCount
+  translation: 數量
+- id: adminStatName
+  translation: 名稱
+- id: adminStatNone
+  translation: 目前沒有資料。

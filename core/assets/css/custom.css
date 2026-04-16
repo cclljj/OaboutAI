@@ -825,6 +825,59 @@
   gap: 1rem;
 }
 
+.oa-admin-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.oa-admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.oa-admin-tabs .oa-btn.is-active {
+  border-color: rgba(15, 118, 110, 0.5);
+  background: rgba(15, 118, 110, 0.12);
+  color: #0e6d66;
+}
+
+.oa-admin-panel {
+  display: none;
+}
+
+.oa-admin-panel.is-active {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.oa-admin-metric-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+
+.oa-admin-metric-card {
+  border: 1px solid #deebf3;
+  border-radius: 0.9rem;
+  background: #fbfdff;
+  padding: 0.8rem;
+}
+
+.oa-admin-metric-label {
+  color: #5a768b;
+  font-size: 0.78rem;
+}
+
+.oa-admin-metric-value {
+  margin-top: 0.35rem;
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: #163348;
+}
+
 .oa-admin-table-wrap {
   overflow-x: auto;
 }
@@ -945,5 +998,10 @@
   .oa-account-menu {
     right: -0.3rem;
     min-width: 14rem;
+  }
+
+  .oa-admin-tabs {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

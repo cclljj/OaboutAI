@@ -230,3 +230,43 @@
   translation: Saved.
 - id: adminActionError
   translation: Unable to save that change right now.
+- id: adminTabOverview
+  translation: Overview
+- id: adminTabAccess
+  translation: Access
+- id: adminTabUsers
+  translation: Users
+- id: adminTabContent
+  translation: Content
+- id: adminSystemUsage
+  translation: System usage
+- id: adminTotalArticles
+  translation: Total articles
+- id: adminTotalUsers
+  translation: Total users
+- id: adminTotalAdmins
+  translation: Total admins
+- id: adminActiveUsers7d
+  translation: Active users (7 days)
+- id: adminLoginEvents7d
+  translation: Login events (7 days)
+- id: adminLoginEventsUnavailable
+  translation: Login event tracking is not enabled yet (table `login_events`).
+- id: adminArticlesDaily
+  translation: Daily new articles (30 days)
+- id: adminUsersDaily
+  translation: Daily new users (30 days)
+- id: adminLoginsDaily
+  translation: Daily logins (30 days)
+- id: adminArticlesByType
+  translation: Articles by type
+- id: adminArticlesByKeyword
+  translation: Top keywords
+- id: adminStatDate
+  translation: Date
+- id: adminStatCount
+  translation: Count
+- id: adminStatName
+  translation: Name
+- id: adminStatNone
+  translation: No data yet.

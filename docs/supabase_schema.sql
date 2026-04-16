@@ -66,6 +66,12 @@ create table if not exists public.app_users (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.login_events (
+  id bigserial primary key,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  occurred_at timestamptz not null default now()
+);
+
 create table if not exists public.user_roles (
   user_id uuid not null references auth.users(id) on delete cascade,
   role text not null check (role in ('admin')),
@@ -116,6 +122,8 @@ create index if not exists idx_articles_lang_source_submission
 create index if not exists idx_articles_keywords on public.articles using gin (keywords);
 create index if not exists idx_articles_topics on public.articles using gin (topics);
 create unique index if not exists idx_app_users_email_lower on public.app_users(email);
+create index if not exists idx_login_events_user_time on public.login_events(user_id, occurred_at desc);
+create index if not exists idx_login_events_occurred_at on public.login_events(occurred_at desc);
 create index if not exists idx_user_roles_role on public.user_roles(role);
 create index if not exists idx_access_requests_requester on public.access_requests(requester_user_id, created_at desc);
 create unique index if not exists idx_access_requests_pending_unique
@@ -218,6 +226,7 @@ for each row execute function public.audit_article_delete();
 
 alter table public.articles enable row level security;
 alter table public.app_users enable row level security;
+alter table public.login_events enable row level security;
 alter table public.user_roles enable row level security;
 alter table public.access_allowlist enable row level security;
 alter table public.access_requests enable row level security;
@@ -271,6 +280,20 @@ drop policy if exists "admins can delete app profile" on public.app_users;
 create policy "admins can delete app profile"
   on public.app_users
   for delete
+  to authenticated
+  using (public.has_role('admin'));
+
+drop policy if exists "users can insert own login events" on public.login_events;
+create policy "users can insert own login events"
+  on public.login_events
+  for insert
+  to authenticated
+  with check (auth.uid() = user_id);
+
+drop policy if exists "admins can read login events" on public.login_events;
+create policy "admins can read login events"
+  on public.login_events
+  for select
   to authenticated
   using (public.has_role('admin'));
 
