@@ -1,6 +1,7 @@
 {{ define "main" }}
   {{ $isControlledTerm := or (eq .Data.Plural "types") (eq .Data.Plural "keywords") }}
   {{ if $isControlledTerm }}
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" false) }}
     <div class="oa-shell">
       <h1 class="oa-page-title">{{ .Title }}</h1>
       {{ with .Content }}<div class="oa-page-subtitle">{{ . }}</div>{{ end }}
