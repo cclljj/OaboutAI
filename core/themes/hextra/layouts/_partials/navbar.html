@@ -55,7 +55,7 @@
       {{- partial "utils/icon.html" (dict "name" "hamburger-menu" "attributes" (printf "height=%d" $iconHeight)) -}}
     </button>
 
-    <div class="oa-auth-controls hx:flex hx:items-center hx:gap-2" data-oa-auth-controls data-oa-auth-compact="true">
+    <div class="oa-auth-controls hx:hidden hx:md:flex hx:items-center hx:gap-2" data-oa-auth-controls data-oa-auth-compact="true">
       <span class="oa-auth-message">{{ i18n "loadingProtectedContent" }}</span>
     </div>
   </nav>
