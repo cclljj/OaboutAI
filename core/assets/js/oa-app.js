@@ -123,6 +123,7 @@
   const DEFAULT_SORT_ORDER = "desc";
   const DEFAULT_PAGE_SIZE = 20;
   const DEFAULT_PAGE = 1;
+  const MONTH_KEY = "month";
   const VALID_SORT_BY = new Set(["source_date", "submission_date"]);
   const VALID_SORT_ORDER = new Set(["asc", "desc"]);
   const VALID_PAGE_SIZES = new Set([20, 50, 100]);
@@ -397,6 +398,34 @@
     return `${url.pathname}${url.search}`;
   }
 
+  function normalizeArchiveMonth(value) {
+    const token = String(value || "").trim();
+    if (!/^\d{4}-\d{2}$/.test(token)) return "";
+    const year = Number.parseInt(token.slice(0, 4), 10);
+    const month = Number.parseInt(token.slice(5, 7), 10);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || month < 1 || month > 12) return "";
+    return token;
+  }
+
+  function nextArchiveMonth(value) {
+    const monthKey = normalizeArchiveMonth(value);
+    if (!monthKey) return "";
+    const year = Number.parseInt(monthKey.slice(0, 4), 10);
+    const month = Number.parseInt(monthKey.slice(5, 7), 10);
+    const nextYear = month === 12 ? year + 1 : year;
+    const nextMonth = String(month === 12 ? 1 : month + 1).padStart(2, "0");
+    return `${nextYear}-${nextMonth}`;
+  }
+
+  function archiveMonthlyHref(month) {
+    const url = new URL(languagePath("archive/monthly/"), window.location.origin);
+    const normalized = normalizeArchiveMonth(month);
+    if (normalized) {
+      url.searchParams.set(MONTH_KEY, normalized);
+    }
+    return `${url.pathname}${url.search}`;
+  }
+
   function formatDateTime(value) {
     if (!value) return "-";
     const parsed = new Date(value);
@@ -549,6 +578,32 @@
       `);
 
     root.innerHTML = sections.join("\n");
+  }
+
+  function renderArchiveMonthIndex(root, records, labels) {
+    const groups = new Map();
+    for (const record of records) {
+      const month = normalizeArchiveMonth((record.source_date || "").slice(0, 7));
+      if (!month) continue;
+      groups.set(month, (groups.get(month) || 0) + 1);
+    }
+
+    const months = Array.from(groups.entries()).sort((a, b) => (a[0] < b[0] ? 1 : -1));
+    if (!months.length) {
+      root.innerHTML = `<p>${escapeHtml(labels.noEntriesYet)}</p>`;
+      return;
+    }
+
+    root.innerHTML = `
+      <div class="oa-term-grid">
+        ${months.map(([month, count]) => `
+          <a class="oa-term-card" href="${escapeHtml(archiveMonthlyHref(month))}">
+            <span class="oa-term-label">${escapeHtml(month)}</span>
+            <span class="oa-term-count">${escapeHtml(String(count))}</span>
+          </a>
+        `).join("")}
+      </div>
+    `;
   }
 
   function renderSingle(root, record, labels, favoritesSet) {
@@ -1101,6 +1156,13 @@
     if (favoritesOnly) {
       query = query.in("slug", favoriteList);
     }
+    if (filters.month) {
+      const monthStart = `${filters.month}-01`;
+      const monthEnd = `${nextArchiveMonth(filters.month)}-01`;
+      if (monthEnd) {
+        query = query.gte("source_date", monthStart).lt("source_date", monthEnd);
+      }
+    }
 
     const sortField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
     const ascending = state.sortOrder === "asc";
@@ -1228,7 +1290,8 @@
     const termValue = root.dataset.oaTermValue || params.get("term_value") || "";
     const querySlug = params.get("slug") || "";
     const slug = root.dataset.oaSlug || querySlug || "";
-    return { view, topic, termType, termValue, slug };
+    const month = normalizeArchiveMonth(params.get(MONTH_KEY) || "");
+    return { view, topic, termType, termValue, slug, month };
   }
 
   function getTopicsCatalog() {
@@ -1975,7 +2038,7 @@
       const needsProtectedContent = access.isApproved && roots.some((root) => collectFilters(root).view !== "admin");
       const hasCatalogViews = roots.some((root) => {
         const view = collectFilters(root).view;
-        return view === "search" || view === "topics_catalog" || view === "terms_catalog";
+        return view === "search" || view === "topics_catalog" || view === "terms_catalog" || view === "archive";
       });
       const articleResult = needsProtectedContent && hasCatalogViews ? await fetchArticles(lang) : { rows: [], error: null };
       const articles = articleResult.rows;
@@ -2063,10 +2126,14 @@
         }
 
         if (filters.view === "archive") {
+          if (!filters.month) {
+            renderArchiveMonthIndex(root, articles, labels);
+            continue;
+          }
           renderServerCollectionView(root, labels, listState, async (stateSnapshot) => {
             return fetchArticlePageFromSupabase(client, keywordAliasMap, lang, filters, stateSnapshot, favoriteSlugs);
           }, (node, pageItems) => {
-            renderArchive(node, pageItems, labels, favoriteSlugs, renderOptions);
+            renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
           continue;
         }
