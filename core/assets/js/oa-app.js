@@ -412,9 +412,8 @@
     if (!monthKey) return "";
     const year = Number.parseInt(monthKey.slice(0, 4), 10);
     const month = Number.parseInt(monthKey.slice(5, 7), 10);
-    const date = new Date(Date.UTC(year, month, 1));
-    const nextYear = date.getUTCFullYear();
-    const nextMonth = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const nextYear = month === 12 ? year + 1 : year;
+    const nextMonth = String(month === 12 ? 1 : month + 1).padStart(2, "0");
     return `${nextYear}-${nextMonth}`;
   }
 
