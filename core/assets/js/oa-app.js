@@ -576,8 +576,9 @@
 
   function renderAvatar(profile, sizeClass) {
     const label = profile.displayName || profile.email || "User";
-    if (profile.avatar) {
-      return `<img class="oa-account-avatar ${sizeClass || ""}" src="${escapeHtml(profile.avatar)}" alt="${escapeHtml(label)}">`;
+    const avatarSrc = sanitizeImageSrc(profile.avatar);
+    if (avatarSrc) {
+      return `<img class="oa-account-avatar ${sizeClass || ""}" src="${escapeHtml(avatarSrc)}" alt="${escapeHtml(label)}">`;
     }
     return `<span class="oa-account-avatar oa-account-avatar-fallback ${sizeClass || ""}" aria-hidden="true">${escapeHtml(getInitials(label))}</span>`;
   }
@@ -748,6 +749,8 @@
     const takeAway = formatMarkdownContent(record.takeaway_html, { stripH2: true });
     const sourceType = String(record.source_type || "").trim();
     const primaryTopic = String(record.primary_topic || "").trim();
+    const sourceHref = sanitizeHref(record.source_url || "");
+    const sourceUrlText = escapeHtml(record.source_url || "-");
 
     root.innerHTML = `
       <article class="oa-single">
@@ -757,7 +760,7 @@
         </div>
         <dl class="oa-metadata oa-card">
           <dt>${escapeHtml(labels.sourceUrl)}</dt>
-          <dd><a href="${escapeHtml(record.source_url || "#")}" target="_blank" rel="noreferrer">${escapeHtml(record.source_url || "-")}</a></dd>
+          <dd>${sourceHref ? `<a href="${escapeHtml(sourceHref)}" target="_blank" rel="noreferrer">${sourceUrlText}</a>` : sourceUrlText}</dd>
           <dt>${escapeHtml(labels.sourceType)}</dt>
           <dd>${sourceType ? buildChipLink(sourceType, filteredItemsHref({ term_type: "types", term_value: sourceType })) : "-"}</dd>
           <dt>${escapeHtml(labels.sourceDate)}</dt>
@@ -849,8 +852,47 @@
   function sanitizeHref(rawHref) {
     const trimmed = String(rawHref || "").trim();
     if (!trimmed) return "";
-    if (/^(https?:|mailto:)/i.test(trimmed)) return trimmed;
+    if (/^mailto:/i.test(trimmed)) return trimmed;
+    try {
+      const parsed = new URL(trimmed, window.location.origin);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        return parsed.href;
+      }
+    } catch (_error) {
+      return "";
+    }
     return "";
+  }
+
+  function sanitizeImageSrc(rawSrc) {
+    const trimmed = String(rawSrc || "").trim();
+    if (!trimmed) return "";
+    if (/^data:image\//i.test(trimmed)) return trimmed;
+    if (/^blob:/i.test(trimmed)) return trimmed;
+    try {
+      const parsed = new URL(trimmed, window.location.origin);
+      if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+        return parsed.href;
+      }
+    } catch (_error) {
+      return "";
+    }
+    return "";
+  }
+
+  function sanitizeSameOriginRedirect(rawRedirect) {
+    const fallback = window.location.href;
+    const trimmed = String(rawRedirect || "").trim();
+    if (!trimmed) return fallback;
+    try {
+      const parsed = new URL(trimmed, window.location.origin);
+      if (parsed.origin !== window.location.origin) return fallback;
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return fallback;
+      return parsed.href;
+    } catch (_error) {
+      return fallback;
+    }
+    return fallback;
   }
 
   function renderInlineMarkdown(value) {
@@ -1743,7 +1785,9 @@
     const roots = Array.from(document.querySelectorAll("[data-oa-protected-view]"));
     const supabaseUrl = document.querySelector('meta[name="oa-supabase-url"]')?.content || "";
     const supabaseAnonKey = document.querySelector('meta[name="oa-supabase-anon-key"]')?.content || "";
-    const oauthRedirectTo = document.querySelector('meta[name="oa-supabase-redirect-url"]')?.content || window.location.origin;
+    const oauthRedirectTo = sanitizeSameOriginRedirect(
+      document.querySelector('meta[name="oa-supabase-redirect-url"]')?.content
+    );
 
     const authControls = Array.from(document.querySelectorAll("[data-oa-auth-controls]"));
     const listState = getListStateFromUrl();

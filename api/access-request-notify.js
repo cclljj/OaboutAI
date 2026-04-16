@@ -18,6 +18,21 @@ function clampText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
+function sanitizeAdminUrl(value, fallback) {
+  const raw = String(value || "").trim();
+  const safeFallback = String(fallback || "").trim();
+  if (!raw) return safeFallback;
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      return parsed.href;
+    }
+  } catch (_error) {
+    return safeFallback;
+  }
+  return safeFallback;
+}
+
 function escapeHtml(value) {
   return String(value || "")
     .replaceAll("&", "&amp;")
@@ -52,7 +67,7 @@ module.exports = async (req, res) => {
   const requestId = safeText(body.requestId, "n/a");
   const requesterUserId = safeText(body.requesterUserId, "n/a");
   const submittedAt = safeText(body.submittedAt, new Date().toISOString());
-  const adminUrl = safeText(body.adminUrl, "https://oaboutai.vercel.app/admin/");
+  const adminUrl = sanitizeAdminUrl(body.adminUrl, "https://oaboutai.vercel.app/admin/");
   const language = safeText(body.language, "en");
 
   if (!requesterEmail || !EMAIL_RE.test(requesterEmail) || !reason) {
