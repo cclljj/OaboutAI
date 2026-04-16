@@ -16,7 +16,7 @@
       title="{{ $changeLanguage }}"
       data-state="closed"
       data-location="{{ $location }}"
-      class="hextra-language-switcher hx:cursor-pointer hx:rounded-md hx:text-left hx:font-medium {{ $class }} hx:grow"
+      class="hextra-language-switcher hx:cursor-pointer hx:rounded-md hx:text-left hx:font-medium {{ $class }} {{ if $grow }}hx:grow{{ end }}"
       type="button"
       aria-label="{{ $changeLanguage }}"
       aria-expanded="false"
