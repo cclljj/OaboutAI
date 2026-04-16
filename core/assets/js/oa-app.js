@@ -1141,6 +1141,10 @@
     const key = normalizeLang(lang);
     const favoritesOnly = filters.view === "favorites";
     const favoriteList = Array.from(favoritesSet || []);
+    const sortField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
+    const ascending = state.sortOrder === "asc";
+    const start = Math.max(0, (state.page - 1) * state.pageSize);
+    const end = start + state.pageSize - 1;
     if (favoritesOnly && !favoriteList.length) {
       return { rows: [], total: 0 };
     }
@@ -1175,10 +1179,6 @@
       }
     }
 
-    const sortField = state.sortBy === "submission_date" ? "submission_date" : "source_date";
-    const ascending = state.sortOrder === "asc";
-    const start = Math.max(0, (state.page - 1) * state.pageSize);
-    const end = start + state.pageSize - 1;
     query = query
       .order(sortField, { ascending, nullsFirst: false })
       .order("slug", { ascending: true })
@@ -1186,6 +1186,39 @@
 
     const { data, error, count } = await query;
     if (error) throw error;
+    if (filters.termType === "keywords" && filters.termValue && Number(count || 0) === 0) {
+      let fallbackQuery = client
+        .from("articles")
+        .select(ARTICLE_LIST_FIELDS)
+        .eq("language", key);
+      if (filters.topic) {
+        const topic = String(filters.topic || "").trim();
+        if (topic) {
+          fallbackQuery = fallbackQuery.or(`primary_topic.eq.${topic},topics.cs.${JSON.stringify([topic])}`);
+        }
+      }
+      if (favoritesOnly) {
+        fallbackQuery = fallbackQuery.in("slug", favoriteList);
+      }
+      if (filters.month) {
+        const monthStart = `${filters.month}-01`;
+        const monthEnd = `${nextArchiveMonth(filters.month)}-01`;
+        if (monthEnd) {
+          fallbackQuery = fallbackQuery.gte("source_date", monthStart).lt("source_date", monthEnd);
+        }
+      }
+      fallbackQuery = fallbackQuery
+        .order(sortField, { ascending, nullsFirst: false })
+        .order("slug", { ascending: true });
+      const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+      if (fallbackError) throw fallbackError;
+      const normalizedRows = (Array.isArray(fallbackData) ? fallbackData : []).map((row) => normalizeArticleRecord(row, keywordAliasMap));
+      const filteredRows = filterRecords(normalizedRows, filters, keywordAliasMap);
+      return {
+        rows: filteredRows.slice(start, end + 1),
+        total: filteredRows.length
+      };
+    }
     return {
       rows: (Array.isArray(data) ? data : []).map((row) => normalizeArticleRecord(row, keywordAliasMap)),
       total: Number(count || 0)
