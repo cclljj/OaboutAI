@@ -2472,6 +2472,35 @@
         }
       }
 
+      // Revoke request-based approval so re-registered users must request again.
+      const reviewedAt = new Date().toISOString();
+      const { error: requestRevokeError } = await client
+        .from("access_requests")
+        .update({
+          status: "denied",
+          reviewer_user_id: currentUser.id,
+          reviewed_at: reviewedAt
+        })
+        .eq("requester_user_id", userId)
+        .in("status", ["approved", "pending"]);
+      if (requestRevokeError) {
+        const details = String(requestRevokeError.message || "").trim();
+        window.alert(details ? `${labels.adminActionError}\n${details}` : labels.adminActionError);
+        return;
+      }
+
+      // Ensure admin role is removed if present.
+      const { error: roleRevokeError } = await client
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId)
+        .eq("role", "admin");
+      if (roleRevokeError) {
+        const details = String(roleRevokeError.message || "").trim();
+        window.alert(details ? `${labels.adminActionError}\n${details}` : labels.adminActionError);
+        return;
+      }
+
       const { error } = await client.from("app_users").delete().eq("id", userId);
       if (error) {
         const details = String(error.message || "").trim();
