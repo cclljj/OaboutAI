@@ -902,6 +902,112 @@
   letter-spacing: 0.04em;
 }
 
+.oa-admin-chart-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.oa-admin-line-chart {
+  width: 100%;
+  height: auto;
+  background: #fbfdff;
+  border: 1px solid #deebf3;
+  border-radius: 0.9rem;
+}
+
+.oa-admin-line-grid line {
+  stroke: #dbeaf3;
+  stroke-width: 1;
+}
+
+.oa-admin-line-path {
+  fill: none;
+  stroke: #0f766e;
+  stroke-width: 2.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.oa-admin-line-dots circle {
+  fill: #0f766e;
+  opacity: 0.9;
+}
+
+.oa-admin-line-label {
+  fill: #607b90;
+  font-size: 11px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.oa-admin-chart-note {
+  color: #5a768b;
+  font-size: 0.78rem;
+}
+
+.oa-admin-pie-wrap {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.oa-admin-pie-chart {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  justify-self: center;
+}
+
+.oa-admin-pie-center-label {
+  fill: #607b90;
+  font-size: 11px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.oa-admin-pie-center-value {
+  fill: #15344a;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.oa-admin-pie-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.oa-admin-pie-legend li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8rem;
+}
+
+.oa-admin-pie-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.oa-admin-pie-name {
+  color: #17364c;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.oa-admin-pie-value {
+  color: #5a768b;
+  font-variant-numeric: tabular-nums;
+}
+
 .oa-admin-list {
   list-style: none;
   padding: 0;
@@ -1003,5 +1109,9 @@
   .oa-admin-tabs {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .oa-admin-pie-wrap {
+    grid-template-columns: 1fr;
   }
 }

@@ -1,10 +1,37 @@
 {{- $supabaseURL := site.Params.supabase.url | default (getenv "HUGO_SUPABASE_URL") | default "" -}}
 {{- $supabaseAnonKey := site.Params.supabase.anonKey | default (getenv "HUGO_SUPABASE_ANON_KEY") | default "" -}}
 {{- $supabaseRedirectURL := site.Params.supabase.redirectUrl | default (getenv "HUGO_SUPABASE_REDIRECT_URL") | default "" -}}
+{{- $baseURL := site.BaseURL | default "" -}}
+{{- $canonicalHost := replaceRE "^https?://([^/]+).*$" "$1" $baseURL -}}
+{{- $canonicalScheme := replaceRE "^(https?)://.*$" "$1" $baseURL -}}
 {{- $vercelAnalyticsFlag := lower (printf "%v" (site.Params.vercelAnalyticsEnabled | default (getenv "HUGO_VERCEL_ANALYTICS_ENABLED") | default "true")) -}}
 {{- $vercelSpeedInsightsFlag := lower (printf "%v" (site.Params.vercelSpeedInsightsEnabled | default (getenv "HUGO_VERCEL_SPEED_INSIGHTS_ENABLED") | default "true")) -}}
 {{- $enableVercelAnalytics := and hugo.IsProduction (not (in (slice "0" "false" "off" "no") $vercelAnalyticsFlag)) -}}
 {{- $enableVercelSpeedInsights := and hugo.IsProduction (not (in (slice "0" "false" "off" "no") $vercelSpeedInsightsFlag)) -}}
+
+{{- if and hugo.IsProduction $canonicalHost $canonicalScheme -}}
+<script>
+  (function() {
+    var canonicalHost = {{ $canonicalHost | jsonify | safeJS }};
+    var canonicalScheme = {{ $canonicalScheme | jsonify | safeJS }};
+    var currentHost = window.location.hostname || "";
+    var isPreviewHost = /\.vercel\.app$/i.test(currentHost);
+    if (!isPreviewHost || currentHost === canonicalHost) return;
+
+    var target =
+      canonicalScheme +
+      "://" +
+      canonicalHost +
+      (window.location.pathname || "/") +
+      (window.location.search || "") +
+      (window.location.hash || "");
+
+    if (window.location.href !== target) {
+      window.location.replace(target);
+    }
+  })();
+</script>
+{{- end -}}
 
 <meta name="oa-supabase-url" content="{{ $supabaseURL }}">
 <meta name="oa-supabase-anon-key" content="{{ $supabaseAnonKey }}">
