@@ -2325,6 +2325,21 @@
       }
     }
 
+    async function notifyRequesterAccessApproved(payload) {
+      try {
+        await fetch("/api/access-approved-notify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload),
+          keepalive: true
+        });
+      } catch (_error) {
+        // Do not block admin review flow when notification delivery fails.
+      }
+    }
+
     async function submitAccessRequest(form, user) {
       const feedback = form.querySelector("[data-oa-feedback]");
       const reason = String(new FormData(form).get("reason") || "").trim();
@@ -2361,15 +2376,28 @@
     }
 
     async function reviewAccessRequest(requestId, approved, user) {
-      const { error } = await client
+      const reviewedAt = new Date().toISOString();
+      const { data, error } = await client
         .from("access_requests")
         .update({
           status: approved ? "approved" : "denied",
           reviewer_user_id: user.id,
-          reviewed_at: new Date().toISOString()
+          reviewed_at: reviewedAt
         })
-        .eq("id", requestId);
+        .eq("id", requestId)
+        .select("id,email,reviewed_at")
+        .single();
       if (!error) {
+        if (approved) {
+          const requesterEmail = normalizeEmail(data?.email || "");
+          if (requesterEmail) {
+            void notifyRequesterAccessApproved({
+              email: requesterEmail,
+              reviewedAt: data?.reviewed_at || reviewedAt,
+              loginUrl: `${window.location.origin}/`
+            });
+          }
+        }
         await renderViews();
       }
     }

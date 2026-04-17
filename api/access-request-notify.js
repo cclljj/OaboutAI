@@ -2,7 +2,7 @@
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 const DEFAULT_FROM = "OaboutAI <onboarding@resend.dev>";
-const DEFAULT_SUBJECT = "[OaboutAI] New access request pending review";
+const DEFAULT_SUBJECT = "[OaboutAI] Access request pending review / 新的存取申請待審核";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function normalizeEmail(value) {
@@ -75,7 +75,8 @@ module.exports = async (req, res) => {
   }
 
   const text = [
-    "A new OaboutAI access request is pending review.",
+    "[EN] OaboutAI access request requires your review.",
+    "Purpose: notify admin that a new applicant is waiting for approval to access protected content.",
     "",
     `Request ID: ${requestId}`,
     `Requester user ID: ${requesterUserId}`,
@@ -83,14 +84,31 @@ module.exports = async (req, res) => {
     `Language: ${language}`,
     `Submitted at: ${submittedAt}`,
     "",
-    "Reason:",
+    "Applicant reason:",
     reason,
     "",
-    `Review now: ${adminUrl}`
+    `Review page: ${adminUrl}`,
+    "",
+    "----------------------------------------",
+    "",
+    "[中文] OaboutAI 有新的存取申請待您審核。",
+    "用途：通知管理員有新申請者正在等待核准，核准後申請者才可存取受保護內容。",
+    "",
+    `申請編號：${requestId}`,
+    `申請者使用者 ID：${requesterUserId}`,
+    `申請者 Email：${requesterEmail}`,
+    `語言：${language}`,
+    `送出時間：${submittedAt}`,
+    "",
+    "申請理由：",
+    reason,
+    "",
+    `審核頁面：${adminUrl}`
   ].join("\n");
 
   const html = [
-    "<p>A new OaboutAI access request is pending review.</p>",
+    "<p><strong>[EN]</strong> OaboutAI access request requires your review.</p>",
+    "<p>Purpose: notify admin that a new applicant is waiting for approval to access protected content.</p>",
     "<ul>",
     `<li><strong>Request ID:</strong> ${escapeHtml(requestId)}</li>`,
     `<li><strong>Requester user ID:</strong> ${escapeHtml(requesterUserId)}</li>`,
@@ -98,9 +116,22 @@ module.exports = async (req, res) => {
     `<li><strong>Language:</strong> ${escapeHtml(language)}</li>`,
     `<li><strong>Submitted at:</strong> ${escapeHtml(submittedAt)}</li>`,
     "</ul>",
-    "<p><strong>Reason</strong></p>",
+    "<p><strong>Applicant reason</strong></p>",
     `<pre style="white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;">${escapeHtml(reason)}</pre>`,
-    `<p><a href="${escapeHtml(adminUrl)}">Open admin review page</a></p>`
+    `<p><a href="${escapeHtml(adminUrl)}">Open admin review page</a></p>`,
+    "<hr>",
+    "<p><strong>[中文]</strong> OaboutAI 有新的存取申請待您審核。</p>",
+    "<p>用途：通知管理員有新申請者正在等待核准，核准後申請者才可存取受保護內容。</p>",
+    "<ul>",
+    `<li><strong>申請編號：</strong> ${escapeHtml(requestId)}</li>`,
+    `<li><strong>申請者使用者 ID：</strong> ${escapeHtml(requesterUserId)}</li>`,
+    `<li><strong>申請者 Email：</strong> ${escapeHtml(requesterEmail)}</li>`,
+    `<li><strong>語言：</strong> ${escapeHtml(language)}</li>`,
+    `<li><strong>送出時間：</strong> ${escapeHtml(submittedAt)}</li>`,
+    "</ul>",
+    "<p><strong>申請理由</strong></p>",
+    `<pre style="white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;">${escapeHtml(reason)}</pre>`,
+    `<p><a href="${escapeHtml(adminUrl)}">開啟管理員審核頁面</a></p>`
   ].join("");
 
   try {
