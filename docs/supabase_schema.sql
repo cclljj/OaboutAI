@@ -167,12 +167,16 @@ as $$
         from public.access_allowlist
         where email = public.current_auth_email()
       )
-      or exists (
-        select 1
-        from public.access_requests
-        where requester_user_id = auth.uid()
-          and status = 'approved'
-      )
+      or coalesce(
+        (
+          select ar.status
+          from public.access_requests ar
+          where ar.requester_user_id = auth.uid()
+          order by ar.created_at desc
+          limit 1
+        ),
+        ''
+      ) = 'approved'
     );
 $$;
 

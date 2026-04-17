@@ -2472,9 +2472,9 @@
         }
       }
 
-      // Revoke request-based approval so re-registered users must request again.
+      // Revoke request-based approval by user id.
       const reviewedAt = new Date().toISOString();
-      const { error: requestRevokeError } = await client
+      const { error: requestRevokeByUserError } = await client
         .from("access_requests")
         .update({
           status: "denied",
@@ -2483,10 +2483,29 @@
         })
         .eq("requester_user_id", userId)
         .in("status", ["approved", "pending"]);
-      if (requestRevokeError) {
-        const details = String(requestRevokeError.message || "").trim();
+      if (requestRevokeByUserError) {
+        const details = String(requestRevokeByUserError.message || "").trim();
         window.alert(details ? `${labels.adminActionError}\n${details}` : labels.adminActionError);
         return;
+      }
+
+      // Revoke request-based approval by email as well to prevent stale records
+      // from previous identities being treated as approved.
+      if (normalizedEmail) {
+        const { error: requestRevokeByEmailError } = await client
+          .from("access_requests")
+          .update({
+            status: "denied",
+            reviewer_user_id: currentUser.id,
+            reviewed_at: reviewedAt
+          })
+          .eq("email", normalizedEmail)
+          .in("status", ["approved", "pending"]);
+        if (requestRevokeByEmailError) {
+          const details = String(requestRevokeByEmailError.message || "").trim();
+          window.alert(details ? `${labels.adminActionError}\n${details}` : labels.adminActionError);
+          return;
+        }
       }
 
       // Ensure admin role is removed if present.
