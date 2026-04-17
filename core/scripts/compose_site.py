@@ -174,6 +174,10 @@ def main() -> int:
     api_root = repo_root / "api"
     if api_root.exists():
         shutil.copytree(api_root, output_root / "api", dirs_exist_ok=True)
+    for manifest_name in ("package.json", "package-lock.json"):
+        manifest_path = repo_root / manifest_name
+        if manifest_path.exists():
+            shutil.copy2(manifest_path, output_root / manifest_name)
     vercel_config = repo_root / "vercel.json"
     if vercel_config.exists():
         shutil.copy2(vercel_config, output_root / "vercel.json")
