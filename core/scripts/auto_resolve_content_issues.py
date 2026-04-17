@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import re
 from pathlib import Path
 
 import yaml
@@ -12,24 +13,39 @@ OBSIDIAN_ROOT = PATHS.data_root / "obsidian"
 KEYWORDS_FILE = PATHS.keywords_file
 KEYWORD_PROPOSALS_FILE = PATHS.keyword_proposals_file
 FALLBACK_KEYWORD = "governance-framework"
+TITLE_SINGLE_QUOTED_RE = re.compile(r"^title:\s*'(.+)'\s*$", re.MULTILINE)
 
 
-def parse_front_matter(md_path: Path) -> tuple[dict, str]:
+def parse_front_matter(md_path: Path) -> tuple[dict, str, str]:
     raw = md_path.read_text(encoding="utf-8")
     if not raw.startswith("---\n"):
-        return {}, raw
+        return {}, "", raw
     parts = raw.split("---\n", 2)
     if len(parts) < 3:
-        return {}, raw
+        return {}, "", raw
     data = yaml.safe_load(parts[1]) or {}
     if not isinstance(data, dict):
-        return {}, raw
+        return {}, "", raw
     body = parts[2]
-    return data, body
+    return data, parts[1], body
 
 
 def write_front_matter(md_path: Path, fm: dict, body: str) -> None:
     dumped = yaml.safe_dump(fm, sort_keys=False, allow_unicode=True).strip()
+    title = str(fm.get("title", "")).strip()
+    if title:
+        escaped_title = title.replace("\n", " ").replace("'", "''")
+        title_line = f"title: '{escaped_title}'"
+        lines = dumped.splitlines()
+        replaced = False
+        for idx, line in enumerate(lines):
+            if line.startswith("title:"):
+                lines[idx] = title_line
+                replaced = True
+                break
+        if not replaced:
+            lines.insert(0, title_line)
+        dumped = "\n".join(lines)
     md_path.write_text(f"---\n{dumped}\n---\n{body}", encoding="utf-8")
 
 
@@ -82,11 +98,14 @@ def main() -> int:
         target_files = sorted(CONTENT_ROOT.glob("**/items/**/index.md"))
 
     for path in target_files:
-        fm, body = parse_front_matter(path)
+        fm, front_matter_block, body = parse_front_matter(path)
         if not fm:
             continue
 
         changed = False
+        title_value = str(fm.get("title", "")).strip()
+        if title_value and not TITLE_SINGLE_QUOTED_RE.search(front_matter_block):
+            changed = True
 
         keywords = fm.get("keywords")
         if isinstance(keywords, list):
