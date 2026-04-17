@@ -34,17 +34,20 @@ ALLOWED_SOURCE_TYPES = {"webpage", "pdf", "youtube", "other"}
 ALLOWED_LANGS = {"en", "zh-tw"}
 DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 FRONT_MATTER_RE = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
+TITLE_SINGLE_QUOTED_RE = re.compile(r"^title:\s*'(.+)'\s*$", re.MULTILINE)
+TITLE_BLOCK_SCALAR_RE = re.compile(r"^title:\s*[>|]", re.MULTILINE)
 
 
-def parse_front_matter(md_path: Path) -> tuple[dict[str, Any], str]:
+def parse_front_matter(md_path: Path) -> tuple[dict[str, Any], str, str]:
     raw = md_path.read_text(encoding="utf-8")
     match = FRONT_MATTER_RE.match(raw)
     if not match:
-        return {}, raw
-    data = yaml.safe_load(match.group(1)) or {}
+        return {}, "", raw
+    front_matter_block = match.group(1)
+    data = yaml.safe_load(front_matter_block) or {}
     if not isinstance(data, dict):
-        return {}, raw
-    return data, raw[match.end() :]
+        return {}, front_matter_block, raw
+    return data, front_matter_block, raw[match.end() :]
 
 
 def parse_sections(body: str) -> dict[str, str]:
@@ -89,6 +92,7 @@ def validate_record(
     keyword_ids: set[str],
     errors: list[str],
     obsidian_mode: bool,
+    front_matter_block: str,
 ) -> None:
     body_sections = parse_sections(fm.pop("__body__", "")) if "__body__" in fm else {}
 
@@ -109,6 +113,14 @@ def validate_record(
 
     validate_date(str(fm.get("source_date", "")), "source_date", errors, rel)
     validate_date(str(fm.get("submission_date", "")), "submission_date", errors, rel)
+
+    if TITLE_BLOCK_SCALAR_RE.search(front_matter_block):
+        errors.append(
+            f"{rel}: `title` must be a single-quoted inline scalar (`title: '...'`); block scalars like `>-` are not allowed"
+        )
+    title_match = TITLE_SINGLE_QUOTED_RE.search(front_matter_block)
+    if not title_match or not title_match.group(1).strip():
+        errors.append(f"{rel}: `title` line must use single quotes and be non-empty (example: `title: 'My Title'`)")
 
     keywords = normalize_list(fm.get("keywords"))
     if not keywords:
@@ -210,7 +222,7 @@ def main() -> int:
         if lang == "zh-tw":
             zh_slugs.add(slug)
 
-        fm, body = parse_front_matter(path)
+        fm, front_matter_block, body = parse_front_matter(path)
         if not fm:
             errors.append(f"{rel}: missing or invalid YAML front matter")
             continue
@@ -224,6 +236,7 @@ def main() -> int:
             keyword_ids=keyword_ids,
             errors=errors,
             obsidian_mode=obsidian_mode,
+            front_matter_block=front_matter_block,
         )
 
     for slug in sorted(zh_slugs):

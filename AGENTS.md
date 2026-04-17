@@ -74,6 +74,10 @@ Canonical Obsidian body contract (required in `obsidian/en/*.md` and `obsidian/z
 - `## Detailed Notes`
 - `## Take-away`
 
+Canonical YAML title contract:
+- `title` MUST use a single-quoted inline scalar: `title: '...'`
+- block scalars for `title` (for example `title: >-`) are not allowed
+
 Compatibility note:
 - Supabase column name remains `takeaway_html` for backward compatibility.
 - Stored value is markdown content parsed from the `## Take-away` section.

@@ -14,6 +14,8 @@ OBSIDIAN_ROOT = DATA_ROOT / "obsidian"
 STATIC_OUT = PATHS.site_root / "static" / "obsidian"
 SUPPORTED_LANGS = ("en", "zh-tw")
 FRONT_MATTER_PATTERN = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
+TITLE_SINGLE_QUOTED_RE = re.compile(r"^title:\s*'(.+)'\s*$", re.MULTILINE)
+TITLE_BLOCK_SCALAR_RE = re.compile(r"^title:\s*[>|]", re.MULTILINE)
 
 
 def parse_markdown(path: Path) -> tuple[dict[str, Any], str]:
@@ -111,8 +113,18 @@ def parse_sections(body: str) -> dict[str, str]:
 
 
 def parse_article(path: Path, lang: str) -> dict[str, Any]:
+    raw = path.read_text(encoding="utf-8")
+    match = FRONT_MATTER_PATTERN.match(raw)
     front_matter, body = parse_markdown(path)
     sections = parse_sections(body)
+
+    if match:
+        front_matter_block = match.group(1)
+        if TITLE_BLOCK_SCALAR_RE.search(front_matter_block):
+            raise ValueError(f"{path}: invalid title YAML style. Use single-quoted inline title (`title: '...'`), not block scalar")
+        title_match = TITLE_SINGLE_QUOTED_RE.search(front_matter_block)
+        if not title_match or not title_match.group(1).strip():
+            raise ValueError(f"{path}: title line must use single quotes and be non-empty (example: `title: 'My Title'`)")
 
     slug = normalize_text(front_matter.get("slug")) or path.stem
     language = normalize_text(front_matter.get("language")) or lang
