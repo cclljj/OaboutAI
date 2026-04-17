@@ -48,7 +48,7 @@ find_existing_entry_path() {
   loc="$(curl -sS "${sitemap_url}" \
     | grep -Eo '<loc>https?://[^<]*/(zh-tw/)?entry/[^<]*/</loc>' \
     | sed -E 's#^<loc>##; s#</loc>$##' \
-    | head -n 1)"
+    | head -n 1 || true)"
 
   if [[ -z "${loc}" ]]; then
     echo "FAIL: no /entry/<slug>/ URL found in sitemap (${sitemap_url})"
