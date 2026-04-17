@@ -1813,12 +1813,6 @@
       });
 
     root.innerHTML = `
-      ${chartRows.length ? `
-      <section class="oa-card oa-section oa-catalog-chart">
-        <h2 class="oa-section-title">${escapeHtml(`${labels.adminTotalArticles || "Total articles"} · ${labels.topics || "Topics"}`)}</h2>
-        ${renderAdminPieChart(labels, chartRows, { ariaLabel: labels.topics || "Topics" })}
-      </section>
-      ` : ""}
       <div class="oa-topic-grid">
         ${topics.map((topic) => `
           <a class="oa-topic-card" href="${escapeHtml(topic.href || languagePath(`topics/${topic.id}/`))}">
@@ -1829,6 +1823,12 @@
           </a>
         `).join("")}
       </div>
+      ${chartRows.length ? `
+      <section class="oa-card oa-section oa-catalog-chart">
+        <h2 class="oa-section-title">${escapeHtml(`${labels.adminTotalArticles || "Total articles"} · ${labels.topics || "Topics"}`)}</h2>
+        ${renderAdminPieChart(labels, chartRows, { ariaLabel: labels.topics || "Topics" })}
+      </section>
+      ` : ""}
     `;
   }
 
@@ -1865,12 +1865,6 @@
     }));
 
     root.innerHTML = `
-      ${termType === "keywords" ? `
-      <section class="oa-card oa-section oa-catalog-chart">
-        <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesByKeyword || labels.keywords)}</h2>
-        ${renderAdminPieChart(labels, chartRows, { ariaLabel: labels.adminArticlesByKeyword || labels.keywords })}
-      </section>
-      ` : ""}
       <div class="oa-term-grid">
         ${sorted.map(([term, count]) => `
           <a class="oa-term-card" href="${escapeHtml(languagePath(`items/?term_type=${encodeURIComponent(String(termType))}&term_value=${encodeURIComponent(String(term))}`))}">
@@ -1879,6 +1873,12 @@
           </a>
         `).join("")}
       </div>
+      ${termType === "keywords" ? `
+      <section class="oa-card oa-section oa-catalog-chart">
+        <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesByKeyword || labels.keywords)}</h2>
+        ${renderAdminPieChart(labels, chartRows, { ariaLabel: labels.adminArticlesByKeyword || labels.keywords })}
+      </section>
+      ` : ""}
     `;
   }
 
