@@ -529,7 +529,7 @@
       counts.set(key, (counts.get(key) || 0) + 1);
     }
     return Array.from(counts.entries())
-      .sort((a, b) => String(b[0]).localeCompare(String(a[0])))
+      .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
       .map(([date, count]) => ({ date, count }));
   }
 
@@ -1063,11 +1063,13 @@
 
     const width = 720;
     const height = 240;
-    const margin = { top: 16, right: 18, bottom: 34, left: 44 };
+    const margin = { top: 16, right: 18, bottom: 36, left: 58 };
     const plotWidth = width - margin.left - margin.right;
     const plotHeight = height - margin.top - margin.bottom;
     const values = points.map((row) => Number(row.count || 0));
     const maxValue = Math.max(...values, 1);
+    const midValue = Math.round(maxValue / 2);
+    const yTitle = labels.adminStatCount || "Count";
 
     function xAt(index) {
       if (points.length <= 1) return margin.left + (plotWidth / 2);
@@ -1086,28 +1088,45 @@
     const lastLabel = String(points[points.length - 1]?.name || points[points.length - 1]?.date || "-");
     const lastValue = values[values.length - 1] || 0;
 
-    const gridLines = [0, 0.5, 1].map((ratio) => {
-      const y = margin.top + (plotHeight * ratio);
+    const yTicks = [
+      { value: maxValue, ratio: 0 },
+      { value: midValue, ratio: 0.5 },
+      { value: 0, ratio: 1 }
+    ];
+
+    const gridLines = yTicks.map((tick) => {
+      const y = margin.top + (plotHeight * tick.ratio);
       return `<line x1="${margin.left}" y1="${y.toFixed(2)}" x2="${(margin.left + plotWidth).toFixed(2)}" y2="${y.toFixed(2)}"></line>`;
     }).join("");
 
     const dots = points.map((row, index) => {
       const cx = xAt(index);
       const cy = yAt(row.count);
-      return `<circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="2.6"></circle>`;
+      const label = String(row.name || row.date || "-");
+      return `
+        <circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="3.2">
+          <title>${escapeHtml(label)}: ${escapeHtml(String(row.count || 0))}</title>
+        </circle>
+      `;
+    }).join("");
+
+    const yLabels = yTicks.map((tick) => {
+      const y = margin.top + (plotHeight * tick.ratio);
+      return `<text class="oa-admin-line-axis-label" x="${(margin.left - 8).toFixed(2)}" y="${(y + 4).toFixed(2)}" text-anchor="end">${escapeHtml(String(tick.value))}</text>`;
     }).join("");
 
     return `
       <div class="oa-admin-chart-wrap">
         <svg class="oa-admin-line-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(options.ariaLabel || labels.adminStatCount)}">
           <g class="oa-admin-line-grid">${gridLines}</g>
+          ${yLabels}
           <polyline class="oa-admin-line-path" points="${polyline}"></polyline>
           <g class="oa-admin-line-dots">${dots}</g>
+          <text class="oa-admin-line-axis-title" x="${(margin.left - 44).toFixed(2)}" y="${(margin.top + (plotHeight / 2)).toFixed(2)}" transform="rotate(-90 ${(margin.left - 44).toFixed(2)} ${(margin.top + (plotHeight / 2)).toFixed(2)})">${escapeHtml(yTitle)}</text>
           <text class="oa-admin-line-label" x="${margin.left}" y="${height - 10}">${escapeHtml(firstLabel)}</text>
           <text class="oa-admin-line-label" x="${(margin.left + plotWidth).toFixed(2)}" y="${height - 10}" text-anchor="end">${escapeHtml(lastLabel)}</text>
-          <text class="oa-admin-line-label" x="${margin.left}" y="${margin.top - 2}">max ${escapeHtml(String(maxValue))}</text>
         </svg>
-        <div class="oa-admin-chart-note">${escapeHtml(labels.adminStatCount)}: ${escapeHtml(String(lastValue))}</div>
+        <div class="oa-admin-chart-note">${escapeHtml(labels.adminStatCount)}: ${escapeHtml(String(lastValue))} · ${escapeHtml(lastLabel)}</div>
       </div>
     `;
   }
@@ -1120,9 +1139,9 @@
 
     const palette = ["#0f766e", "#0ea5a2", "#14b8a6", "#2dd4bf", "#06b6d4", "#0ea5e9", "#6366f1", "#8b5cf6"];
     const total = slices.reduce((sum, row) => sum + Number(row.count || 0), 0);
-    const cx = 100;
-    const cy = 100;
-    const radius = 72;
+    const cx = 130;
+    const cy = 130;
+    const radius = 100;
     let startAngle = -Math.PI / 2;
 
     const paths = slices.map((row, index) => {
@@ -1162,11 +1181,11 @@
 
     return `
       <div class="oa-admin-pie-wrap">
-        <svg class="oa-admin-pie-chart" viewBox="0 0 200 200" role="img" aria-label="${escapeHtml(options.ariaLabel || labels.adminStatCount)}">
+        <svg class="oa-admin-pie-chart" viewBox="0 0 260 260" role="img" aria-label="${escapeHtml(options.ariaLabel || labels.adminStatCount)}">
           ${paths}
-          <circle cx="${cx}" cy="${cy}" r="32" fill="#fff"></circle>
+          <circle cx="${cx}" cy="${cy}" r="44" fill="#fff"></circle>
           <text x="${cx}" y="${cy - 3}" text-anchor="middle" class="oa-admin-pie-center-label">Total</text>
-          <text x="${cx}" y="${cy + 13}" text-anchor="middle" class="oa-admin-pie-center-value">${escapeHtml(String(total))}</text>
+          <text x="${cx}" y="${cy + 16}" text-anchor="middle" class="oa-admin-pie-center-value">${escapeHtml(String(total))}</text>
         </svg>
         <ul class="oa-admin-pie-legend">
           ${legend}
@@ -1269,13 +1288,6 @@
       .sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
     const deletionLogs = Array.isArray(dashboard.deletionLogs) ? dashboard.deletionLogs : [];
     const stats = buildAdminStats(dashboard, explicitAdminIds);
-    const summaryPieRows = stats.summary
-      .filter((item) => Number.isFinite(Number(item.value)))
-      .map((item) => ({
-        name: labels[item.label] || item.label,
-        count: Number(item.value || 0)
-      }))
-      .filter((item) => item.count > 0);
 
     root.innerHTML = `
       <section class="oa-admin-shell" data-oa-admin-tabs>
@@ -1297,12 +1309,6 @@
         </div>
 
         <section class="oa-admin-grid oa-admin-panel is-active" data-oa-admin-panel="overview">
-          <section class="oa-card oa-admin-card">
-            <h2 class="oa-section-title">${escapeHtml(labels.adminSystemUsage)}</h2>
-            ${renderAdminPieChart(labels, summaryPieRows, { ariaLabel: labels.adminSystemUsage })}
-            ${stats.hasLoginEvents ? "" : `<p class="oa-page-subtitle">${escapeHtml(labels.adminLoginEventsUnavailable)}</p>`}
-          </section>
-
           <section class="oa-card oa-admin-card">
             <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesDaily)}</h2>
             ${renderAdminLineChart(labels, stats.dailyArticles.map((row) => ({ name: row.date, count: row.count })), { ariaLabel: labels.adminArticlesDaily })}
@@ -1775,7 +1781,7 @@
     return Array.isArray(parsed) ? parsed : [];
   }
 
-  function renderTopicsCatalog(root, topics, records) {
+  function renderTopicsCatalog(root, topics, records, labels) {
     const counts = new Map();
     for (const topic of topics) {
       counts.set(topic.id, 0);
@@ -1794,7 +1800,24 @@
         counts.set(topicId, (counts.get(topicId) || 0) + 1);
       }
     }
+    const chartRows = topics
+      .map((topic) => ({
+        name: topic.label || topic.id,
+        count: counts.get(topic.id) || 0
+      }))
+      .filter((row) => Number(row.count || 0) > 0)
+      .sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      });
+
     root.innerHTML = `
+      ${chartRows.length ? `
+      <section class="oa-card oa-section oa-catalog-chart">
+        <h2 class="oa-section-title">${escapeHtml(`${labels.adminTotalArticles || "Total articles"} · ${labels.topics || "Topics"}`)}</h2>
+        ${renderAdminPieChart(labels, chartRows, { ariaLabel: labels.topics || "Topics" })}
+      </section>
+      ` : ""}
       <div class="oa-topic-grid">
         ${topics.map((topic) => `
           <a class="oa-topic-card" href="${escapeHtml(topic.href || languagePath(`topics/${topic.id}/`))}">
@@ -1835,7 +1858,18 @@
       return;
     }
 
+    const chartRows = sorted.slice(0, 16).map(([term, count]) => ({
+      name: String(term),
+      count: Number(count || 0)
+    }));
+
     root.innerHTML = `
+      ${termType === "keywords" ? `
+      <section class="oa-card oa-section oa-catalog-chart">
+        <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesByKeyword || labels.keywords)}</h2>
+        ${renderAdminPieChart(labels, chartRows, { ariaLabel: labels.adminArticlesByKeyword || labels.keywords })}
+      </section>
+      ` : ""}
       <div class="oa-term-grid">
         ${sorted.map(([term, count]) => `
           <a class="oa-term-card" href="${escapeHtml(languagePath(`items/?term_type=${encodeURIComponent(String(termType))}&term_value=${encodeURIComponent(String(term))}`))}">
@@ -2624,7 +2658,7 @@
         }
 
         if (filters.view === "topics_catalog") {
-          renderTopicsCatalog(root, getTopicsCatalog(), articles);
+          renderTopicsCatalog(root, getTopicsCatalog(), articles, labels);
           continue;
         }
 

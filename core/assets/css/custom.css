@@ -932,11 +932,31 @@
 .oa-admin-line-dots circle {
   fill: #0f766e;
   opacity: 0.9;
+  transition: r 0.16s ease, opacity 0.16s ease;
+}
+
+.oa-admin-line-dots circle:hover {
+  r: 4.6;
+  opacity: 1;
 }
 
 .oa-admin-line-label {
   fill: #607b90;
   font-size: 11px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.oa-admin-line-axis-label {
+  fill: #607b90;
+  font-size: 10px;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
+}
+
+.oa-admin-line-axis-title {
+  fill: #4f6a7d;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif;
 }
 
@@ -947,14 +967,15 @@
 
 .oa-admin-pie-wrap {
   display: grid;
-  grid-template-columns: minmax(180px, 220px) 1fr;
-  gap: 0.9rem;
+  grid-template-columns: minmax(250px, 340px) minmax(160px, 240px);
+  gap: 0.7rem;
   align-items: center;
+  justify-content: space-between;
 }
 
 .oa-admin-pie-chart {
   width: 100%;
-  max-width: 220px;
+  max-width: 320px;
   height: auto;
   justify-self: center;
 }
@@ -1006,6 +1027,10 @@
 .oa-admin-pie-value {
   color: #5a768b;
   font-variant-numeric: tabular-nums;
+}
+
+.oa-catalog-chart {
+  margin-bottom: 1rem;
 }
 
 .oa-admin-list {
