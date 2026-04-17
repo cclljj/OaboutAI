@@ -44,7 +44,10 @@ def parse_front_matter(md_path: Path) -> tuple[dict[str, Any], str, str]:
     if not match:
         return {}, "", raw
     front_matter_block = match.group(1)
-    data = yaml.safe_load(front_matter_block) or {}
+    try:
+        data = yaml.safe_load(front_matter_block) or {}
+    except yaml.YAMLError as exc:
+        raise ValueError(f"invalid YAML front matter ({exc})") from exc
     if not isinstance(data, dict):
         return {}, front_matter_block, raw
     return data, front_matter_block, raw[match.end() :]
@@ -222,7 +225,11 @@ def main() -> int:
         if lang == "zh-tw":
             zh_slugs.add(slug)
 
-        fm, front_matter_block, body = parse_front_matter(path)
+        try:
+            fm, front_matter_block, body = parse_front_matter(path)
+        except ValueError as exc:
+            errors.append(f"{rel}: {exc}")
+            continue
         if not fm:
             errors.append(f"{rel}: missing or invalid YAML front matter")
             continue

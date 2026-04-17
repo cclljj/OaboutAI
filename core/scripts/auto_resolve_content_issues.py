@@ -31,21 +31,27 @@ def parse_front_matter(md_path: Path) -> tuple[dict, str, str]:
 
 
 def write_front_matter(md_path: Path, fm: dict, body: str) -> None:
-    dumped = yaml.safe_dump(fm, sort_keys=False, allow_unicode=True).strip()
     title = str(fm.get("title", "")).strip()
-    if title:
-        escaped_title = title.replace("\n", " ").replace("'", "''")
+    normalized_title = " ".join(title.splitlines()).strip()
+    title_line = ""
+    if normalized_title:
+        escaped_title = normalized_title.replace("'", "''")
         title_line = f"title: '{escaped_title}'"
-        lines = dumped.splitlines()
-        replaced = False
-        for idx, line in enumerate(lines):
-            if line.startswith("title:"):
-                lines[idx] = title_line
-                replaced = True
-                break
-        if not replaced:
-            lines.insert(0, title_line)
-        dumped = "\n".join(lines)
+
+    other_fields: dict = {}
+    for key, value in fm.items():
+        if key == "title":
+            continue
+        other_fields[key] = value
+
+    dumped_others = yaml.safe_dump(other_fields, sort_keys=False, allow_unicode=True).strip()
+    lines: list[str] = []
+    if title_line:
+        lines.append(title_line)
+    if dumped_others and dumped_others != "{}":
+        lines.extend(dumped_others.splitlines())
+
+    dumped = "\n".join(lines).strip()
     md_path.write_text(f"---\n{dumped}\n---\n{body}", encoding="utf-8")
 
 
