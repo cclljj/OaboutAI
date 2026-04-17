@@ -113,6 +113,10 @@
     adminDeleteUserBlocked: "You cannot delete your own account or the bootstrap admin from this list.",
     adminActionSuccess: "Saved.",
     adminActionError: "Unable to save that change right now.",
+    adminApprovalSavedNotifyFailed: "Approval was saved, but the email notification could not be sent.",
+    adminApprovalSavedNotifyForwarded: "Approval was saved. Automatic email to requester is blocked by mail provider policy, so a manual-forward notice was sent to admin email.",
+    adminNotifyNotConfigured: "Email notifications are not configured on the server.",
+    adminNotifyNetworkError: "The notification service is temporarily unreachable.",
     adminTabOverview: "Overview",
     adminTabAccess: "Access",
     adminTabUsers: "Users",
@@ -175,6 +179,15 @@
 
   function normalizeEmail(value) {
     return String(value || "").trim().toLowerCase();
+  }
+
+  function explainNotificationFailure(detail, labels) {
+    const token = String(detail || "").trim();
+    if (!token) return "";
+    if (token === "notification_not_configured") return labels.adminNotifyNotConfigured;
+    if (token === "network_error") return labels.adminNotifyNetworkError;
+    if (token === "requester_notify_fallback_to_admin") return labels.adminApprovalSavedNotifyForwarded;
+    return token;
   }
 
   function parseJsonAttr(value, fallback) {
@@ -2346,6 +2359,9 @@
           return { ok: false, detail: text.slice(0, 500) };
         }
         const data = await response.json().catch(() => ({}));
+        if (data && data.ok === true && data.skipped && data.reason === "requester_notify_fallback_to_admin") {
+          return { ok: true, warning: String(data.reason || "") };
+        }
         if (data && data.ok === true && data.skipped) {
           return { ok: false, detail: String(data.reason || "notification_skipped") };
         }
@@ -2402,33 +2418,40 @@
         .eq("id", requestId)
         .select("id,email,reviewed_at,requester_user_id")
         .single();
-      if (!error) {
-        if (approved) {
-          let requesterEmail = normalizeEmail(data?.email || "");
-          if (!requesterEmail && data?.requester_user_id) {
-            const lookup = await client
-              .from("app_users")
-              .select("email")
-              .eq("id", data.requester_user_id)
-              .maybeSingle();
-            if (!lookup.error) {
-              requesterEmail = normalizeEmail(lookup.data?.email || "");
-            }
-          }
-          if (requesterEmail) {
-            const notifyResult = await notifyRequesterAccessApproved({
-              email: requesterEmail,
-              reviewedAt: data?.reviewed_at || reviewedAt,
-              loginUrl: `${window.location.origin}/`
-            });
-            if (!notifyResult?.ok) {
-              const detail = String(notifyResult?.detail || "").trim();
-              window.alert(detail ? `${labels.adminActionError}\n${detail}` : labels.adminActionError);
-            }
+      if (error) {
+        const detail = String(error.message || "").trim();
+        window.alert(detail ? `${labels.adminActionError}\n${detail}` : labels.adminActionError);
+        return;
+      }
+      if (approved) {
+        let requesterEmail = normalizeEmail(data?.email || "");
+        if (!requesterEmail && data?.requester_user_id) {
+          const lookup = await client
+            .from("app_users")
+            .select("email")
+            .eq("id", data.requester_user_id)
+            .maybeSingle();
+          if (!lookup.error) {
+            requesterEmail = normalizeEmail(lookup.data?.email || "");
           }
         }
-        await renderViews();
+        if (requesterEmail) {
+          const notifyResult = await notifyRequesterAccessApproved({
+            email: requesterEmail,
+            reviewedAt: data?.reviewed_at || reviewedAt,
+            loginUrl: `${window.location.origin}/`
+          });
+          if (notifyResult?.ok && notifyResult?.warning) {
+            const info = explainNotificationFailure(notifyResult.warning, labels);
+            if (info) window.alert(info);
+          }
+          if (!notifyResult?.ok) {
+            const detail = explainNotificationFailure(notifyResult?.detail, labels);
+            window.alert(detail ? `${labels.adminApprovalSavedNotifyFailed}\n${detail}` : labels.adminApprovalSavedNotifyFailed);
+          }
+        }
       }
+      await renderViews();
     }
 
     async function addAllowlistEntry(form, user) {

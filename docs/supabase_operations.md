@@ -142,7 +142,7 @@ Set in Vercel project:
 - `HUGO_SUPABASE_REDIRECT_URL`
 - `RESEND_API_KEY`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL` (optional, default `cclljj@gmail.com`)
-- `OABOUTAI_RESEND_FROM` (optional, default `OaboutAI <onboarding@resend.dev>`)
+- `OABOUTAI_RESEND_FROM` (recommended, use a Resend-verified domain sender; `onboarding@resend.dev` only supports test-recipient delivery)
 
 If these are missing, UI will show:
 - `Supabase is not configured yet...`

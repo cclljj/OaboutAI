@@ -3,6 +3,7 @@
 const RESEND_API_URL = "https://api.resend.com/emails";
 const DEFAULT_FROM = "OaboutAI <onboarding@resend.dev>";
 const DEFAULT_SUBJECT = "[OaboutAI] Access approved / 存取權限已核准";
+const ADMIN_FALLBACK_SUBJECT = "[OaboutAI] Manual forward needed: access approved";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function normalizeEmail(value) {
@@ -43,6 +44,20 @@ function json(res, statusCode, payload) {
   res.send(JSON.stringify(payload));
 }
 
+async function sendEmail(apiKey, payload) {
+  const response = await fetch(RESEND_API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`
+    },
+    body: JSON.stringify(payload)
+  });
+  if (response.ok) return { ok: true };
+  const detail = await response.text();
+  return { ok: false, status: response.status, detail };
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -51,6 +66,7 @@ module.exports = async (req, res) => {
 
   const apiKey = String(process.env.RESEND_API_KEY || "").trim();
   const from = safeText(process.env.OABOUTAI_RESEND_FROM, DEFAULT_FROM);
+  const adminEmail = normalizeEmail(process.env.OABOUTAI_ADMIN_NOTIFY_EMAIL || "cclljj@gmail.com");
   if (!apiKey) {
     return json(res, 202, { ok: true, skipped: true, reason: "notification_not_configured" });
   }
@@ -107,24 +123,69 @@ module.exports = async (req, res) => {
   ].join("");
 
   try {
-    const response = await fetch(RESEND_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        from,
-        to: [requesterEmail],
-        subject: DEFAULT_SUBJECT,
-        text,
-        html
-      })
+    const sendResult = await sendEmail(apiKey, {
+      from,
+      to: [requesterEmail],
+      subject: DEFAULT_SUBJECT,
+      text,
+      html
     });
 
-    if (!response.ok) {
-      const detail = await response.text();
-      return json(res, 502, { ok: false, error: "resend_failed", detail: detail.slice(0, 500) });
+    if (!sendResult.ok) {
+      const detail = String(sendResult.detail || "");
+      const lowerDetail = detail.toLowerCase();
+      const restrictedByTestMode =
+        lowerDetail.includes("you can only send testing emails to your own email address") ||
+        lowerDetail.includes("please verify a domain at resend.com/domains");
+
+      if (restrictedByTestMode && adminEmail && EMAIL_RE.test(adminEmail) && adminEmail !== requesterEmail) {
+        const manualText = [
+          "Automatic requester email failed because Resend is in testing mode or sender domain is not verified.",
+          "Please manually forward the approval notice below to the requester.",
+          "",
+          `Requester email: ${requesterEmail}`,
+          `Approved at: ${reviewedAt}`,
+          `Login URL: ${loginUrl}`,
+          "",
+          "----- Forward content (EN + 中文) -----",
+          "",
+          text
+        ].join("\n");
+
+        const manualHtml = [
+          "<p>Automatic requester email failed because Resend is in testing mode or sender domain is not verified.</p>",
+          "<p>Please manually forward the approval notice below to the requester.</p>",
+          "<ul>",
+          `<li><strong>Requester email:</strong> ${escapeHtml(requesterEmail)}</li>`,
+          `<li><strong>Approved at:</strong> ${escapeHtml(reviewedAt)}</li>`,
+          `<li><strong>Login URL:</strong> <a href="${escapeHtml(loginUrl)}">${escapeHtml(loginUrl)}</a></li>`,
+          "</ul>",
+          "<hr>",
+          html
+        ].join("");
+
+        const fallback = await sendEmail(apiKey, {
+          from,
+          to: [adminEmail],
+          subject: ADMIN_FALLBACK_SUBJECT,
+          text: manualText,
+          html: manualHtml
+        });
+
+        if (fallback.ok) {
+          return json(res, 202, {
+            ok: true,
+            skipped: true,
+            reason: "requester_notify_fallback_to_admin"
+          });
+        }
+      }
+
+      return json(res, 502, {
+        ok: false,
+        error: "resend_failed",
+        detail: detail.slice(0, 500)
+      });
     }
 
     return json(res, 200, { ok: true });

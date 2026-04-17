@@ -122,7 +122,7 @@ Set these variables in Vercel project settings:
 - `HUGO_SUPABASE_REDIRECT_URL=https://oaboutai.vercel.app`
 - `RESEND_API_KEY=<resend-api-key>`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL=<admin-email-to-receive-access-request-alerts>`
-- `OABOUTAI_RESEND_FROM=OaboutAI <onboarding@resend.dev>` (optional)
+- `OABOUTAI_RESEND_FROM=OaboutAI <notify@your-verified-domain.com>` (recommended; must use a Resend-verified domain to notify non-admin recipients)
 - `HUGO_VERCEL_ANALYTICS_ENABLED=true` (optional)
 - `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED=true` (optional)
 - `OABOUTAI_DATA_REPO_URL=https://github.com/cclljj/OaboutAI_data`
@@ -139,7 +139,7 @@ export HUGO_SUPABASE_ANON_KEY="<anon-public-key>"
 export HUGO_SUPABASE_REDIRECT_URL="http://localhost:1313"
 export RESEND_API_KEY="<resend-api-key>"
 export OABOUTAI_ADMIN_NOTIFY_EMAIL="<admin-email>"
-export OABOUTAI_RESEND_FROM="OaboutAI <onboarding@resend.dev>"
+export OABOUTAI_RESEND_FROM="OaboutAI <notify@your-verified-domain.com>"
 export HUGO_VERCEL_ANALYTICS_ENABLED="true"
 export HUGO_VERCEL_SPEED_INSIGHTS_ENABLED="true"
 export OABOUTAI_DATA_REPO_URL="https://github.com/cclljj/OaboutAI_data"
