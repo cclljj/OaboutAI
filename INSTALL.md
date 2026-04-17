@@ -122,7 +122,14 @@ Set these variables in Vercel project settings:
 - `HUGO_SUPABASE_REDIRECT_URL=https://oaboutai.vercel.app`
 - `RESEND_API_KEY=<resend-api-key>`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL=<admin-email-to-receive-access-request-alerts>`
-- `OABOUTAI_RESEND_FROM=OaboutAI <notify@your-verified-domain.com>` (recommended; must use a Resend-verified domain to notify non-admin recipients)
+- `OABOUTAI_SMTP_USER=cclljj.agent@gmail.com`
+- `OABOUTAI_SMTP_PASS=<gmail-app-password>`
+- `OABOUTAI_SMTP_HOST=smtp.gmail.com` (optional)
+- `OABOUTAI_SMTP_PORT=465` (optional)
+- `OABOUTAI_SMTP_SECURE=true` (optional)
+- `OABOUTAI_MAIL_FROM=OaboutAI <cclljj.agent@gmail.com>` (optional)
+- `OABOUTAI_REPLY_TO=cclljj@gmail.com` (optional)
+- `OABOUTAI_RESEND_FROM=OaboutAI <notify@your-verified-domain.com>` (Resend fallback; must use a verified domain for non-test recipients)
 - `HUGO_VERCEL_ANALYTICS_ENABLED=true` (optional)
 - `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED=true` (optional)
 - `OABOUTAI_DATA_REPO_URL=https://github.com/cclljj/OaboutAI_data`
@@ -139,6 +146,13 @@ export HUGO_SUPABASE_ANON_KEY="<anon-public-key>"
 export HUGO_SUPABASE_REDIRECT_URL="http://localhost:1313"
 export RESEND_API_KEY="<resend-api-key>"
 export OABOUTAI_ADMIN_NOTIFY_EMAIL="<admin-email>"
+export OABOUTAI_SMTP_USER="cclljj.agent@gmail.com"
+export OABOUTAI_SMTP_PASS="<gmail-app-password>"
+export OABOUTAI_SMTP_HOST="smtp.gmail.com"
+export OABOUTAI_SMTP_PORT="465"
+export OABOUTAI_SMTP_SECURE="true"
+export OABOUTAI_MAIL_FROM="OaboutAI <cclljj.agent@gmail.com>"
+export OABOUTAI_REPLY_TO="cclljj@gmail.com"
 export OABOUTAI_RESEND_FROM="OaboutAI <notify@your-verified-domain.com>"
 export HUGO_VERCEL_ANALYTICS_ENABLED="true"
 export HUGO_VERCEL_SPEED_INSIGHTS_ENABLED="true"
@@ -148,6 +162,12 @@ export OABOUTAI_DATA_REPO_TOKEN_ENV="OABOUTAI_DATA_REPO_TOKEN"
 export OABOUTAI_DATA_REPO_SUBDIR="obsidian"
 export OABOUTAI_DATA_REPO_TOKEN="<github-token>"
 ```
+
+Gmail App Password setup (`cclljj.agent@gmail.com`):
+1. Sign in to Google account security settings.
+2. Enable 2-Step Verification.
+3. Open App passwords and create one for `Mail`.
+4. Copy the 16-character app password and set it as `OABOUTAI_SMTP_PASS`.
 
 ## 7. Load / Refresh Article Data
 

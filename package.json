@@ -1,0 +1,10 @@
+{
+  "name": "oaboutai-site",
+  "private": true,
+  "version": "1.0.0",
+  "description": "OaboutAI Hugo site + Vercel serverless helpers",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "nodemailer": "^7.0.5"
+  }
+}

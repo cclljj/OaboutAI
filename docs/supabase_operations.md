@@ -142,7 +142,14 @@ Set in Vercel project:
 - `HUGO_SUPABASE_REDIRECT_URL`
 - `RESEND_API_KEY`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL` (optional, default `cclljj@gmail.com`)
-- `OABOUTAI_RESEND_FROM` (recommended, use a Resend-verified domain sender; `onboarding@resend.dev` only supports test-recipient delivery)
+- `OABOUTAI_SMTP_USER` (recommended: `cclljj.agent@gmail.com`)
+- `OABOUTAI_SMTP_PASS` (Gmail App Password)
+- `OABOUTAI_SMTP_HOST` (optional, default `smtp.gmail.com`)
+- `OABOUTAI_SMTP_PORT` (optional, default `465`)
+- `OABOUTAI_SMTP_SECURE` (optional, default `true`)
+- `OABOUTAI_MAIL_FROM` (optional, default `OaboutAI <OABOUTAI_SMTP_USER>`)
+- `OABOUTAI_REPLY_TO` (optional)
+- `OABOUTAI_RESEND_FROM` (Resend fallback sender; if used for non-test recipients, sender domain must be verified)
 
 If these are missing, UI will show:
 - `Supabase is not configured yet...`

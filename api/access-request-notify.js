@@ -1,18 +1,7 @@
 "use strict";
 
-const RESEND_API_URL = "https://api.resend.com/emails";
-const DEFAULT_FROM = "OaboutAI <onboarding@resend.dev>";
 const DEFAULT_SUBJECT = "[OaboutAI] Access request pending review / 新的存取申請待審核";
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function normalizeEmail(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function safeText(value, fallback) {
-  const text = String(value || "").trim();
-  return text || fallback;
-}
+const { EMAIL_RE, escapeHtml, json, normalizeEmail, safeText, sendEmail } = require("./_mailer");
 
 function clampText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -33,31 +22,14 @@ function sanitizeAdminUrl(value, fallback) {
   return safeFallback;
 }
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function json(res, statusCode, payload) {
-  res.status(statusCode).setHeader("Content-Type", "application/json; charset=utf-8");
-  res.send(JSON.stringify(payload));
-}
-
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return json(res, 405, { ok: false, error: "method_not_allowed" });
   }
 
-  const apiKey = String(process.env.RESEND_API_KEY || "").trim();
   const adminEmail = normalizeEmail(process.env.OABOUTAI_ADMIN_NOTIFY_EMAIL || "cclljj@gmail.com");
-  const from = safeText(process.env.OABOUTAI_RESEND_FROM, DEFAULT_FROM);
-
-  if (!apiKey || !adminEmail || !EMAIL_RE.test(adminEmail)) {
+  if (!adminEmail || !EMAIL_RE.test(adminEmail)) {
     return json(res, 202, { ok: true, skipped: true, reason: "notification_not_configured" });
   }
 
@@ -135,27 +107,24 @@ module.exports = async (req, res) => {
   ].join("");
 
   try {
-    const response = await fetch(RESEND_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        from,
-        to: [adminEmail],
-        subject: DEFAULT_SUBJECT,
-        text,
-        html
-      })
+    const sent = await sendEmail({
+      to: [adminEmail],
+      subject: DEFAULT_SUBJECT,
+      text,
+      html
     });
-
-    if (!response.ok) {
-      const detail = await response.text();
-      return json(res, 502, { ok: false, error: "resend_failed", detail: detail.slice(0, 500) });
+    if (!sent.ok) {
+      if (sent.skipped) {
+        return json(res, 202, { ok: true, skipped: true, reason: sent.reason || "notification_not_configured" });
+      }
+      return json(res, 502, {
+        ok: false,
+        error: sent.error || "notification_send_failed",
+        detail: String(sent.detail || "").slice(0, 500)
+      });
     }
 
-    return json(res, 200, { ok: true });
+    return json(res, 200, { ok: true, provider: sent.provider || "" });
   } catch (error) {
     return json(res, 502, {
       ok: false,

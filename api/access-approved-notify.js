@@ -1,19 +1,8 @@
 "use strict";
 
-const RESEND_API_URL = "https://api.resend.com/emails";
-const DEFAULT_FROM = "OaboutAI <onboarding@resend.dev>";
 const DEFAULT_SUBJECT = "[OaboutAI] Access approved / 存取權限已核准";
 const ADMIN_FALLBACK_SUBJECT = "[OaboutAI] Manual forward needed: access approved";
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function normalizeEmail(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function safeText(value, fallback) {
-  const text = String(value || "").trim();
-  return text || fallback;
-}
+const { EMAIL_RE, escapeHtml, json, normalizeEmail, safeText, sendEmail } = require("./_mailer");
 
 function sanitizeSiteUrl(value, fallback) {
   const raw = String(value || "").trim();
@@ -30,46 +19,13 @@ function sanitizeSiteUrl(value, fallback) {
   return safeFallback;
 }
 
-function escapeHtml(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function json(res, statusCode, payload) {
-  res.status(statusCode).setHeader("Content-Type", "application/json; charset=utf-8");
-  res.send(JSON.stringify(payload));
-}
-
-async function sendEmail(apiKey, payload) {
-  const response = await fetch(RESEND_API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`
-    },
-    body: JSON.stringify(payload)
-  });
-  if (response.ok) return { ok: true };
-  const detail = await response.text();
-  return { ok: false, status: response.status, detail };
-}
-
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return json(res, 405, { ok: false, error: "method_not_allowed" });
   }
 
-  const apiKey = String(process.env.RESEND_API_KEY || "").trim();
-  const from = safeText(process.env.OABOUTAI_RESEND_FROM, DEFAULT_FROM);
   const adminEmail = normalizeEmail(process.env.OABOUTAI_ADMIN_NOTIFY_EMAIL || "cclljj@gmail.com");
-  if (!apiKey) {
-    return json(res, 202, { ok: true, skipped: true, reason: "notification_not_configured" });
-  }
 
   const body = typeof req.body === "object" && req.body ? req.body : {};
   const requesterEmail = normalizeEmail(body.email || "");
@@ -123,8 +79,7 @@ module.exports = async (req, res) => {
   ].join("");
 
   try {
-    const sendResult = await sendEmail(apiKey, {
-      from,
+    const sendResult = await sendEmail({
       to: [requesterEmail],
       subject: DEFAULT_SUBJECT,
       text,
@@ -132,11 +87,15 @@ module.exports = async (req, res) => {
     });
 
     if (!sendResult.ok) {
+      if (sendResult.skipped) {
+        return json(res, 202, { ok: true, skipped: true, reason: sendResult.reason || "notification_not_configured" });
+      }
       const detail = String(sendResult.detail || "");
       const lowerDetail = detail.toLowerCase();
       const restrictedByTestMode =
         lowerDetail.includes("you can only send testing emails to your own email address") ||
-        lowerDetail.includes("please verify a domain at resend.com/domains");
+        lowerDetail.includes("please verify a domain at resend.com/domains") ||
+        lowerDetail.includes("daily user sending limit exceeded");
 
       if (restrictedByTestMode && adminEmail && EMAIL_RE.test(adminEmail) && adminEmail !== requesterEmail) {
         const manualText = [
@@ -164,8 +123,7 @@ module.exports = async (req, res) => {
           html
         ].join("");
 
-        const fallback = await sendEmail(apiKey, {
-          from,
+        const fallback = await sendEmail({
           to: [adminEmail],
           subject: ADMIN_FALLBACK_SUBJECT,
           text: manualText,
@@ -183,12 +141,12 @@ module.exports = async (req, res) => {
 
       return json(res, 502, {
         ok: false,
-        error: "resend_failed",
+        error: sendResult.error || "notification_send_failed",
         detail: detail.slice(0, 500)
       });
     }
 
-    return json(res, 200, { ok: true });
+    return json(res, 200, { ok: true, provider: sendResult.provider || "" });
   } catch (error) {
     return json(res, 502, {
       ok: false,

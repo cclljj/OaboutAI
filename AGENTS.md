@@ -55,6 +55,13 @@ Required runtime env vars:
 - `RESEND_API_KEY`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL` (default: `cclljj@gmail.com`)
 - `OABOUTAI_RESEND_FROM` (optional)
+- `OABOUTAI_SMTP_USER` (optional; when set, notification email prefers SMTP over Resend)
+- `OABOUTAI_SMTP_PASS` (optional; Gmail app password when using Gmail SMTP)
+- `OABOUTAI_SMTP_HOST` (optional; default `smtp.gmail.com`)
+- `OABOUTAI_SMTP_PORT` (optional; default `465`)
+- `OABOUTAI_SMTP_SECURE` (optional; default `true`)
+- `OABOUTAI_MAIL_FROM` (optional; default `OaboutAI <OABOUTAI_SMTP_USER>`)
+- `OABOUTAI_REPLY_TO` (optional)
 - `HUGO_VERCEL_ANALYTICS_ENABLED` (optional, default: `true`)
 - `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED` (optional, default: `true`)
 - `OABOUTAI_DATA_REPO_URL` (default: `https://github.com/cclljj/OaboutAI_data`)
