@@ -31,6 +31,7 @@ fi
 "${compose_cmd[@]}"
 
 pushd "${COMPOSED_SITE}" >/dev/null
+python3 scripts/sync_share_entries.py
 rm -rf data/obsidian
 rm -rf static/obsidian
 rm -f data/keyword_proposals.jsonl

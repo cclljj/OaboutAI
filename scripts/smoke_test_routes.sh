@@ -57,6 +57,7 @@ done
 assert_contains_regex "/" 'data-oa-protected-view="?home_recent'
 assert_contains_regex "/items/" 'data-oa-protected-view="?items_list'
 assert_contains_regex "/item/?slug=smoke-test" 'data-oa-protected-view="?item_single'
+assert_contains_regex "/entry/smoke-test/" 'data-oa-protected-view="?item_single'
 assert_contains_regex "/topics/" 'data-oa-protected-view="?topics_catalog'
 assert_contains_regex "/keywords/" 'data-oa-term-type="?keywords'
 assert_contains_regex "/types/" 'data-oa-term-type="?types'

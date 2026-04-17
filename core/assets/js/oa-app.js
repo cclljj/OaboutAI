@@ -435,8 +435,8 @@
   function articleHref(slug) {
     const encoded = encodeURIComponent(String(slug || ""));
     const currentLang = normalizeLang(document.documentElement.lang);
-    const base = currentLang === "zh-tw" ? "/zh-tw/item/" : "/item/";
-    return `${base}?slug=${encoded}`;
+    const base = currentLang === "zh-tw" ? "/zh-tw/entry/" : "/entry/";
+    return `${base}${encoded}/`;
   }
 
   function languagePath(path) {
@@ -846,7 +846,11 @@
       const trimmed = line.trim();
       if (!trimmed) {
         flushParagraph();
-        flushList();
+        // Keep the current list open across blank lines so ordered numbering
+        // does not reset to "1." for every item.
+        if (!listType) {
+          flushList();
+        }
         continue;
       }
 

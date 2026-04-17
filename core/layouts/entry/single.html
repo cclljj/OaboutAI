@@ -1,0 +1,13 @@
+{{ define "main" }}
+{{ $slug := .Params.slug | default (.File.Dir | strings.TrimSuffix "/" | path.Base) }}
+{{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" false) }}
+<div class="oa-shell">
+  <div
+    class="oa-single-shell"
+    data-oa-protected-view="item_single"
+    data-oa-slug="{{ $slug }}"
+  >
+    <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
+  </div>
+</div>
+{{ end }}

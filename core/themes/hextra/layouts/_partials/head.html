@@ -9,8 +9,9 @@
   {{ end -}}
   {{ partialCached "favicons.html" . -}}
   {{- $privateContentMode := site.Params.privateContent | default false -}}
+  {{- $sharePublicTitle := .Params.share_public_title | default false -}}
   <title>
-    {{- if $privateContentMode -}}
+    {{- if and $privateContentMode (not $sharePublicTitle) -}}
       {{ .Site.Title -}}
     {{- else if .IsHome -}}
       {{ .Site.Title -}}
@@ -31,6 +32,8 @@
     {{- partial "opengraph.html" . -}}
     {{- partial "schema.html" . -}}
     {{- partial "twitter_cards.html" . -}}
+  {{- else if $sharePublicTitle -}}
+    {{- partial "custom/share-social-meta.html" . -}}
   {{- end -}}
 
   {{- $mainCss := resources.Get "css/compiled/main.css" -}}
