@@ -967,15 +967,15 @@
 
 .oa-admin-pie-wrap {
   display: grid;
-  grid-template-columns: minmax(250px, 340px) minmax(160px, 240px);
-  gap: 0.7rem;
+  grid-template-columns: minmax(280px, 1.45fr) minmax(200px, 1fr);
+  gap: 0.6rem;
   align-items: center;
   justify-content: space-between;
 }
 
 .oa-admin-pie-chart {
   width: 100%;
-  max-width: 320px;
+  max-width: 360px;
   height: auto;
   justify-self: center;
 }
@@ -1002,12 +1002,23 @@
   gap: 0.45rem;
 }
 
+.oa-admin-pie-legend.is-multi-column {
+  display: block;
+  columns: 2;
+  column-gap: 0.75rem;
+}
+
 .oa-admin-pie-legend li {
   display: grid;
   grid-template-columns: 10px 1fr auto;
   align-items: center;
   gap: 0.45rem;
   font-size: 0.8rem;
+}
+
+.oa-admin-pie-legend.is-multi-column li {
+  break-inside: avoid;
+  margin-bottom: 0.42rem;
 }
 
 .oa-admin-pie-dot {
@@ -1138,5 +1149,9 @@
 
   .oa-admin-pie-wrap {
     grid-template-columns: 1fr;
+  }
+
+  .oa-admin-pie-legend.is-multi-column {
+    columns: 1;
   }
 }

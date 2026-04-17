@@ -1178,6 +1178,7 @@
         </li>
       `;
     }).join("");
+    const legendClass = slices.length >= 8 ? "oa-admin-pie-legend is-multi-column" : "oa-admin-pie-legend";
 
     return `
       <div class="oa-admin-pie-wrap">
@@ -1187,7 +1188,7 @@
           <text x="${cx}" y="${cy - 3}" text-anchor="middle" class="oa-admin-pie-center-label">Total</text>
           <text x="${cx}" y="${cy + 16}" text-anchor="middle" class="oa-admin-pie-center-value">${escapeHtml(String(total))}</text>
         </svg>
-        <ul class="oa-admin-pie-legend">
+        <ul class="${legendClass}">
           ${legend}
         </ul>
       </div>
