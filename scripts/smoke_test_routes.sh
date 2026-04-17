@@ -45,13 +45,36 @@ assert_contains_regex() {
 find_existing_entry_path() {
   local sitemap_url="${BASE_URL}/sitemap.xml"
   local loc
-  loc="$(curl -sS "${sitemap_url}" \
-    | grep -Eo '<loc>https?://[^<]*/(zh-tw/)?entry/[^<]*/</loc>' \
-    | sed -E 's#^<loc>##; s#</loc>$##' \
-    | head -n 1 || true)"
+
+  extract_entry_loc() {
+    local url="$1"
+    curl -sS "${url}" \
+      | grep -Eo '<loc>https?://[^<]*/(zh-tw/)?entry/[^<]*/</loc>' \
+      | sed -E 's#^<loc>##; s#</loc>$##' \
+      | head -n 1 || true
+  }
+
+  loc="$(extract_entry_loc "${sitemap_url}")"
 
   if [[ -z "${loc}" ]]; then
-    echo "FAIL: no /entry/<slug>/ URL found in sitemap (${sitemap_url})"
+    local sitemap_children
+    sitemap_children="$(curl -sS "${sitemap_url}" \
+      | grep -Eo '<loc>https?://[^<]*/(en|zh-tw)/sitemap.xml</loc>' \
+      | sed -E 's#^<loc>##; s#</loc>$##' || true)"
+
+    if [[ -n "${sitemap_children}" ]]; then
+      while IFS= read -r child_sitemap; do
+        [[ -z "${child_sitemap}" ]] && continue
+        loc="$(extract_entry_loc "${child_sitemap}")"
+        if [[ -n "${loc}" ]]; then
+          break
+        fi
+      done <<< "${sitemap_children}"
+    fi
+  fi
+
+  if [[ -z "${loc}" ]]; then
+    echo "FAIL: no /entry/<slug>/ URL found in sitemap (${sitemap_url})" >&2
     exit 1
   fi
 
