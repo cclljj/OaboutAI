@@ -2312,7 +2312,7 @@
 
     async function notifyAdminAccessRequest(payload) {
       try {
-        await fetch("/api/access-request-notify", {
+        const response = await fetch("/api/access-request-notify", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -2320,14 +2320,20 @@
           body: JSON.stringify(payload),
           keepalive: true
         });
+        if (!response.ok) {
+          const text = await response.text();
+          return { ok: false, detail: text.slice(0, 500) };
+        }
+        const data = await response.json().catch(() => ({}));
+        return { ok: true, data };
       } catch (_error) {
-        // Do not block request submission UI when notification delivery fails.
+        return { ok: false, detail: "network_error" };
       }
     }
 
     async function notifyRequesterAccessApproved(payload) {
       try {
-        await fetch("/api/access-approved-notify", {
+        const response = await fetch("/api/access-approved-notify", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -2335,8 +2341,17 @@
           body: JSON.stringify(payload),
           keepalive: true
         });
+        if (!response.ok) {
+          const text = await response.text();
+          return { ok: false, detail: text.slice(0, 500) };
+        }
+        const data = await response.json().catch(() => ({}));
+        if (data && data.ok === true && data.skipped) {
+          return { ok: false, detail: String(data.reason || "notification_skipped") };
+        }
+        return { ok: true, data };
       } catch (_error) {
-        // Do not block admin review flow when notification delivery fails.
+        return { ok: false, detail: "network_error" };
       }
     }
 
@@ -2363,7 +2378,7 @@
         setFeedback(feedback, error.message || labels.requestSubmitError, true);
         return;
       }
-      void notifyAdminAccessRequest({
+      await notifyAdminAccessRequest({
         requestId: data?.id || "",
         requesterUserId: user.id,
         email: profile.email,
@@ -2385,17 +2400,31 @@
           reviewed_at: reviewedAt
         })
         .eq("id", requestId)
-        .select("id,email,reviewed_at")
+        .select("id,email,reviewed_at,requester_user_id")
         .single();
       if (!error) {
         if (approved) {
-          const requesterEmail = normalizeEmail(data?.email || "");
+          let requesterEmail = normalizeEmail(data?.email || "");
+          if (!requesterEmail && data?.requester_user_id) {
+            const lookup = await client
+              .from("app_users")
+              .select("email")
+              .eq("id", data.requester_user_id)
+              .maybeSingle();
+            if (!lookup.error) {
+              requesterEmail = normalizeEmail(lookup.data?.email || "");
+            }
+          }
           if (requesterEmail) {
-            void notifyRequesterAccessApproved({
+            const notifyResult = await notifyRequesterAccessApproved({
               email: requesterEmail,
               reviewedAt: data?.reviewed_at || reviewedAt,
               loginUrl: `${window.location.origin}/`
             });
+            if (!notifyResult?.ok) {
+              const detail = String(notifyResult?.detail || "").trim();
+              window.alert(detail ? `${labels.adminActionError}\n${detail}` : labels.adminActionError);
+            }
           }
         }
         await renderViews();
