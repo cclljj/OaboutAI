@@ -42,6 +42,26 @@ assert_contains_regex() {
   echo "OK  : ${url} contains marker"
 }
 
+find_existing_entry_path() {
+  local sitemap_url="${BASE_URL}/sitemap.xml"
+  local loc
+  loc="$(curl -sS "${sitemap_url}" \
+    | grep -Eo '<loc>https?://[^<]*/(zh-tw/)?entry/[^<]*/</loc>' \
+    | sed -E 's#^<loc>##; s#</loc>$##' \
+    | head -n 1)"
+
+  if [[ -z "${loc}" ]]; then
+    echo "FAIL: no /entry/<slug>/ URL found in sitemap (${sitemap_url})"
+    exit 1
+  fi
+
+  local path="${loc#${BASE_URL}}"
+  if [[ "${path}" == "${loc}" ]]; then
+    path="$(echo "${loc}" | sed -E 's#^https?://[^/]+##')"
+  fi
+  echo "${path}"
+}
+
 # wait for deployment edge propagation
 retry=0
 until curl -sS -I "${BASE_URL}" >/dev/null 2>&1; do
@@ -57,7 +77,8 @@ done
 assert_contains_regex "/" 'data-oa-protected-view="?home_recent'
 assert_contains_regex "/items/" 'data-oa-protected-view="?items_list'
 assert_contains_regex "/item/?slug=smoke-test" 'data-oa-protected-view="?item_single'
-assert_contains_regex "/entry/smoke-test/" 'data-oa-protected-view="?item_single'
+ENTRY_PATH="$(find_existing_entry_path)"
+assert_contains_regex "${ENTRY_PATH}" 'data-oa-protected-view="?item_single'
 assert_contains_regex "/topics/" 'data-oa-protected-view="?topics_catalog'
 assert_contains_regex "/keywords/" 'data-oa-term-type="?keywords'
 assert_contains_regex "/types/" 'data-oa-term-type="?types'
