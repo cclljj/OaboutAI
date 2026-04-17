@@ -2459,6 +2459,19 @@
       if (!window.confirm(firstConfirmation)) return;
       if (!window.confirm(labels.adminDeleteUserConfirmFinal)) return;
 
+      // Remove allowlist entry first so re-registered users must request approval again.
+      if (normalizedEmail) {
+        const { error: allowlistError } = await client
+          .from("access_allowlist")
+          .delete()
+          .eq("email", normalizedEmail);
+        if (allowlistError) {
+          const details = String(allowlistError.message || "").trim();
+          window.alert(details ? `${labels.adminActionError}\n${details}` : labels.adminActionError);
+          return;
+        }
+      }
+
       const { error } = await client.from("app_users").delete().eq("id", userId);
       if (error) {
         const details = String(error.message || "").trim();
