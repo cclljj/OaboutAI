@@ -125,7 +125,6 @@ Runtime/build env (Vercel or CI):
 - `HUGO_SUPABASE_URL`
 - `HUGO_SUPABASE_ANON_KEY`
 - `HUGO_SUPABASE_REDIRECT_URL`
-- `RESEND_API_KEY`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL`（default: `cclljj@gmail.com`）
 - `OABOUTAI_SMTP_USER`（建議：`cclljj.agent@gmail.com`）
 - `OABOUTAI_SMTP_PASS`（Gmail App Password）
@@ -134,6 +133,7 @@ Runtime/build env (Vercel or CI):
 - `OABOUTAI_SMTP_SECURE`（optional，default: `true`）
 - `OABOUTAI_MAIL_FROM`（optional，預設 `OaboutAI <OABOUTAI_SMTP_USER>`）
 - `OABOUTAI_REPLY_TO`（optional，例如 `cclljj@gmail.com`）
+- `RESEND_API_KEY`（optional；SMTP 無法使用時的 fallback）
 - `OABOUTAI_RESEND_FROM`（Resend fallback 用；若啟用 Resend 正式寄送，需已驗證網域）
 - `HUGO_VERCEL_ANALYTICS_ENABLED`（optional；default: `true`）
 - `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED`（optional；default: `true`）

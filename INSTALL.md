@@ -120,7 +120,6 @@ Set these variables in Vercel project settings:
 - `HUGO_SUPABASE_URL=https://<project-ref>.supabase.co`
 - `HUGO_SUPABASE_ANON_KEY=<anon-public-key>`
 - `HUGO_SUPABASE_REDIRECT_URL=https://oaboutai.vercel.app`
-- `RESEND_API_KEY=<resend-api-key>`
 - `OABOUTAI_ADMIN_NOTIFY_EMAIL=<admin-email-to-receive-access-request-alerts>`
 - `OABOUTAI_SMTP_USER=cclljj.agent@gmail.com`
 - `OABOUTAI_SMTP_PASS=<gmail-app-password>`
@@ -129,6 +128,7 @@ Set these variables in Vercel project settings:
 - `OABOUTAI_SMTP_SECURE=true` (optional)
 - `OABOUTAI_MAIL_FROM=OaboutAI <cclljj.agent@gmail.com>` (optional)
 - `OABOUTAI_REPLY_TO=cclljj@gmail.com` (optional)
+- `RESEND_API_KEY=<resend-api-key>` (optional fallback)
 - `OABOUTAI_RESEND_FROM=OaboutAI <notify@your-verified-domain.com>` (Resend fallback; must use a verified domain for non-test recipients)
 - `HUGO_VERCEL_ANALYTICS_ENABLED=true` (optional)
 - `HUGO_VERCEL_SPEED_INSIGHTS_ENABLED=true` (optional)
@@ -144,7 +144,6 @@ For local shell testing, you can export them before running Hugo:
 export HUGO_SUPABASE_URL="https://<project-ref>.supabase.co"
 export HUGO_SUPABASE_ANON_KEY="<anon-public-key>"
 export HUGO_SUPABASE_REDIRECT_URL="http://localhost:1313"
-export RESEND_API_KEY="<resend-api-key>"
 export OABOUTAI_ADMIN_NOTIFY_EMAIL="<admin-email>"
 export OABOUTAI_SMTP_USER="cclljj.agent@gmail.com"
 export OABOUTAI_SMTP_PASS="<gmail-app-password>"
@@ -153,6 +152,7 @@ export OABOUTAI_SMTP_PORT="465"
 export OABOUTAI_SMTP_SECURE="true"
 export OABOUTAI_MAIL_FROM="OaboutAI <cclljj.agent@gmail.com>"
 export OABOUTAI_REPLY_TO="cclljj@gmail.com"
+export RESEND_API_KEY="<resend-api-key>"
 export OABOUTAI_RESEND_FROM="OaboutAI <notify@your-verified-domain.com>"
 export HUGO_VERCEL_ANALYTICS_ENABLED="true"
 export HUGO_VERCEL_SPEED_INSIGHTS_ENABLED="true"
