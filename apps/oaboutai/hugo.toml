@@ -39,6 +39,9 @@ enableGitInfo = false
     displayTitle = true
     displayLogo = false
 
+  [params.footer]
+    displayPoweredBy = false
+
   [[params.navbar.links]]
     name = "Recent"
     url = "/"
