@@ -1817,21 +1817,56 @@
       return;
     }
     if (!data || data.length === 0) {
-      shell.innerHTML = `<h1 class="oa-page-title">${escapeHtml(labels.digestTitle || "Weekly AI Digest")}</h1><p class="oa-page-subtitle">${escapeHtml(labels.noDigests || "No digests available yet.")}</p>`;
+      shell.innerHTML = `<p class="oa-page-subtitle">${escapeHtml(labels.noDigests || "No digests available yet.")}</p>`;
       return;
     }
 
     const items = data
       .map((d) => {
         const url = languagePath(`digest/?date=${d.digest_date}`);
-        return `<div class="oa-digest-entry"><a href="${url}" class="oa-digest-date-link">${escapeHtml(d.digest_date)}</a><span class="oa-digest-entry-title">${escapeHtml(d.title)}</span></div>`;
+        return `
+          <article class="oa-entry-card">
+            <div class="oa-entry-card-head">
+              <h3><a class="oa-entry-title" href="${escapeHtml(url)}">${escapeHtml(d.title || d.digest_date)}</a></h3>
+            </div>
+            <p class="oa-meta">${buildChip(`${labels.sourceDate} ${d.digest_date || "-"}`)}</p>
+          </article>
+        `;
       })
       .join("");
 
-    shell.innerHTML = `
-      <h1 class="oa-page-title">${escapeHtml(labels.digestTitle || "Weekly AI Digest")}</h1>
-      <p class="oa-page-subtitle">${escapeHtml(labels.digestNewestFirst || "Sorted by date, newest first")}</p>
-      <div class="oa-digest-list">${items}</div>`;
+    shell.innerHTML = items;
+  }
+
+  function extractDigestItemSlug(rawHref) {
+    const href = String(rawHref || "").trim();
+    if (!href || href.startsWith("#")) return "";
+    try {
+      const parsed = new URL(href, window.location.origin);
+      const slugParam = parsed.searchParams.get("slug");
+      if (slugParam) return decodeURIComponent(slugParam);
+
+      const matched = parsed.pathname.match(/\/(?:zh-tw\/)?(?:items|item|entry)\/([^/?#]+)\/?$/i);
+      if (!matched || !matched[1]) return "";
+      return decodeURIComponent(matched[1]);
+    } catch (_error) {
+      return "";
+    }
+  }
+
+  function rewriteDigestItemLinks(contentHtml) {
+    const html = String(contentHtml || "");
+    if (!html) return "";
+    const template = document.createElement("template");
+    template.innerHTML = html;
+
+    template.content.querySelectorAll("a[href]").forEach((anchor) => {
+      const slug = extractDigestItemSlug(anchor.getAttribute("href") || "");
+      if (!slug) return;
+      anchor.setAttribute("href", articleHref(slug));
+    });
+
+    return template.innerHTML;
   }
 
   async function renderDigestSingle(shell, client, lang, labels, date) {
@@ -1848,13 +1883,16 @@
     }
 
     const backUrl = languagePath("digest/");
+    const contentHtml = rewriteDigestItemLinks(data.content_html);
     shell.innerHTML = `
-      <article class="oa-digest-article">
-        <div class="oa-digest-back"><a href="${backUrl}">${escapeHtml(labels.backToDigest || "← Back to Digest")}</a></div>
+      <article class="oa-single oa-digest-article">
+        <div class="oa-digest-back"><a class="oa-btn oa-btn-secondary" href="${escapeHtml(backUrl)}">${escapeHtml(labels.backToDigest || "← Back to Digest")}</a></div>
         <h1 class="oa-page-title">${escapeHtml(data.title)}</h1>
         <p class="oa-page-subtitle">${escapeHtml(data.digest_date)}</p>
-        <div class="oa-digest-content">${data.content_html}</div>
-        <div class="oa-digest-back oa-digest-back--bottom"><a href="${backUrl}">${escapeHtml(labels.backToDigest || "← Back to Digest")}</a></div>
+        <section class="oa-section oa-card">
+          <div class="oa-markdown oa-digest-content">${contentHtml}</div>
+        </section>
+        <div class="oa-digest-back oa-digest-back--bottom"><a class="oa-btn oa-btn-secondary" href="${escapeHtml(backUrl)}">${escapeHtml(labels.backToDigest || "← Back to Digest")}</a></div>
       </article>`;
   }
 

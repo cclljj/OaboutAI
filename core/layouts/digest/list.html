@@ -1,7 +1,9 @@
 {{ define "main" }}
 {{ partial "sidebar.html" (dict "context" . "disableSidebar" true "displayPlaceholder" false) }}
 <div class="oa-shell">
-  <div class="oa-digest-shell" data-oa-protected-view="digest">
+  <h1 class="oa-page-title">{{ .Title }}</h1>
+  <p class="oa-page-subtitle">{{ i18n "digestNewestFirst" }}</p>
+  <div class="oa-entry-list" data-oa-protected-view="digest">
     <p class="oa-page-subtitle">{{ i18n "loadingProtectedContent" }}</p>
   </div>
 </div>
