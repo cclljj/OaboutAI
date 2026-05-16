@@ -1866,6 +1866,20 @@
       anchor.setAttribute("href", articleHref(slug));
     });
 
+    const isReferenceHeading = (text) => /^(references?|reference)$/i.test(text) || /^(參考資料|參考文獻)$/.test(text);
+    template.content.querySelectorAll("h1,h2,h3,h4,h5,h6").forEach((heading) => {
+      const headingText = String(heading.textContent || "").trim();
+      if (!isReferenceHeading(headingText)) return;
+      let sibling = heading.nextElementSibling;
+      while (sibling) {
+        if (/^H[1-6]$/.test(sibling.tagName)) break;
+        if (sibling.tagName === "OL" || sibling.tagName === "UL") {
+          sibling.classList.add("oa-digest-reference-list");
+        }
+        sibling = sibling.nextElementSibling;
+      }
+    });
+
     return template.innerHTML;
   }
 

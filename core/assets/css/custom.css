@@ -554,6 +554,11 @@
   margin-top: 0.4rem;
 }
 
+.oa-digest-content .oa-digest-reference-list {
+  list-style: none;
+  padding-left: 0;
+}
+
 .oa-entry-card-head {
   display: flex;
   align-items: flex-start;
