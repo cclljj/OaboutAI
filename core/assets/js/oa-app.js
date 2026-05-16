@@ -136,7 +136,12 @@
     adminStatDate: "Date",
     adminStatCount: "Count",
     adminStatName: "Name",
-    adminStatNone: "No data yet."
+    adminStatNone: "No data yet.",
+    digestTitle: "Weekly AI Digest",
+    digestNewestFirst: "Sorted by date, newest first",
+    noDigests: "No digests available yet.",
+    backToDigest: "← Back to Digest",
+    digestLoading: "Loading digest..."
   };
 
   const SORT_BY_KEY = "sort_by";
@@ -1789,6 +1794,70 @@
     return { view, topic, termType, termValue, slug, month };
   }
 
+  // ── Digest ──────────────────────────────────────────────
+  async function renderDigestView(shell, client, lang, labels) {
+    const params = new URLSearchParams(window.location.search);
+    const date = params.get("date");
+    if (date) {
+      await renderDigestSingle(shell, client, lang, labels, date);
+    } else {
+      await renderDigestList(shell, client, lang, labels);
+    }
+  }
+
+  async function renderDigestList(shell, client, lang, labels) {
+    const { data, error } = await client
+      .from("digests")
+      .select("digest_date, title")
+      .eq("language", lang)
+      .order("digest_date", { ascending: false });
+
+    if (error) {
+      shell.innerHTML = `<p class="oa-error">${escapeHtml(error.message)}</p>`;
+      return;
+    }
+    if (!data || data.length === 0) {
+      shell.innerHTML = `<h1 class="oa-page-title">${escapeHtml(labels.digestTitle || "Weekly AI Digest")}</h1><p class="oa-page-subtitle">${escapeHtml(labels.noDigests || "No digests available yet.")}</p>`;
+      return;
+    }
+
+    const items = data
+      .map((d) => {
+        const url = languagePath(`digest/?date=${d.digest_date}`);
+        return `<div class="oa-digest-entry"><a href="${url}" class="oa-digest-date-link">${escapeHtml(d.digest_date)}</a><span class="oa-digest-entry-title">${escapeHtml(d.title)}</span></div>`;
+      })
+      .join("");
+
+    shell.innerHTML = `
+      <h1 class="oa-page-title">${escapeHtml(labels.digestTitle || "Weekly AI Digest")}</h1>
+      <p class="oa-page-subtitle">${escapeHtml(labels.digestNewestFirst || "Sorted by date, newest first")}</p>
+      <div class="oa-digest-list">${items}</div>`;
+  }
+
+  async function renderDigestSingle(shell, client, lang, labels, date) {
+    const { data, error } = await client
+      .from("digests")
+      .select("digest_date, title, content_html")
+      .eq("digest_date", date)
+      .eq("language", lang)
+      .maybeSingle();
+
+    if (error || !data) {
+      shell.innerHTML = `<p class="oa-error">Digest not found for ${escapeHtml(date)}.</p>`;
+      return;
+    }
+
+    const backUrl = languagePath("digest/");
+    shell.innerHTML = `
+      <article class="oa-digest-article">
+        <div class="oa-digest-back"><a href="${backUrl}">${escapeHtml(labels.backToDigest || "← Back to Digest")}</a></div>
+        <h1 class="oa-page-title">${escapeHtml(data.title)}</h1>
+        <p class="oa-page-subtitle">${escapeHtml(data.digest_date)}</p>
+        <div class="oa-digest-content">${data.content_html}</div>
+        <div class="oa-digest-back oa-digest-back--bottom"><a href="${backUrl}">${escapeHtml(labels.backToDigest || "← Back to Digest")}</a></div>
+      </article>`;
+  }
+
   function getTopicsCatalog() {
     const node = document.getElementById("oa-topics-catalog");
     const parsed = node ? parseJsonAttr(node.textContent, []) : [];
@@ -2838,6 +2907,11 @@
           }, (node, pageItems) => {
             renderList(node, pageItems, labels, favoriteSlugs, renderOptions);
           }, () => bindGlobalActions(user, access));
+          continue;
+        }
+
+        if (filters.view === "digest") {
+          await renderDigestView(root, client, lang, labels);
           continue;
         }
 

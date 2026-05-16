@@ -65,6 +65,11 @@ enableGitInfo = false
     pageRef = "/"
     weight = 10
   [[menu.main]]
+    identifier = "digest"
+    name = "Digest"
+    pageRef = "/digest"
+    weight = 15
+  [[menu.main]]
     identifier = "topics"
     name = "Topics"
     pageRef = "/topics"

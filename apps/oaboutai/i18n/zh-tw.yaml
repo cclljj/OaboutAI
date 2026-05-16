@@ -270,3 +270,15 @@
   translation: 名稱
 - id: adminStatNone
   translation: 目前沒有資料。
+- id: digest
+  translation: "文摘"
+- id: digestTitle
+  translation: "每週 AI 文摘"
+- id: digestNewestFirst
+  translation: "依日期排序，由近而遠"
+- id: noDigests
+  translation: "目前尚無文摘。"
+- id: backToDigest
+  translation: "← 返回文摘列表"
+- id: digestLoading
+  translation: "載入中..."

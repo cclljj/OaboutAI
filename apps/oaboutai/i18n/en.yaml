@@ -270,3 +270,15 @@
   translation: Name
 - id: adminStatNone
   translation: No data yet.
+- id: digest
+  translation: "Digest"
+- id: digestTitle
+  translation: "Weekly AI Digest"
+- id: digestNewestFirst
+  translation: "Sorted by date, newest first"
+- id: noDigests
+  translation: "No digests available yet."
+- id: backToDigest
+  translation: "← Back to Digest"
+- id: digestLoading
+  translation: "Loading digest..."
