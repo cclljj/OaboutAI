@@ -7,7 +7,7 @@
   {
     "id": "risk-management",
     "label": { "en": "Risk Management", "zh-tw": "風險管理" },
-    "aliases": ["risk control", "risk governance", "threat-modeling", "human-oversight", "content-moderation"]
+    "aliases": ["risk control", "risk governance", "threat-modeling", "content-moderation"]
   },
   {
     "id": "model-evaluation",
@@ -66,6 +66,89 @@
       "digital sovereignty",
       "主權ai",
       "ai主權"
+    ]
+  },
+  {
+    "id": "cybersecurity",
+    "label": { "en": "Cybersecurity", "zh-tw": "網路安全" },
+    "aliases": [
+      "ai-assisted-attacks",
+      "vulnerability-exploitation",
+      "agentic-ai-security",
+      "prompt-injection",
+      "tool-call-injection",
+      "credential-exfiltration",
+      "api-router-attacks",
+      "cybersecurity-risk",
+      "supply-chain-security",
+      "cyberattacks-fraud",
+      "ai-security",
+      "ai-threat-defense"
+    ]
+  },
+  {
+    "id": "labor-market",
+    "label": { "en": "Labor Market", "zh-tw": "勞動市場" },
+    "aliases": [
+      "ai-labor-market",
+      "workforce-transformation",
+      "talent-mobility",
+      "upskilling",
+      "automation-risk",
+      "job-displacement",
+      "workforce-transition",
+      "deskilling",
+      "workforce-development",
+      "ai-skills",
+      "ai-literacy",
+      "labor-market-impact",
+      "ai-workforce-impact",
+      "ai-workforce",
+      "skill-atrophy"
+    ]
+  },
+  {
+    "id": "human-oversight",
+    "label": { "en": "Human Oversight", "zh-tw": "人工監督" },
+    "aliases": [
+      "cognitive-offloading",
+      "automation-bias",
+      "human-ai-interaction",
+      "supervision-paradox",
+      "human-in-the-loop"
+    ]
+  },
+  {
+    "id": "transparency",
+    "label": { "en": "Transparency", "zh-tw": "透明度" },
+    "aliases": [
+      "algorithmic-transparency",
+      "explainable-ai",
+      "legal-disclosure",
+      "content-safety",
+      "synthetic-media",
+      "content-provenance"
+    ]
+  },
+  {
+    "id": "export-controls",
+    "label": { "en": "Export Controls", "zh-tw": "出口管制" },
+    "aliases": [
+      "strategic-competition",
+      "ai-geopolitics",
+      "talent-restriction",
+      "chip-controls",
+      "tech-decoupling"
+    ]
+  },
+  {
+    "id": "data-governance",
+    "label": { "en": "Data Governance", "zh-tw": "資料治理" },
+    "aliases": [
+      "data-privacy",
+      "data-architecture",
+      "data-residency",
+      "data-sovereignty-enterprise"
     ]
   }
 ]

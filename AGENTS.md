@@ -115,11 +115,18 @@ Keywords:
   - `governance-framework`
   - `public-consultation`
   - `sovereign-ai`
+  - `cybersecurity`
+  - `labor-market`
+  - `human-oversight`
+  - `transparency`
+  - `export-controls`
+  - `data-governance`
 - additional descriptive hyphenated keywords are allowed when needed.
 - aliases in `keywords.json` must map to canonical keyword IDs.
 - if no exact keyword exists:
   1. map to closest existing id
   2. append proposal to `apps/<app-id>/data/keyword_proposals.jsonl`
+- **Do NOT use topic IDs (`ai-safety`, `ai-governance`, `agentic-ai`, `ai-policy`, `physical-ai`) as keywords.**
 
 Topic validation rules:
 - `primary_topic` and every entry in `topics` MUST be one of the 5 exact topic IDs above.
