@@ -50,6 +50,9 @@ jobs:
       - name: Install validator dependency
         run: pip install pyyaml
 
+      - name: Enforce Supabase grant policy in SQL files
+        run: python scripts/check_supabase_grant_policy.py
+
       - name: Compose site (core + app)
         run: |
           python scripts/compose_site.py \

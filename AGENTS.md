@@ -172,3 +172,43 @@ Failure triage:
 - Breaking favorites ownership isolation.
 - Hard-coding secrets into repo files.
 - Removing legacy slug rewrite compatibility.
+
+## 9. Supabase Grant Policy (Mandatory)
+
+Background:
+- Supabase Data API/GraphQL exposure should be treated as **explicit grant only**.
+- Do not rely on `public` schema default privileges for safety.
+- In this project, SQL owner-level `ALTER DEFAULT PRIVILEGES` may be unavailable in SQL Editor; therefore migrations must be self-contained and defensive.
+
+Rules for every new `public.*` table migration:
+1. Create table.
+2. Immediately `revoke all on table ... from anon, authenticated, service_role`.
+3. Re-grant least privileges explicitly:
+   - `anon`: closed by default (no grants unless explicitly required).
+   - `authenticated`: only the minimum needed by product behavior.
+   - `service_role`: backend operational privileges as needed.
+4. If table uses a sequence (`serial`/`bigserial`), apply the same explicit revoke/grant on that sequence.
+5. Enable RLS: `alter table ... enable row level security`.
+6. Create policies for all intended operations (select/insert/update/delete).
+7. Keep steps 1-6 in the **same migration file**. Do not split across follow-up migrations.
+
+Current runtime least-privilege baseline (must not be broadened without justification):
+- `public.articles`: `authenticated` = `SELECT`
+- `public.app_users`: `authenticated` = `SELECT, INSERT, UPDATE`
+- `public.login_events`: `authenticated` = `INSERT` (+ sequence `USAGE`)
+- `public.user_roles`: `authenticated` = `SELECT, INSERT, DELETE`
+- `public.access_allowlist`: `authenticated` = `SELECT, INSERT, DELETE`
+- `public.access_requests`: `authenticated` = `SELECT, INSERT, UPDATE`
+- `public.favorites`: `authenticated` = `SELECT, INSERT, DELETE`
+- `public.article_deletion_logs`: `authenticated` = `SELECT` (+ sequence `USAGE`)
+
+Required verification after any schema permission change:
+1. Confirm RLS remains enabled on runtime tables.
+2. Confirm `anon` has no table/sequence privileges unless explicitly intended.
+3. Confirm each table's `authenticated` privileges match least-privilege intent.
+4. Confirm app critical flows still pass:
+   - authenticated article read
+   - profile upsert/update
+   - favorites add/remove
+   - access request submit/review
+   - CI/service-role article sync
