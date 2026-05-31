@@ -16,6 +16,7 @@ node_modules/
 # Hugo
 public/
 resources/
+.hugo_build.lock
 .vercel
 .build/
 

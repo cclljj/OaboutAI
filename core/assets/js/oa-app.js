@@ -141,7 +141,9 @@
     digestNewestFirst: "Sorted by date, newest first",
     noDigests: "No digests available yet.",
     backToDigest: "← Back to Digest",
-    digestLoading: "Loading digest..."
+    digestLoading: "Loading digest...",
+    oauthBrowserUnsupported:
+      "This in-app browser is blocked by Google sign-in policy. Please open this site in Safari or Chrome, then sign in again."
   };
 
   const SORT_BY_KEY = "sort_by";
@@ -530,6 +532,22 @@
     const month = String(parsed.getMonth() + 1).padStart(2, "0");
     const day = String(parsed.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  }
+
+  function isLikelyUnsupportedOAuthBrowser() {
+    const ua = String(window.navigator?.userAgent || "").toLowerCase();
+    if (!ua) return false;
+    const blockedMarkers = [
+      " line/",
+      " fban/",
+      " fbav/",
+      " instagram",
+      " micromessenger",
+      " webview",
+      " gsa/",
+      "; wv)"
+    ];
+    return blockedMarkers.some((marker) => ua.includes(marker.trim()));
   }
 
   function buildRecentDailyCounts(values, days = 30) {
@@ -2431,6 +2449,12 @@
     }
 
     async function signIn() {
+      if (isLikelyUnsupportedOAuthBrowser()) {
+        const isZh = normalizeLang(document.documentElement.lang) === "zh-tw";
+        const fallbackZh = "目前這個 App 內建瀏覽器被 Google 登入政策封鎖。請改用 Safari 或 Chrome 開啟本站，再重新登入。";
+        window.alert(isZh ? fallbackZh : labels.oauthBrowserUnsupported);
+        return;
+      }
       await client.auth.signInWithOAuth({
         provider: "google",
         options: {
