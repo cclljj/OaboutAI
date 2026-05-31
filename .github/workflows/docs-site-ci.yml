@@ -8,6 +8,7 @@ on:
       - "api/**"
       - "scripts/**"
       - "docs/**"
+      - "openspec/**"
       - "README.md"
       - "INSTALL.md"
       - "AGENTS.md"
@@ -20,6 +21,7 @@ on:
       - "api/**"
       - "scripts/**"
       - "docs/**"
+      - "openspec/**"
       - "README.md"
       - "INSTALL.md"
       - "AGENTS.md"
@@ -52,6 +54,9 @@ jobs:
 
       - name: Enforce Supabase grant policy in SQL files
         run: python scripts/check_supabase_grant_policy.py
+
+      - name: Enforce OpenSpec structure
+        run: python scripts/check_openspec_specs.py
 
       - name: Compose site (core + app)
         run: |

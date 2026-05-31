@@ -21,6 +21,7 @@ Current production delivery model:
 2. Preserve strict auth gate behavior for list/single pages.
 3. Keep legacy `/items/<slug>` links working via rewrite to `/item/?slug=<slug>`.
 4. Do not reintroduce bulk tracked article markdown into public GitHub unless explicitly requested.
+5. Keep OpenSpec files in `openspec/` synchronized with behavior changes.
 
 ## 3. Canonical Paths (Current)
 
@@ -35,6 +36,9 @@ Inside `apps/<app-id>/`:
 
 Project-level:
 - `docs/supabase_schema.sql`
+- `openspec/project.md`
+- `openspec/specs/**/spec.md`
+- `openspec/specs/**/design.md`
 - `core/assets/js/oa-app.js`
 - `core/layouts/**` (shell templates)
 

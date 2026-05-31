@@ -33,6 +33,7 @@ Production: [https://oaboutai.vercel.app/](https://oaboutai.vercel.app/)
 - `apps/oaboutai/`: app 組態與內容殼層
 - `scripts/`: monorepo 入口腳本（compose / validate / build）
 - `docs/`: schema、操作手冊、系統測試清單
+- `openspec/`: OpenSpec behavioral specifications for recreating and evolving the system
 - `.github/workflows/docs-site-ci.yml`: CI/CD 主流程
 
 ## Current Top-level Topics
@@ -147,6 +148,7 @@ Runtime/build env (Vercel or CI):
 - Supabase schema: [docs/supabase_schema.sql](docs/supabase_schema.sql)
 - Supabase ops: [docs/supabase_operations.md](docs/supabase_operations.md)
 - Regression checklist: [docs/system_test_checklist.md](docs/system_test_checklist.md)
+- OpenSpec specs: [openspec/project.md](openspec/project.md)
 - Agent contract: [AGENTS.md](AGENTS.md)
 
 ## Data-side setup (AI-agent friendly)

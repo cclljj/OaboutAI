@@ -1,0 +1,5 @@
+project: oaboutai
+profile: core
+specs_dir: specs
+changes_dir: changes
+archive_dir: changes/archive
