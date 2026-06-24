@@ -109,14 +109,16 @@ The system SHALL expose `/admin/` only to admins and support access, user, and c
 
 - **GIVEN** an admin enters an email address
 - **WHEN** the admin adds it to the allowlist
-- **THEN** `public.access_allowlist` is upserted with the email and admin id
+- **THEN** `public.access_allowlist` is inserted with the email and admin id
+- **AND** an existing matching email is treated as already complete
 - **AND** removing an allowlist entry deletes that row
 
 #### Scenario: Admin manages roles
 
 - **GIVEN** an admin promotes or removes a known user
 - **WHEN** the action is confirmed by RLS
-- **THEN** `public.user_roles` is upserted or deleted for role `admin`
+- **THEN** `public.user_roles` is inserted or deleted for role `admin`
+- **AND** an existing matching admin role is treated as already complete
 
 #### Scenario: Admin removes known user
 
@@ -159,4 +161,3 @@ RLS SHALL enforce owner-only user operations and admin-only administrative mutat
 
 - **WHEN** roles, allowlist, access review, app profile delete, or article delete operations occur
 - **THEN** policies require admin role or bootstrap admin status
-

@@ -2,6 +2,7 @@
 
 const DEFAULT_SUBJECT = "[OaboutAI] Access request pending review / 新的存取申請待審核";
 const { EMAIL_RE, escapeHtml, json, normalizeEmail, safeText, sendEmail } = require("./_mailer");
+const { authenticateRequest, fetchAccessRequestById, jsonError } = require("./_supabase_auth");
 
 function clampText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -22,11 +23,24 @@ function sanitizeAdminUrl(value, fallback) {
   return safeFallback;
 }
 
+function resolveAdminUrl() {
+  const fallback = "https://oaboutai.vercel.app/admin/";
+  const base = sanitizeAdminUrl(process.env.HUGO_SUPABASE_REDIRECT_URL || "", "https://oaboutai.vercel.app/");
+  try {
+    return new URL("/admin/", base).href;
+  } catch (_error) {
+    return fallback;
+  }
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return json(res, 405, { ok: false, error: "method_not_allowed" });
   }
+
+  const auth = await authenticateRequest(req, res);
+  if (!auth) return;
 
   const adminEmail = normalizeEmail(process.env.OABOUTAI_ADMIN_NOTIFY_EMAIL || "cclljj@gmail.com");
   if (!adminEmail || !EMAIL_RE.test(adminEmail)) {
@@ -34,13 +48,34 @@ module.exports = async (req, res) => {
   }
 
   const body = typeof req.body === "object" && req.body ? req.body : {};
-  const requesterEmail = normalizeEmail(body.email || "");
-  const reason = clampText(body.reason, 4000);
-  const requestId = safeText(body.requestId, "n/a");
-  const requesterUserId = safeText(body.requesterUserId, "n/a");
-  const submittedAt = safeText(body.submittedAt, new Date().toISOString());
-  const adminUrl = sanitizeAdminUrl(body.adminUrl, "https://oaboutai.vercel.app/admin/");
+  const requestId = safeText(body.requestId, "");
   const language = safeText(body.language, "en");
+  const adminUrl = resolveAdminUrl();
+
+  if (!requestId) {
+    return jsonError(res, 400, "invalid_payload", "requestId is required");
+  }
+
+  const lookup = await fetchAccessRequestById(auth.envConfig, auth.accessToken, requestId);
+  if (!lookup.ok) {
+    return jsonError(res, 502, lookup.error || "access_request_lookup_failed", lookup.detail || "");
+  }
+  if (!lookup.row) {
+    return jsonError(res, 404, "request_not_found_or_forbidden");
+  }
+
+  const requesterUserId = safeText(lookup.row.requester_user_id, "");
+  const requesterEmail = normalizeEmail(lookup.row.email || "");
+  const reason = clampText(lookup.row.reason, 4000);
+  const submittedAt = safeText(lookup.row.created_at, new Date().toISOString());
+  const status = safeText(lookup.row.status, "");
+
+  if (!requesterUserId || requesterUserId !== safeText(auth.user.id, "")) {
+    return jsonError(res, 403, "forbidden");
+  }
+  if (status !== "pending") {
+    return jsonError(res, 409, "invalid_request_state", "request must be pending");
+  }
 
   if (!requesterEmail || !EMAIL_RE.test(requesterEmail) || !reason) {
     return json(res, 400, { ok: false, error: "invalid_payload" });

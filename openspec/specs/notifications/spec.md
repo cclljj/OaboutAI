@@ -35,16 +35,23 @@ The system SHALL attempt notification delivery through SMTP first, then Resend w
 
 The system SHALL notify the admin email when a user submits an access request.
 
-#### Scenario: Valid request payload
+#### Scenario: Authenticated request payload
 
-- **WHEN** `/api/access-request-notify` receives POST with valid requester email, reason, request id, user id, language, submitted time, and admin URL
+- **WHEN** `/api/access-request-notify` receives POST with a valid bearer token and `requestId`
 - **THEN** it sends a bilingual email to `OABOUTAI_ADMIN_NOTIFY_EMAIL`
+- **AND** requester email and reason are loaded server-side from `public.access_requests`
 - **AND** returns JSON success if delivery succeeds
 
 #### Scenario: Invalid request payload
 
-- **WHEN** requester email is invalid or reason is empty
-- **THEN** the endpoint returns `400` with `invalid_payload`
+- **WHEN** `requestId` is missing or the request row is not visible to the caller
+- **THEN** the endpoint returns a `4xx` error (`invalid_payload` or not-found/forbidden variant)
+
+#### Scenario: Unauthorized caller
+
+- **WHEN** bearer token is missing or invalid
+- **THEN** the endpoint returns `401`
+- **AND** no email delivery is attempted
 
 #### Scenario: Wrong method
 
@@ -55,10 +62,18 @@ The system SHALL notify the admin email when a user submits an access request.
 
 The system SHALL notify the requester when an admin approves access.
 
-#### Scenario: Valid approval payload
+#### Scenario: Valid approval request
 
-- **WHEN** `/api/access-approved-notify` receives POST with a valid requester email
+- **WHEN** `/api/access-approved-notify` receives POST with a valid bearer token and `requestId`
+- **AND** the caller has admin privileges
+- **AND** the request status is `approved`
 - **THEN** it sends a bilingual approval email with login URL and approval timestamp
+
+#### Scenario: Non-admin caller
+
+- **WHEN** a non-admin caller invokes `/api/access-approved-notify`
+- **THEN** the endpoint returns `403`
+- **AND** no requester email is sent
 
 #### Scenario: Resend test-mode restriction
 
@@ -82,4 +97,3 @@ Notification endpoints SHALL normalize emails and escape HTML content before gen
 - **WHEN** `OABOUTAI_MAIL_FROM` is configured
 - **THEN** it is used as the sender
 - **AND** otherwise the sender falls back to SMTP user or Resend sender defaults
-

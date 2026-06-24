@@ -2468,12 +2468,22 @@
       await client.auth.signOut();
     }
 
+    async function getAccessToken() {
+      const { data } = await client.auth.getSession();
+      return String(data?.session?.access_token || "").trim();
+    }
+
     async function notifyAdminAccessRequest(payload) {
       try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          return { ok: false, detail: "missing_access_token" };
+        }
         const response = await fetch("/api/access-request-notify", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`
           },
           body: JSON.stringify(payload),
           keepalive: true
@@ -2491,10 +2501,15 @@
 
     async function notifyRequesterAccessApproved(payload) {
       try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          return { ok: false, detail: "missing_access_token" };
+        }
         const response = await fetch("/api/access-approved-notify", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`
           },
           body: JSON.stringify(payload),
           keepalive: true
@@ -2541,12 +2556,7 @@
       }
       await notifyAdminAccessRequest({
         requestId: data?.id || "",
-        requesterUserId: user.id,
-        email: profile.email,
-        reason,
-        language: normalizeLang(document.documentElement.lang || "en"),
-        submittedAt: data?.created_at || new Date().toISOString(),
-        adminUrl: `${window.location.origin}${languagePath("admin/")}`
+        language: normalizeLang(document.documentElement.lang || "en")
       });
       await renderViews();
     }
@@ -2569,31 +2579,16 @@
         return;
       }
       if (approved) {
-        let requesterEmail = normalizeEmail(data?.email || "");
-        if (!requesterEmail && data?.requester_user_id) {
-          const lookup = await client
-            .from("app_users")
-            .select("email")
-            .eq("id", data.requester_user_id)
-            .maybeSingle();
-          if (!lookup.error) {
-            requesterEmail = normalizeEmail(lookup.data?.email || "");
-          }
+        const notifyResult = await notifyRequesterAccessApproved({
+          requestId: data?.id || ""
+        });
+        if (notifyResult?.ok && notifyResult?.warning) {
+          const info = explainNotificationFailure(notifyResult.warning, labels);
+          if (info) window.alert(info);
         }
-        if (requesterEmail) {
-          const notifyResult = await notifyRequesterAccessApproved({
-            email: requesterEmail,
-            reviewedAt: data?.reviewed_at || reviewedAt,
-            loginUrl: `${window.location.origin}/`
-          });
-          if (notifyResult?.ok && notifyResult?.warning) {
-            const info = explainNotificationFailure(notifyResult.warning, labels);
-            if (info) window.alert(info);
-          }
-          if (!notifyResult?.ok) {
-            const detail = explainNotificationFailure(notifyResult?.detail, labels);
-            window.alert(detail ? `${labels.adminApprovalSavedNotifyFailed}\n${detail}` : labels.adminApprovalSavedNotifyFailed);
-          }
+        if (!notifyResult?.ok) {
+          const detail = explainNotificationFailure(notifyResult?.detail, labels);
+          window.alert(detail ? `${labels.adminApprovalSavedNotifyFailed}\n${detail}` : labels.adminApprovalSavedNotifyFailed);
         }
       }
       await renderViews();
@@ -2606,11 +2601,11 @@
         setFeedback(feedback, labels.adminActionError, true);
         return;
       }
-      const { error } = await client.from("access_allowlist").upsert({
+      const { error } = await client.from("access_allowlist").insert({
         email,
         created_by: user.id
-      }, { onConflict: "email" });
-      if (error) {
+      });
+      if (error && error.code !== "23505") {
         setFeedback(feedback, error.message || labels.adminActionError, true);
         return;
       }
@@ -2625,12 +2620,12 @@
     }
 
     async function promoteAdmin(userId, currentUser) {
-      const { error } = await client.from("user_roles").upsert({
+      const { error } = await client.from("user_roles").insert({
         user_id: userId,
         role: "admin",
         created_by: currentUser.id
-      }, { onConflict: "user_id,role" });
-      if (!error) {
+      });
+      if (!error || error.code === "23505") {
         await renderViews();
       }
     }

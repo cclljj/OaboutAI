@@ -169,7 +169,7 @@ If these are missing, UI will show:
 2. Front-end upserts a row into `public.app_users`
 3. If the email is not allowlisted and the user is not an admin, the UI shows a request form
 4. Submitting the form inserts a `pending` row into `public.access_requests`
-5. Frontend posts notification payload to `/api/access-request-notify` (non-blocking)
+5. Frontend posts notification payload (`requestId`) to `/api/access-request-notify` with `Authorization: Bearer <Supabase access token>` (non-blocking)
 6. Vercel function sends admin email via SMTP first, then Resend fallback if configured
 7. Admin reviews it in `/admin/`
 8. If approved, the next refresh/session check grants access

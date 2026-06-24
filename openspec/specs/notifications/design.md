@@ -32,22 +32,27 @@ Shared:
 
 Both endpoints return JSON through the shared `json()` helper and only accept POST.
 
-`access-request-notify` validates:
+Both endpoints require:
 
-- requester email
-- non-empty reason
-- optional request/user metadata
-- sanitized admin URL
+- `Authorization: Bearer <supabase access token>`
+- `requestId` in JSON body
 
-`access-approved-notify` validates:
+`access-request-notify` validates and enforces:
 
-- requester email
-- optional reviewed timestamp
-- sanitized login URL
+- caller has a valid Supabase session
+- caller is the same `requester_user_id` as the target `public.access_requests` row
+- request status is `pending`
+- requester email/reason are loaded from DB instead of trusting payload fields
+
+`access-approved-notify` validates and enforces:
+
+- caller has a valid Supabase session
+- caller is admin (explicit `user_roles.admin` or bootstrap admin email)
+- request status is `approved`
+- requester email/reviewed timestamp are loaded from DB instead of trusting payload fields
 
 ## Frontend Integration
 
 Access request notification is non-blocking from the user's perspective. The request row is saved first, then email notification is attempted.
 
 Approval notification happens after the admin update succeeds. If notification fails, the admin sees an alert, but the database approval remains saved.
-
