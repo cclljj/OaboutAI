@@ -13,6 +13,7 @@ SUPPORTED_LANGS = ("en", "zh-tw")
 
 FRONT_MATTER_PATTERN = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
 TITLE_SINGLE_QUOTED_RE = re.compile(r"^title:\s*'(.+)'\s*$", re.MULTILINE)
+SAFE_SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
 
 def parse_simple_front_matter(block: str) -> dict[str, str]:
@@ -46,6 +47,8 @@ def parse_slug_title(path: Path) -> tuple[str, str]:
         raise ValueError(f"{path}: missing title")
     if not slug:
         raise ValueError(f"{path}: missing slug")
+    if not SAFE_SLUG_RE.fullmatch(slug):
+        raise ValueError(f"{path}: invalid slug `{slug}`; use lowercase letters, numbers, and hyphens only")
 
     return slug, title
 
@@ -98,6 +101,8 @@ def sync_lang(lang: str) -> tuple[int, int]:
         slug, title = parse_slug_title(source_file)
         keep_slugs.add(slug)
         out_dir = target_lang_root / slug
+        if not out_dir.resolve().is_relative_to(target_lang_root.resolve()):
+            raise ValueError(f"{source_file}: unsafe slug path `{slug}`")
         out_dir.mkdir(parents=True, exist_ok=True)
         out_file = out_dir / "index.md"
         content = build_share_page(title=title, slug=slug)

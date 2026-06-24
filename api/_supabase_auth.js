@@ -44,7 +44,7 @@ async function supabaseAuthUser(envConfig, accessToken) {
 
 async function fetchAccessRequestById(envConfig, accessToken, requestId) {
   const query = new URLSearchParams();
-  query.set("select", "id,requester_user_id,email,reason,status,reviewed_at,created_at");
+  query.set("select", "id,requester_user_id,email,reason,status,reviewed_at,admin_notified_at,created_at");
   query.set("id", `eq.${requestId}`);
   query.set("limit", "1");
   const response = await fetch(`${envConfig.supabaseUrl}/rest/v1/access_requests?${query.toString()}`, {
@@ -57,6 +57,25 @@ async function fetchAccessRequestById(envConfig, accessToken, requestId) {
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
     return { ok: false, error: "access_request_lookup_failed", detail };
+  }
+  const rows = await response.json().catch(() => []);
+  const row = Array.isArray(rows) && rows.length ? rows[0] : null;
+  return { ok: true, row };
+}
+
+async function claimAccessRequestAdminNotification(envConfig, accessToken, requestId) {
+  const response = await fetch(`${envConfig.supabaseUrl}/rest/v1/rpc/claim_access_request_admin_notification`, {
+    method: "POST",
+    headers: {
+      apikey: envConfig.anonKey,
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ target_request_id: requestId })
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    return { ok: false, error: "access_request_notification_claim_failed", detail };
   }
   const rows = await response.json().catch(() => []);
   const row = Array.isArray(rows) && rows.length ? rows[0] : null;
@@ -112,6 +131,7 @@ async function authenticateRequest(req, res) {
 
 module.exports = {
   authenticateRequest,
+  claimAccessRequestAdminNotification,
   fetchAccessRequestById,
   hasAdminRole,
   jsonError

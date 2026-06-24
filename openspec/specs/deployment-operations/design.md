@@ -36,7 +36,7 @@
 `deploy-vercel`:
 
 - requires `validate-and-build`
-- runs on `push main` or `workflow_dispatch`
+- runs on `push main` or `workflow_dispatch` targeting `refs/heads/main`
 - checks required tokens and Supabase secrets
 - cleans and validates private data token
 - checks private data repo access
@@ -66,3 +66,11 @@ The script validates shell markers rather than authenticated protected content.
 
 When adding documentation that should trigger CI, include its path in workflow `push.paths` and `pull_request.paths`. OpenSpec changes should be included so behavioral documentation edits receive the same validation path as code/doc changes.
 
+## Supabase Grant Guard
+
+`scripts/check_supabase_grant_policy.py` enforces the project baseline for runtime `public.*` tables:
+
+- no table grants to `anon`
+- `authenticated` grants must match the least-privilege table baseline
+- `service_role` grants must be limited to `select`, `insert`, `update`, and `delete`
+- newly created `public.*` tables must include same-file revoke, explicit grants, RLS enablement, and policy creation

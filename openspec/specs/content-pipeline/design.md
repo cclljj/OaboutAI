@@ -75,7 +75,12 @@ The sync script writes through Supabase PostgREST:
 - Headers include `apikey`, `Authorization: Bearer <service-role-key>`, `Content-Type: application/json`, and merge preference.
 - Delete-missing uses filtered DELETE requests grouped by language and slug batches.
 
+## Private Data Safety
+
+Private data archive extraction rejects symlinks, hardlinks, device files, and other special files before copying language folders into `data/obsidian`.
+
+Share-entry generation accepts only single-segment lowercase slugs made from letters, numbers, and hyphens. The generated output path must resolve under `content/<lang>/entry`.
+
 ## Legacy Scripts
 
 `compile_obsidian_articles.py` and `ingest_item.py` remain for historical workflows. Production runtime must continue using Supabase `public.articles`, not public static article bundles.
-

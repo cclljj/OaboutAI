@@ -1,8 +1,9 @@
 "use strict";
 
 const DEFAULT_SUBJECT = "[OaboutAI] Access request pending review / 新的存取申請待審核";
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const { EMAIL_RE, escapeHtml, json, normalizeEmail, safeText, sendEmail } = require("./_mailer");
-const { authenticateRequest, fetchAccessRequestById, jsonError } = require("./_supabase_auth");
+const { authenticateRequest, claimAccessRequestAdminNotification, fetchAccessRequestById, jsonError } = require("./_supabase_auth");
 
 function clampText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
@@ -55,20 +56,36 @@ module.exports = async (req, res) => {
   if (!requestId) {
     return jsonError(res, 400, "invalid_payload", "requestId is required");
   }
-
-  const lookup = await fetchAccessRequestById(auth.envConfig, auth.accessToken, requestId);
-  if (!lookup.ok) {
-    return jsonError(res, 502, lookup.error || "access_request_lookup_failed", lookup.detail || "");
-  }
-  if (!lookup.row) {
-    return jsonError(res, 404, "request_not_found_or_forbidden");
+  if (!UUID_RE.test(requestId)) {
+    return jsonError(res, 400, "invalid_payload", "requestId must be a UUID");
   }
 
-  const requesterUserId = safeText(lookup.row.requester_user_id, "");
-  const requesterEmail = normalizeEmail(lookup.row.email || "");
-  const reason = clampText(lookup.row.reason, 4000);
-  const submittedAt = safeText(lookup.row.created_at, new Date().toISOString());
-  const status = safeText(lookup.row.status, "");
+  const claim = await claimAccessRequestAdminNotification(auth.envConfig, auth.accessToken, requestId);
+  if (!claim.ok) {
+    return jsonError(res, 502, claim.error || "access_request_notification_claim_failed", claim.detail || "");
+  }
+  if (!claim.row) {
+    const lookup = await fetchAccessRequestById(auth.envConfig, auth.accessToken, requestId);
+    if (!lookup.ok) {
+      return jsonError(res, 502, lookup.error || "access_request_lookup_failed", lookup.detail || "");
+    }
+    if (!lookup.row) {
+      return jsonError(res, 404, "request_not_found_or_forbidden");
+    }
+    if (safeText(lookup.row.admin_notified_at, "")) {
+      return json(res, 202, { ok: true, skipped: true, reason: "already_notified" });
+    }
+    if (safeText(lookup.row.status, "") !== "pending") {
+      return jsonError(res, 409, "invalid_request_state", "request must be pending");
+    }
+    return jsonError(res, 403, "forbidden");
+  }
+
+  const requesterUserId = safeText(claim.row.requester_user_id, "");
+  const requesterEmail = normalizeEmail(claim.row.email || "");
+  const reason = clampText(claim.row.reason, 4000);
+  const submittedAt = safeText(claim.row.created_at, new Date().toISOString());
+  const status = safeText(claim.row.status, "");
 
   if (!requesterUserId || requesterUserId !== safeText(auth.user.id, "")) {
     return jsonError(res, 403, "forbidden");

@@ -42,7 +42,10 @@ Both endpoints require:
 - caller has a valid Supabase session
 - caller is the same `requester_user_id` as the target `public.access_requests` row
 - request status is `pending`
+- request has not already been marked with `admin_notified_at`
 - requester email/reason are loaded from DB instead of trusting payload fields
+
+The endpoint calls `public.claim_access_request_admin_notification(request_id)` before delivery. The function atomically sets `admin_notified_at` only for the authenticated request owner, pending status, and previously unnotified rows. Duplicate calls return `already_notified` without sending email.
 
 `access-approved-notify` validates and enforces:
 

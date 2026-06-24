@@ -9,15 +9,24 @@ alter default privileges for role postgres in schema public
 alter default privileges for role postgres in schema public
   revoke usage, select on sequences from anon, authenticated, service_role;
 
--- 1) Existing tables: explicit grants (least privilege for authenticated + full service_role)
+-- 1) Existing tables: reset then re-grant explicit least privilege
+
+revoke all on table public.articles from anon, authenticated, service_role;
+revoke all on table public.app_users from anon, authenticated, service_role;
+revoke all on table public.login_events from anon, authenticated, service_role;
+revoke all on table public.user_roles from anon, authenticated, service_role;
+revoke all on table public.access_allowlist from anon, authenticated, service_role;
+revoke all on table public.access_requests from anon, authenticated, service_role;
+revoke all on table public.favorites from anon, authenticated, service_role;
+revoke all on table public.article_deletion_logs from anon, authenticated, service_role;
 
 grant select on table public.articles to authenticated;
 grant select, insert, update, delete on table public.articles to service_role;
 
-grant select, insert, update, delete on table public.app_users to authenticated;
+grant select, insert, update on table public.app_users to authenticated;
 grant select, insert, update, delete on table public.app_users to service_role;
 
-grant select, insert on table public.login_events to authenticated;
+grant insert on table public.login_events to authenticated;
 grant select, insert, update, delete on table public.login_events to service_role;
 
 grant select, insert, delete on table public.user_roles to authenticated;
@@ -37,21 +46,11 @@ grant select, insert, update, delete on table public.article_deletion_logs to se
 
 -- 2) Sequences for bigserial columns
 
-grant usage, select on sequence public.login_events_id_seq to authenticated;
-grant usage, select on sequence public.article_deletion_logs_id_seq to authenticated;
+revoke all on sequence public.login_events_id_seq from anon, authenticated, service_role;
+revoke all on sequence public.article_deletion_logs_id_seq from anon, authenticated, service_role;
+
+grant usage on sequence public.login_events_id_seq to authenticated;
+grant usage on sequence public.article_deletion_logs_id_seq to authenticated;
 
 grant usage, select on sequence public.login_events_id_seq to service_role;
 grant usage, select on sequence public.article_deletion_logs_id_seq to service_role;
-
--- 3) Keep anon fully closed for runtime tables
-revoke all on table public.articles from anon;
-revoke all on table public.app_users from anon;
-revoke all on table public.login_events from anon;
-revoke all on table public.user_roles from anon;
-revoke all on table public.access_allowlist from anon;
-revoke all on table public.access_requests from anon;
-revoke all on table public.favorites from anon;
-revoke all on table public.article_deletion_logs from anon;
-
-revoke all on sequence public.login_events_id_seq from anon;
-revoke all on sequence public.article_deletion_logs_id_seq from anon;

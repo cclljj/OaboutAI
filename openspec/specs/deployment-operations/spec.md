@@ -20,6 +20,8 @@ The CI validation job SHALL validate code, content metadata, SQL grant policy, a
 - **WHEN** the validation job runs
 - **THEN** it executes `scripts/check_supabase_grant_policy.py`
 - **AND** fails if a SQL file creates a `public.*` table without same-file grant/RLS/policy statements
+- **AND** fails if existing runtime table grants drift from the documented least-privilege baseline
+- **AND** fails if any `public.*` table is granted to `anon`
 
 #### Scenario: Shell-only build validation
 
@@ -28,7 +30,7 @@ The CI validation job SHALL validate code, content metadata, SQL grant policy, a
 
 ### Requirement: Production Deploy Job
 
-The deploy job SHALL run only for main branch pushes or manual workflow dispatch.
+The deploy job SHALL run only for main branch pushes or manual workflow dispatch targeting `refs/heads/main`.
 
 #### Scenario: Required secret checks
 
@@ -70,6 +72,7 @@ Content-only changes in `OaboutAI_data` SHALL be able to trigger OaboutAI deploy
 - **GIVEN** the data repository has a workflow with a token allowed to dispatch OaboutAI Actions
 - **WHEN** content changes are pushed
 - **THEN** OaboutAI receives `workflow_dispatch`
+- **AND** the dispatch targets the OaboutAI `main` ref
 - **AND** the deploy job runs even without a code push
 
 ### Requirement: Operational Runbooks
@@ -97,4 +100,3 @@ The site SHALL optionally enable Vercel Analytics and Speed Insights only in pro
 - **GIVEN** the relevant flag is `0`, `false`, `off`, or `no`
 - **WHEN** the head partial renders
 - **THEN** the matching Vercel script is omitted
-

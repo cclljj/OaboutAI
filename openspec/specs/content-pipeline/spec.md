@@ -16,6 +16,7 @@ Production article body content SHALL be sourced from the private repository `cc
 - **WHEN** the deploy job composes the site with the private data repo URL, ref, token env, and subdir
 - **THEN** `obsidian/en` and `obsidian/zh-tw` are copied into composed `data/obsidian`
 - **AND** missing language folders fail the compose step
+- **AND** archive symlinks, hardlinks, device files, and other special files are rejected before copy
 
 #### Scenario: Missing private token in CI
 
@@ -108,6 +109,8 @@ The pipeline SHALL generate public share entry shells that reveal titles and slu
 - **WHEN** private Obsidian sources are present
 - **THEN** `sync_share_entries.py` generates `content/<lang>/entry/<slug>/index.md`
 - **AND** generated entry pages contain title, slug, layout `entry`, and no protected body sections
+- **AND** slugs must be lowercase letters, numbers, and hyphens only
+- **AND** the resolved output path must remain inside `content/<lang>/entry`
 
 #### Scenario: Remove stale entry shells
 
@@ -123,4 +126,3 @@ Traditional Chinese entries SHALL have a corresponding English canonical entry.
 - **GIVEN** a `zh-tw` article slug has no matching English slug
 - **WHEN** validation runs
 - **THEN** validation fails
-

@@ -94,9 +94,13 @@ create table if not exists public.access_requests (
   status text not null default 'pending' check (status in ('pending', 'approved', 'denied')),
   reviewer_user_id uuid references auth.users(id) on delete set null,
   reviewed_at timestamptz,
+  admin_notified_at timestamptz,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.access_requests
+  add column if not exists admin_notified_at timestamptz;
 
 create table if not exists public.favorites (
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -207,6 +211,46 @@ begin
   return old;
 end;
 $$;
+
+create or replace function public.claim_access_request_admin_notification(target_request_id uuid)
+returns table (
+  id uuid,
+  requester_user_id uuid,
+  email text,
+  reason text,
+  status text,
+  reviewed_at timestamptz,
+  admin_notified_at timestamptz,
+  created_at timestamptz
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+  update public.access_requests ar
+  set
+    admin_notified_at = now(),
+    updated_at = now()
+  where ar.id = target_request_id
+    and ar.requester_user_id = auth.uid()
+    and ar.status = 'pending'
+    and ar.admin_notified_at is null
+  returning
+    ar.id,
+    ar.requester_user_id,
+    ar.email,
+    ar.reason,
+    ar.status,
+    ar.reviewed_at,
+    ar.admin_notified_at,
+    ar.created_at;
+end;
+$$;
+
+revoke all on function public.claim_access_request_admin_notification(uuid) from public, anon, authenticated, service_role;
+grant execute on function public.claim_access_request_admin_notification(uuid) to authenticated, service_role;
 
 drop trigger if exists trg_articles_set_updated_at on public.articles;
 create trigger trg_articles_set_updated_at

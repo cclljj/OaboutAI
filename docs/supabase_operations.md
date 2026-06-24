@@ -170,13 +170,16 @@ If these are missing, UI will show:
 3. If the email is not allowlisted and the user is not an admin, the UI shows a request form
 4. Submitting the form inserts a `pending` row into `public.access_requests`
 5. Frontend posts notification payload (`requestId`) to `/api/access-request-notify` with `Authorization: Bearer <Supabase access token>` (non-blocking)
-6. Vercel function sends admin email via SMTP first, then Resend fallback if configured
-7. Admin reviews it in `/admin/`
-8. If approved, the next refresh/session check grants access
-9. If denied, the user remains blocked and may submit a new request later
+6. Vercel function atomically marks `admin_notified_at` through `public.claim_access_request_admin_notification(...)`
+7. Vercel function sends admin email via SMTP first, then Resend fallback if configured
+8. Duplicate notification calls for the same request return `already_notified` and do not send another email
+9. Admin reviews it in `/admin/`
+10. If approved, the next refresh/session check grants access
+11. If denied, the user remains blocked and may submit a new request later
 
 Important:
 - Notification delivery is intentionally non-blocking; request submission still succeeds even if email delivery fails.
+- Existing Supabase projects must apply the `admin_notified_at` column and `claim_access_request_admin_notification` function from `docs/supabase_schema.sql` before deploying the idempotent notification endpoint.
 - Protected article data is guarded by approval-aware RLS; login alone is not enough.
 
 ## 7. Common Incidents

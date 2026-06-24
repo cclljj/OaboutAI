@@ -36,6 +36,7 @@ DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 FRONT_MATTER_RE = re.compile(r"^---\n(.*?)\n---\n?", re.DOTALL)
 TITLE_SINGLE_QUOTED_RE = re.compile(r"^title:\s*'(.+)'\s*$", re.MULTILINE)
 TITLE_BLOCK_SCALAR_RE = re.compile(r"^title:\s*[>|]", re.MULTILINE)
+SAFE_SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 
 
 def parse_front_matter(md_path: Path) -> tuple[dict[str, Any], str, str]:
@@ -113,6 +114,13 @@ def validate_record(
         errors.append(f"{rel}: `language` must be one of {sorted(ALLOWED_LANGS)}")
     if language != lang:
         errors.append(f"{rel}: `language` must match path language `{lang}`")
+    front_matter_slug = str(fm.get("slug", "") or "").strip()
+    if front_matter_slug and front_matter_slug != slug:
+        errors.append(f"{rel}: front matter slug `{front_matter_slug}` must match path slug `{slug}`")
+    if front_matter_slug and not SAFE_SLUG_RE.fullmatch(front_matter_slug):
+        errors.append(f"{rel}: front matter slug `{front_matter_slug}` must use lowercase letters, numbers, and hyphens only")
+    if not SAFE_SLUG_RE.fullmatch(slug):
+        errors.append(f"{rel}: path slug `{slug}` must use lowercase letters, numbers, and hyphens only")
 
     validate_date(str(fm.get("source_date", "")), "source_date", errors, rel)
     validate_date(str(fm.get("submission_date", "")), "submission_date", errors, rel)

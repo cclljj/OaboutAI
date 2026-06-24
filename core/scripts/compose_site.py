@@ -56,17 +56,28 @@ def copy_data_languages(source_root: Path, target_root: Path) -> None:
     target_root.mkdir(parents=True, exist_ok=True)
     for lang in ("en", "zh-tw"):
         source_lang = source_root / lang
-        if not source_lang.exists():
+        if not source_lang.exists() or source_lang.is_symlink() or not source_lang.is_dir():
             raise SystemExit(f"ERROR: missing language folder in data repo: {source_lang}")
+        assert_regular_tree(source_lang)
         target_lang = target_root / lang
         if target_lang.exists():
             shutil.rmtree(target_lang)
         shutil.copytree(source_lang, target_lang)
 
 
+def assert_regular_tree(root: Path) -> None:
+    for path in root.rglob("*"):
+        if path.is_symlink():
+            raise SystemExit(f"ERROR: unsafe symlink in private data archive: {path}")
+        if not path.is_file() and not path.is_dir():
+            raise SystemExit(f"ERROR: unsafe special file in private data archive: {path}")
+
+
 def safe_extract_tar(tar: tarfile.TarFile, destination: Path) -> None:
     dest_real = destination.resolve()
     for member in tar.getmembers():
+        if member.issym() or member.islnk() or member.isdev():
+            raise SystemExit("ERROR: unsafe link or special file detected while extracting private data archive.")
         member_path = (destination / member.name).resolve()
         if os.path.commonpath([str(dest_real), str(member_path)]) != str(dest_real):
             raise SystemExit("ERROR: unsafe path detected while extracting private data archive.")

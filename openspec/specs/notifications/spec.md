@@ -40,7 +40,15 @@ The system SHALL notify the admin email when a user submits an access request.
 - **WHEN** `/api/access-request-notify` receives POST with a valid bearer token and `requestId`
 - **THEN** it sends a bilingual email to `OABOUTAI_ADMIN_NOTIFY_EMAIL`
 - **AND** requester email and reason are loaded server-side from `public.access_requests`
+- **AND** the request is atomically marked with `admin_notified_at` before delivery is attempted
 - **AND** returns JSON success if delivery succeeds
+
+#### Scenario: Duplicate request notification
+
+- **GIVEN** an access request already has `admin_notified_at`
+- **WHEN** `/api/access-request-notify` receives the same `requestId`
+- **THEN** no email delivery is attempted
+- **AND** the endpoint returns accepted JSON with reason `already_notified`
 
 #### Scenario: Invalid request payload
 
