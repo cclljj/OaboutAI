@@ -72,4 +72,4 @@ The unsupported-browser check looks for common in-app browser/WebView markers be
 
 ## Admin Dashboard Data
 
-The admin dashboard fetches requests, allowlist, users, roles, deletion logs, articles, and login events. It derives summary metrics, 30-day line charts, source type counts, and keyword counts in the browser.
+The admin dashboard fetches requests, allowlist, users, roles, deletion logs, articles, and up to one year of login events. It derives summary metrics, selectable 7-day/30-day/90-day/1-year line charts, source type counts, keyword counts, and a login user leaderboard in the browser.

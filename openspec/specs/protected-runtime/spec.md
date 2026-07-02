@@ -90,5 +90,5 @@ The browser app SHALL escape untrusted text and sanitize URLs before inserting r
 
 - **WHEN** executive summary, detailed notes, or take-away fields are rendered
 - **THEN** supported Markdown syntax is converted to safe HTML
+- **AND** source line breaks inside paragraph blocks are preserved for readability
 - **AND** unsupported raw HTML is escaped rather than trusted
-

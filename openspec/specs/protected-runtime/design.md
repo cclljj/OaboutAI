@@ -46,6 +46,9 @@ The app uses local helpers:
 
 - `escapeHtml`
 - `sanitizeHref`
+- `formatMarkdownContent`
+
+`formatMarkdownContent` converts supported Markdown-like body syntax into safe HTML, preserves source line breaks inside paragraph blocks with `<br>`, and delegates inline text to escaped Markdown rendering rather than trusting raw HTML.
 - `sanitizeImageSrc`
 - `sanitizeSameOriginRedirect`
 - `formatMarkdownContent`
@@ -56,4 +59,3 @@ Markdown support is intentionally narrow: paragraphs, ordered/unordered lists, i
 ## Leakage Guards
 
 The former `compile_obsidian_articles.py` static JSON path still exists for legacy contexts, but production CI removes `data/obsidian` and `static/obsidian` before Hugo/Vercel build. Any replica must preserve that removal step.
-

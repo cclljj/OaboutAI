@@ -864,6 +864,39 @@
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
 
+.oa-admin-overview-head {
+  gap: 1rem;
+}
+
+.oa-admin-range {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.oa-admin-range-label {
+  color: #5a768b;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.oa-admin-range-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.oa-admin-range-options .oa-btn.is-active {
+  border-color: rgba(15, 118, 110, 0.5);
+  background: rgba(15, 118, 110, 0.12);
+  color: #0e6d66;
+}
+
 .oa-admin-metric-card {
   border: 1px solid #deebf3;
   border-radius: 0.9rem;
@@ -1150,6 +1183,15 @@
   .oa-admin-tabs {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .oa-admin-range,
+  .oa-admin-range-options {
+    justify-content: stretch;
+  }
+
+  .oa-admin-range-options .oa-btn {
+    flex: 1 1 9rem;
   }
 
   .oa-admin-pie-wrap {

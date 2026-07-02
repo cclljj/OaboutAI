@@ -246,18 +246,34 @@
   translation: 使用者總數
 - id: adminTotalAdmins
   translation: 管理員總數
-- id: adminActiveUsers7d
-  translation: 近 7 天活躍使用者
-- id: adminLoginEvents7d
-  translation: 近 7 天登入次數
+- id: adminActiveUsersRange
+  translation: 活躍使用者
+- id: adminLoginEventsRange
+  translation: 登入次數
 - id: adminLoginEventsUnavailable
   translation: 尚未啟用登入事件追蹤（需建立 `login_events` 資料表）。
+- id: adminStatsRange
+  translation: 統計範圍
+- id: adminStatsRange7d
+  translation: 過去 7 天
+- id: adminStatsRange30d
+  translation: 過去 30 天
+- id: adminStatsRange90d
+  translation: 過去 90 天
+- id: adminStatsRange365d
+  translation: 過去一年
 - id: adminArticlesDaily
-  translation: 每日新增文章（近 30 天）
+  translation: 每日新增文章
 - id: adminUsersDaily
-  translation: 每日新增使用者（近 30 天）
+  translation: 每日新增使用者
 - id: adminLoginsDaily
-  translation: 每日登入次數（近 30 天）
+  translation: 每日登入次數
+- id: adminLoginLeaderboard
+  translation: 登入使用者排行榜
+- id: adminLoginUser
+  translation: 使用者
+- id: adminLastLogin
+  translation: 最近登入
 - id: adminArticlesByType
   translation: 依文章類型統計
 - id: adminArticlesByKeyword

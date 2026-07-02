@@ -125,12 +125,20 @@
     adminTotalArticles: "Total articles",
     adminTotalUsers: "Total users",
     adminTotalAdmins: "Total admins",
-    adminActiveUsers7d: "Active users (7 days)",
-    adminLoginEvents7d: "Login events (7 days)",
+    adminActiveUsersRange: "Active users",
+    adminLoginEventsRange: "Login events",
     adminLoginEventsUnavailable: "Login event tracking is not enabled yet (table `login_events`).",
-    adminArticlesDaily: "Daily new articles (30 days)",
-    adminUsersDaily: "Daily new users (30 days)",
-    adminLoginsDaily: "Daily logins (30 days)",
+    adminStatsRange: "Range",
+    adminStatsRange7d: "Past 7 days",
+    adminStatsRange30d: "Past 30 days",
+    adminStatsRange90d: "Past 90 days",
+    adminStatsRange365d: "Past year",
+    adminArticlesDaily: "Daily new articles",
+    adminUsersDaily: "Daily new users",
+    adminLoginsDaily: "Daily logins",
+    adminLoginLeaderboard: "Login user leaderboard",
+    adminLoginUser: "User",
+    adminLastLogin: "Last login",
     adminArticlesByType: "Articles by type",
     adminArticlesByKeyword: "Top keywords",
     adminStatDate: "Date",
@@ -155,6 +163,8 @@
   const DEFAULT_PAGE_SIZE = 20;
   const DEFAULT_PAGE = 1;
   const MONTH_KEY = "month";
+  const DEFAULT_ADMIN_STATS_DAYS = 30;
+  const ADMIN_STATS_RANGE_OPTIONS = [7, 30, 90, 365];
   const VALID_SORT_BY = new Set(["source_date", "submission_date"]);
   const VALID_SORT_ORDER = new Set(["asc", "desc"]);
   const VALID_PAGE_SIZES = new Set([20, 50, 100]);
@@ -177,6 +187,7 @@
     "detailed_notes",
     "takeaway_html"
   ].join(",");
+  let adminStatsDays = DEFAULT_ADMIN_STATS_DAYS;
 
   function normalizeLang(value) {
     const lower = String(value || "en").toLowerCase();
@@ -585,6 +596,62 @@
       .slice(0, limit);
   }
 
+  function getAdminRangeLabel(labels, days) {
+    const normalized = ADMIN_STATS_RANGE_OPTIONS.includes(Number(days)) ? Number(days) : DEFAULT_ADMIN_STATS_DAYS;
+    return labels[`adminStatsRange${normalized}d`] || `${normalized} days`;
+  }
+
+  function buildAdminMetricLabel(labels, key, rangeLabel) {
+    const base = labels[key] || key;
+    return `${base} (${rangeLabel})`;
+  }
+
+  function filterRowsSince(rows, getDate, days) {
+    const cutoff = Date.now() - (Number(days || DEFAULT_ADMIN_STATS_DAYS) * 24 * 60 * 60 * 1000);
+    return (Array.isArray(rows) ? rows : []).filter((row) => parseDate(getDate(row)) >= cutoff);
+  }
+
+  function buildLoginUserLeaderboard(loginEvents, users, days, limit = 10) {
+    const userMap = new Map();
+    for (const user of Array.isArray(users) ? users : []) {
+      if (user?.id) userMap.set(user.id, user);
+    }
+
+    const statsByUser = new Map();
+    for (const row of filterRowsSince(loginEvents, (event) => event.occurred_at, days)) {
+      const userId = String(row.user_id || "").trim();
+      if (!userId) continue;
+      const occurredAt = String(row.occurred_at || "");
+      const current = statsByUser.get(userId) || { userId, count: 0, lastLoginAt: "" };
+      current.count += 1;
+      if (!current.lastLoginAt || parseDate(occurredAt) > parseDate(current.lastLoginAt)) {
+        current.lastLoginAt = occurredAt;
+      }
+      statsByUser.set(userId, current);
+    }
+
+    return Array.from(statsByUser.values())
+      .map((row) => {
+        const user = userMap.get(row.userId) || {};
+        const email = normalizeEmail(user.email || "");
+        const displayName = String(user.display_name || "").trim();
+        return {
+          ...row,
+          email,
+          displayName,
+          avatar: user.avatar_url || "",
+          name: displayName || email || row.userId
+        };
+      })
+      .sort((a, b) => {
+        if (b.count !== a.count) return b.count - a.count;
+        const byLastLogin = parseDate(b.lastLoginAt) - parseDate(a.lastLoginAt);
+        if (byLastLogin !== 0) return byLastLogin;
+        return String(a.name || "").localeCompare(String(b.name || ""));
+      })
+      .slice(0, limit);
+  }
+
   function getUserProfile(user) {
     const metadata = user?.user_metadata || {};
     const email = normalizeEmail(user?.email || metadata.email || "");
@@ -864,9 +931,11 @@
 
     function flushParagraph() {
       if (!paragraphLines.length) return;
-      const text = paragraphLines.join(" ").trim();
-      if (text) {
-        blocks.push(`<p>${renderInlineMarkdown(text)}</p>`);
+      const lines = paragraphLines
+        .map((line) => line.trim())
+        .filter(Boolean);
+      if (lines.length) {
+        blocks.push(`<p>${lines.map((line) => renderInlineMarkdown(line)).join("<br>")}</p>`);
       }
       paragraphLines = [];
     }
@@ -1091,6 +1160,77 @@
     `;
   }
 
+  function renderAdminMetricGrid(labels, rows) {
+    const metrics = Array.isArray(rows) ? rows : [];
+    if (!metrics.length) return "";
+    return `
+      <div class="oa-admin-metric-grid">
+        ${metrics.map((row) => `
+          <div class="oa-admin-metric-card">
+            <div class="oa-admin-metric-label">${escapeHtml(row.name || labels[row.label] || row.label || "-")}</div>
+            <div class="oa-admin-metric-value">${escapeHtml(String(row.value ?? "-"))}</div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function renderAdminRangeSelector(labels, activeDays) {
+    const current = ADMIN_STATS_RANGE_OPTIONS.includes(Number(activeDays)) ? Number(activeDays) : DEFAULT_ADMIN_STATS_DAYS;
+    return `
+      <div class="oa-admin-range" aria-label="${escapeHtml(labels.adminStatsRange)}">
+        <span class="oa-admin-range-label">${escapeHtml(labels.adminStatsRange)}</span>
+        <div class="oa-admin-range-options" role="group" aria-label="${escapeHtml(labels.adminStatsRange)}">
+          ${ADMIN_STATS_RANGE_OPTIONS.map((days) => `
+            <button
+              class="oa-btn oa-btn-secondary ${days === current ? "is-active" : ""}"
+              type="button"
+              data-oa-admin-range="${days}"
+              aria-pressed="${days === current ? "true" : "false"}"
+            >${escapeHtml(getAdminRangeLabel(labels, days))}</button>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderAdminLoginLeaderboard(labels, rows) {
+    const leaders = Array.isArray(rows) ? rows : [];
+    if (!leaders.length) {
+      return `<p>${escapeHtml(labels.adminStatNone)}</p>`;
+    }
+    return `
+      <div class="oa-admin-table-wrap">
+        <table class="oa-admin-table">
+          <thead>
+            <tr>
+              <th>${escapeHtml(labels.adminLoginUser)}</th>
+              <th>${escapeHtml(labels.adminStatCount)}</th>
+              <th>${escapeHtml(labels.adminLastLogin)}</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${leaders.map((row) => `
+              <tr>
+                <td>
+                  <div class="oa-account-row">
+                    ${renderAvatar({ avatar: row.avatar || "", displayName: row.displayName || row.name || "", email: row.email || "" }, "oa-account-avatar-sm")}
+                    <div>
+                      <strong>${escapeHtml(row.displayName || row.email || row.name || "-")}</strong>
+                      <div class="oa-page-subtitle">${escapeHtml(row.email || row.userId || "-")}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>${escapeHtml(String(row.count || 0))}</td>
+                <td>${escapeHtml(formatDateTime(row.lastLoginAt))}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
   function renderAdminLineChart(labels, rows, options = {}) {
     const points = Array.isArray(rows) ? rows : [];
     if (!points.length) {
@@ -1231,28 +1371,30 @@
     `;
   }
 
-  function buildAdminStats(dashboard, explicitAdminIds) {
+  function buildAdminStats(dashboard, explicitAdminIds, rangeDays, labels) {
     const articles = Array.isArray(dashboard.articles) ? dashboard.articles : [];
     const users = Array.isArray(dashboard.users) ? dashboard.users : [];
     const requests = Array.isArray(dashboard.requests) ? dashboard.requests : [];
     const loginEvents = Array.isArray(dashboard.loginEvents) ? dashboard.loginEvents : [];
     const hasLoginEvents = Boolean(dashboard.hasLoginEvents);
-    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    const days = ADMIN_STATS_RANGE_OPTIONS.includes(Number(rangeDays)) ? Number(rangeDays) : DEFAULT_ADMIN_STATS_DAYS;
+    const rangeLabel = getAdminRangeLabel(labels || DEFAULT_LABELS, days);
 
     const explicitAdminCount = new Set([...explicitAdminIds]).size;
     const bootstrapUser = users.find((row) => normalizeEmail(row.email) === BOOTSTRAP_ADMIN_EMAIL) || null;
     const bootstrapAlreadyCounted = bootstrapUser?.id ? explicitAdminIds.has(bootstrapUser.id) : false;
     const totalAdmins = explicitAdminCount + (bootstrapAlreadyCounted ? 0 : 1);
-    const activeUsers7d = users.filter((row) => parseDate(row.last_seen_at) >= sevenDaysAgo).length;
-    const loginEvents7d = loginEvents.filter((row) => parseDate(row.occurred_at) >= sevenDaysAgo).length;
+    const activeUsersInRange = filterRowsSince(users, (row) => row.last_seen_at, days).length;
+    const loginEventsInRange = filterRowsSince(loginEvents, (row) => row.occurred_at, days).length;
     const pendingRequests = requests.filter((row) => row.status === "pending").length;
 
+    const articlesInRange = filterRowsSince(articles, (row) => row.submission_date || row.created_at, days);
     const articleDates = articles.map((row) => row.submission_date || row.created_at).filter(Boolean);
     const userDates = users.map((row) => row.created_at).filter(Boolean);
     const loginDates = loginEvents.map((row) => row.occurred_at).filter(Boolean);
-    const articleTypes = articles.map((row) => row.source_type).filter(Boolean);
+    const articleTypes = articlesInRange.map((row) => row.source_type).filter(Boolean);
     const articleKeywords = [];
-    for (const row of articles) {
+    for (const row of articlesInRange) {
       const keywords = Array.isArray(row.keywords) ? row.keywords : [];
       for (const keyword of keywords) {
         const token = normalizeKeywordToken(keyword);
@@ -1265,14 +1407,17 @@
         { label: "adminTotalArticles", value: articles.length },
         { label: "adminTotalUsers", value: users.length },
         { label: "adminTotalAdmins", value: totalAdmins },
-        { label: "adminActiveUsers7d", value: activeUsers7d },
-        { label: "adminLoginEvents7d", value: hasLoginEvents ? loginEvents7d : "-" },
+        { name: buildAdminMetricLabel(labels || DEFAULT_LABELS, "adminActiveUsersRange", rangeLabel), value: activeUsersInRange },
+        { name: buildAdminMetricLabel(labels || DEFAULT_LABELS, "adminLoginEventsRange", rangeLabel), value: hasLoginEvents ? loginEventsInRange : "-" },
         { label: "adminPendingRequests", value: pendingRequests }
       ],
       hasLoginEvents,
-      dailyArticles: buildRecentDailyCounts(articleDates, 30),
-      dailyUsers: buildRecentDailyCounts(userDates, 30),
-      dailyLogins: hasLoginEvents ? buildRecentDailyCounts(loginDates, 30) : [],
+      rangeDays: days,
+      rangeLabel,
+      dailyArticles: buildRecentDailyCounts(articleDates, days),
+      dailyUsers: buildRecentDailyCounts(userDates, days),
+      dailyLogins: hasLoginEvents ? buildRecentDailyCounts(loginDates, days) : [],
+      loginLeaderboard: hasLoginEvents ? buildLoginUserLeaderboard(loginEvents, users, days, 10) : [],
       byType: buildTopCounts(articleTypes, 20),
       byKeyword: buildTopCounts(articleKeywords, 20)
     };
@@ -1324,7 +1469,7 @@
       })
       .sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
     const deletionLogs = Array.isArray(dashboard.deletionLogs) ? dashboard.deletionLogs : [];
-    const stats = buildAdminStats(dashboard, explicitAdminIds);
+    const stats = buildAdminStats(dashboard, explicitAdminIds, adminStatsDays, labels);
 
     root.innerHTML = `
       <section class="oa-admin-shell" data-oa-admin-tabs>
@@ -1346,6 +1491,17 @@
         </div>
 
         <section class="oa-admin-grid oa-admin-panel is-active" data-oa-admin-panel="overview">
+          <section class="oa-card oa-admin-card oa-admin-overview-head">
+            <div class="oa-admin-card-head">
+              <div>
+                <h2 class="oa-section-title">${escapeHtml(labels.adminSystemUsage)}</h2>
+                <p class="oa-page-subtitle">${escapeHtml(stats.rangeLabel)}</p>
+              </div>
+              ${renderAdminRangeSelector(labels, stats.rangeDays)}
+            </div>
+            ${renderAdminMetricGrid(labels, stats.summary)}
+          </section>
+
           <section class="oa-card oa-admin-card">
             <h2 class="oa-section-title">${escapeHtml(labels.adminArticlesDaily)}</h2>
             ${renderAdminLineChart(labels, stats.dailyArticles.map((row) => ({ name: row.date, count: row.count })), { ariaLabel: labels.adminArticlesDaily })}
@@ -1360,6 +1516,13 @@
             <h2 class="oa-section-title">${escapeHtml(labels.adminLoginsDaily)}</h2>
             ${stats.hasLoginEvents
               ? renderAdminLineChart(labels, stats.dailyLogins.map((row) => ({ name: row.date, count: row.count })), { ariaLabel: labels.adminLoginsDaily })
+              : `<p>${escapeHtml(labels.adminLoginEventsUnavailable)}</p>`}
+          </section>
+
+          <section class="oa-card oa-admin-card">
+            <h2 class="oa-section-title">${escapeHtml(labels.adminLoginLeaderboard)}</h2>
+            ${stats.hasLoginEvents
+              ? renderAdminLoginLeaderboard(labels, stats.loginLeaderboard)
               : `<p>${escapeHtml(labels.adminLoginEventsUnavailable)}</p>`}
           </section>
 
@@ -2432,7 +2595,12 @@
         client.from("user_roles").select("user_id,role,created_at"),
         client.from("article_deletion_logs").select("slug,language,title,deleted_at,deleted_by_account").order("deleted_at", { ascending: false }).limit(200),
         client.from("articles").select("slug,source_type,submission_date,created_at,keywords"),
-        client.from("login_events").select("user_id,occurred_at").order("occurred_at", { ascending: false }).limit(5000)
+        client
+          .from("login_events")
+          .select("user_id,occurred_at")
+          .gte("occurred_at", new Date(Date.now() - (365 * 24 * 60 * 60 * 1000)).toISOString())
+          .order("occurred_at", { ascending: false })
+          .limit(20000)
       ]);
       const hasLoginEvents = !loginEventsResult.error;
 
@@ -2844,6 +3012,14 @@
       document.querySelectorAll("[data-oa-admin-refresh]").forEach((btn) => {
         btn.onclick = async () => {
           if (!access?.isAdmin) return;
+          await renderViews();
+        };
+      });
+      document.querySelectorAll("[data-oa-admin-range]").forEach((btn) => {
+        btn.onclick = async () => {
+          if (!access?.isAdmin) return;
+          const days = Number(btn.dataset.oaAdminRange || DEFAULT_ADMIN_STATS_DAYS);
+          adminStatsDays = ADMIN_STATS_RANGE_OPTIONS.includes(days) ? days : DEFAULT_ADMIN_STATS_DAYS;
           await renderViews();
         };
       });

@@ -246,18 +246,34 @@
   translation: Total users
 - id: adminTotalAdmins
   translation: Total admins
-- id: adminActiveUsers7d
-  translation: Active users (7 days)
-- id: adminLoginEvents7d
-  translation: Login events (7 days)
+- id: adminActiveUsersRange
+  translation: Active users
+- id: adminLoginEventsRange
+  translation: Login events
 - id: adminLoginEventsUnavailable
   translation: Login event tracking is not enabled yet (table `login_events`).
+- id: adminStatsRange
+  translation: Range
+- id: adminStatsRange7d
+  translation: Past 7 days
+- id: adminStatsRange30d
+  translation: Past 30 days
+- id: adminStatsRange90d
+  translation: Past 90 days
+- id: adminStatsRange365d
+  translation: Past year
 - id: adminArticlesDaily
-  translation: Daily new articles (30 days)
+  translation: Daily new articles
 - id: adminUsersDaily
-  translation: Daily new users (30 days)
+  translation: Daily new users
 - id: adminLoginsDaily
-  translation: Daily logins (30 days)
+  translation: Daily logins
+- id: adminLoginLeaderboard
+  translation: Login user leaderboard
+- id: adminLoginUser
+  translation: User
+- id: adminLastLogin
+  translation: Last login
 - id: adminArticlesByType
   translation: Articles by type
 - id: adminArticlesByKeyword

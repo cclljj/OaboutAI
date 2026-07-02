@@ -139,6 +139,8 @@ order by email;
 
 The browser records one best-effort `public.login_events` row when a signed-in session is loaded. Admin dashboard daily login charts require `authenticated` to have `SELECT, INSERT` on `public.login_events`; RLS still limits `SELECT` rows to admins.
 
+The admin overview reads recent login events for up to one year, then lets admins switch the displayed range between 7 days, 30 days, 90 days, and 1 year. Daily login charts and the login user leaderboard use the same selected range.
+
 ```sql
 select count(*) as login_events_7d
 from public.login_events

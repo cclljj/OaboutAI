@@ -134,7 +134,9 @@ The system SHALL expose `/admin/` only to admins and support access, user, and c
 - **GIVEN** login event tracking has been applied to Supabase
 - **WHEN** an admin opens the dashboard overview
 - **THEN** the browser can read recent `public.login_events` rows
-- **AND** daily login and 7-day login metrics are shown
+- **AND** daily login and login event metrics are shown for the selected range
+- **AND** the admin can switch the overview range between 7 days, 30 days, 90 days, and 1 year
+- **AND** a login user leaderboard ranks users by login events within the selected range
 - **AND** non-admin users cannot read login events because RLS requires admin status
 
 ### Requirement: Explicit Supabase Grants
