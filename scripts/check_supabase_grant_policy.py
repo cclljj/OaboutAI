@@ -30,7 +30,7 @@ REVOKE_ALL_TABLE_RE = re.compile(
 AUTHENTICATED_TABLE_BASELINE: dict[str, set[str]] = {
     "articles": {"select"},
     "app_users": {"select", "insert", "update"},
-    "login_events": {"insert"},
+    "login_events": {"select", "insert"},
     "user_roles": {"select", "insert", "delete"},
     "access_allowlist": {"select", "insert", "delete"},
     "access_requests": {"select", "insert", "update"},

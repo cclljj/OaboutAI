@@ -129,6 +129,14 @@ The system SHALL expose `/admin/` only to admins and support access, user, and c
 - **AND** explicit admin role is removed
 - **AND** the app profile is deleted
 
+#### Scenario: Admin views login analytics
+
+- **GIVEN** login event tracking has been applied to Supabase
+- **WHEN** an admin opens the dashboard overview
+- **THEN** the browser can read recent `public.login_events` rows
+- **AND** daily login and 7-day login metrics are shown
+- **AND** non-admin users cannot read login events because RLS requires admin status
+
 ### Requirement: Explicit Supabase Grants
 
 Supabase public runtime tables SHALL use explicit grants plus RLS rather than relying on public schema defaults.

@@ -26,7 +26,7 @@ grant select, insert, update, delete on table public.articles to service_role;
 grant select, insert, update on table public.app_users to authenticated;
 grant select, insert, update, delete on table public.app_users to service_role;
 
-grant insert on table public.login_events to authenticated;
+grant select, insert on table public.login_events to authenticated;
 grant select, insert, update, delete on table public.login_events to service_role;
 
 grant select, insert, delete on table public.user_roles to authenticated;

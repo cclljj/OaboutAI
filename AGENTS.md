@@ -199,7 +199,7 @@ Rules for every new `public.*` table migration:
 Current runtime least-privilege baseline (must not be broadened without justification):
 - `public.articles`: `authenticated` = `SELECT`
 - `public.app_users`: `authenticated` = `SELECT, INSERT, UPDATE`
-- `public.login_events`: `authenticated` = `INSERT` (+ sequence `USAGE`)
+- `public.login_events`: `authenticated` = `SELECT, INSERT` (+ sequence `USAGE`; RLS limits SELECT to admins)
 - `public.user_roles`: `authenticated` = `SELECT, INSERT, DELETE`
 - `public.access_allowlist`: `authenticated` = `SELECT, INSERT, DELETE`
 - `public.access_requests`: `authenticated` = `SELECT, INSERT, UPDATE`

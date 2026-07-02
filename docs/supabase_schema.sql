@@ -283,7 +283,7 @@ revoke all on table public.article_deletion_logs from anon, authenticated, servi
 
 grant select on table public.articles to authenticated;
 grant select, insert, update on table public.app_users to authenticated;
-grant insert on table public.login_events to authenticated;
+grant select, insert on table public.login_events to authenticated;
 grant select, insert, delete on table public.user_roles to authenticated;
 grant select, insert, delete on table public.access_allowlist to authenticated;
 grant select, insert, update on table public.access_requests to authenticated;
@@ -370,7 +370,7 @@ create policy "users can insert own login events"
   on public.login_events
   for insert
   to authenticated
-  with check (auth.uid() = user_id);
+  with check ((select auth.uid()) = user_id);
 
 drop policy if exists "admins can read login events" on public.login_events;
 create policy "admins can read login events"

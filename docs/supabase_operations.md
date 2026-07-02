@@ -40,6 +40,7 @@ After running, verify required tables exist:
 ```sql
 select to_regclass('public.favorites') as favorites_table,
        to_regclass('public.app_users') as app_users_table,
+       to_regclass('public.login_events') as login_events_table,
        to_regclass('public.user_roles') as user_roles_table,
        to_regclass('public.access_allowlist') as access_allowlist_table,
        to_regclass('public.access_requests') as access_requests_table;
@@ -132,6 +133,16 @@ order by au.email;
 select email, created_at
 from public.access_allowlist
 order by email;
+```
+
+### 5.6 Login event tracking
+
+The browser records one best-effort `public.login_events` row when a signed-in session is loaded. Admin dashboard daily login charts require `authenticated` to have `SELECT, INSERT` on `public.login_events`; RLS still limits `SELECT` rows to admins.
+
+```sql
+select count(*) as login_events_7d
+from public.login_events
+where occurred_at >= now() - interval '7 days';
 ```
 
 ## 5. Runtime Env Vars

@@ -38,7 +38,7 @@ Audit helper:
 
 - `public.articles`: `authenticated` = `SELECT`
 - `public.app_users`: `authenticated` = `SELECT, INSERT, UPDATE`
-- `public.login_events`: `authenticated` = `INSERT`, sequence `USAGE`
+- `public.login_events`: `authenticated` = `SELECT, INSERT`, sequence `USAGE` (SELECT is RLS-limited to admins)
 - `public.user_roles`: `authenticated` = `SELECT, INSERT, DELETE`
 - `public.access_allowlist`: `authenticated` = `SELECT, INSERT, DELETE`
 - `public.access_requests`: `authenticated` = `SELECT, INSERT, UPDATE`
@@ -73,4 +73,3 @@ The unsupported-browser check looks for common in-app browser/WebView markers be
 ## Admin Dashboard Data
 
 The admin dashboard fetches requests, allowlist, users, roles, deletion logs, articles, and login events. It derives summary metrics, 30-day line charts, source type counts, and keyword counts in the browser.
-
