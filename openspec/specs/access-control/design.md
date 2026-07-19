@@ -23,16 +23,22 @@ Runtime access tables:
 - `public.favorites`
 - `public.article_deletion_logs`
 
-Access helper functions:
+Private access helper functions (not exposed through the Data API):
 
-- `public.current_auth_email()`
-- `public.is_bootstrap_admin()`
-- `public.has_role(target_role text)`
-- `public.is_approved_user()`
+- `private.current_auth_email()`
+- `private.is_bootstrap_admin()`
+- `private.has_role(target_role text)`
+- `private.is_approved_user()`
 
 Audit helper:
 
-- `public.audit_article_delete()`
+- `private.audit_article_delete()`
+
+Intentional authenticated RPCs:
+
+- `public.claim_access_request_admin_notification(uuid)`
+- `public.get_access_context(text, text)`
+- `public.get_admin_dashboard_stats(integer)`
 
 ## Least Privilege Baseline
 
@@ -72,4 +78,4 @@ The unsupported-browser check looks for common in-app browser/WebView markers be
 
 ## Admin Dashboard Data
 
-The admin dashboard fetches requests, allowlist, users, roles, deletion logs, articles, and up to one year of login events. It derives summary metrics, selectable 7-day/30-day/90-day/1-year line charts, source type counts, keyword counts, and a login user leaderboard in the browser.
+The admin dashboard fetches bounded operational lists for management. Summary metrics, selectable 7-day/30-day/90-day/1-year series, source type counts, keyword counts, and the login leaderboard are aggregated by `public.get_admin_dashboard_stats`; raw article and year-long login-event datasets are not downloaded to the browser.

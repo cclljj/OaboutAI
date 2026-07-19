@@ -532,19 +532,6 @@
     return parsed.toLocaleString();
   }
 
-  function formatDateOnly(value) {
-    if (!value) return "";
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) {
-      const token = String(value).slice(0, 10);
-      return /^\d{4}-\d{2}-\d{2}$/.test(token) ? token : "";
-    }
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, "0");
-    const day = String(parsed.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  }
-
   function isLikelyUnsupportedOAuthBrowser() {
     const ua = String(window.navigator?.userAgent || "").toLowerCase();
     if (!ua) return false;
@@ -561,41 +548,6 @@
     return blockedMarkers.some((marker) => ua.includes(marker.trim()));
   }
 
-  function buildRecentDailyCounts(values, days = 30) {
-    const counts = new Map();
-    const now = new Date();
-    for (let i = 0; i < days; i += 1) {
-      const date = new Date(now);
-      date.setDate(now.getDate() - i);
-      const key = formatDateOnly(date.toISOString());
-      if (key) counts.set(key, 0);
-    }
-    for (const value of values) {
-      const key = formatDateOnly(value);
-      if (!key || !counts.has(key)) continue;
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return Array.from(counts.entries())
-      .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
-      .map(([date, count]) => ({ date, count }));
-  }
-
-  function buildTopCounts(values, limit = 12) {
-    const counts = new Map();
-    for (const raw of values) {
-      const key = String(raw || "").trim();
-      if (!key) continue;
-      counts.set(key, (counts.get(key) || 0) + 1);
-    }
-    return Array.from(counts.entries())
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => {
-        if (b.count !== a.count) return b.count - a.count;
-        return a.name.localeCompare(b.name);
-      })
-      .slice(0, limit);
-  }
-
   function getAdminRangeLabel(labels, days) {
     const normalized = ADMIN_STATS_RANGE_OPTIONS.includes(Number(days)) ? Number(days) : DEFAULT_ADMIN_STATS_DAYS;
     return labels[`adminStatsRange${normalized}d`] || `${normalized} days`;
@@ -604,52 +556,6 @@
   function buildAdminMetricLabel(labels, key, rangeLabel) {
     const base = labels[key] || key;
     return `${base} (${rangeLabel})`;
-  }
-
-  function filterRowsSince(rows, getDate, days) {
-    const cutoff = Date.now() - (Number(days || DEFAULT_ADMIN_STATS_DAYS) * 24 * 60 * 60 * 1000);
-    return (Array.isArray(rows) ? rows : []).filter((row) => parseDate(getDate(row)) >= cutoff);
-  }
-
-  function buildLoginUserLeaderboard(loginEvents, users, days, limit = 10) {
-    const userMap = new Map();
-    for (const user of Array.isArray(users) ? users : []) {
-      if (user?.id) userMap.set(user.id, user);
-    }
-
-    const statsByUser = new Map();
-    for (const row of filterRowsSince(loginEvents, (event) => event.occurred_at, days)) {
-      const userId = String(row.user_id || "").trim();
-      if (!userId) continue;
-      const occurredAt = String(row.occurred_at || "");
-      const current = statsByUser.get(userId) || { userId, count: 0, lastLoginAt: "" };
-      current.count += 1;
-      if (!current.lastLoginAt || parseDate(occurredAt) > parseDate(current.lastLoginAt)) {
-        current.lastLoginAt = occurredAt;
-      }
-      statsByUser.set(userId, current);
-    }
-
-    return Array.from(statsByUser.values())
-      .map((row) => {
-        const user = userMap.get(row.userId) || {};
-        const email = normalizeEmail(user.email || "");
-        const displayName = String(user.display_name || "").trim();
-        return {
-          ...row,
-          email,
-          displayName,
-          avatar: user.avatar_url || "",
-          name: displayName || email || row.userId
-        };
-      })
-      .sort((a, b) => {
-        if (b.count !== a.count) return b.count - a.count;
-        const byLastLogin = parseDate(b.lastLoginAt) - parseDate(a.lastLoginAt);
-        if (byLastLogin !== 0) return byLastLogin;
-        return String(a.name || "").localeCompare(String(b.name || ""));
-      })
-      .slice(0, limit);
   }
 
   function getUserProfile(user) {
@@ -1371,55 +1277,30 @@
     `;
   }
 
-  function buildAdminStats(dashboard, explicitAdminIds, rangeDays, labels) {
-    const articles = Array.isArray(dashboard.articles) ? dashboard.articles : [];
-    const users = Array.isArray(dashboard.users) ? dashboard.users : [];
-    const requests = Array.isArray(dashboard.requests) ? dashboard.requests : [];
-    const loginEvents = Array.isArray(dashboard.loginEvents) ? dashboard.loginEvents : [];
-    const hasLoginEvents = Boolean(dashboard.hasLoginEvents);
+  function buildAdminStats(dashboard, rangeDays, labels) {
+    const serverStats = dashboard.stats && typeof dashboard.stats === "object" ? dashboard.stats : {};
     const days = ADMIN_STATS_RANGE_OPTIONS.includes(Number(rangeDays)) ? Number(rangeDays) : DEFAULT_ADMIN_STATS_DAYS;
     const rangeLabel = getAdminRangeLabel(labels || DEFAULT_LABELS, days);
-
-    const explicitAdminCount = new Set([...explicitAdminIds]).size;
-    const bootstrapUser = users.find((row) => normalizeEmail(row.email) === BOOTSTRAP_ADMIN_EMAIL) || null;
-    const bootstrapAlreadyCounted = bootstrapUser?.id ? explicitAdminIds.has(bootstrapUser.id) : false;
-    const totalAdmins = explicitAdminCount + (bootstrapAlreadyCounted ? 0 : 1);
-    const activeUsersInRange = filterRowsSince(users, (row) => row.last_seen_at, days).length;
-    const loginEventsInRange = filterRowsSince(loginEvents, (row) => row.occurred_at, days).length;
-    const pendingRequests = requests.filter((row) => row.status === "pending").length;
-
-    const articlesInRange = filterRowsSince(articles, (row) => row.submission_date || row.created_at, days);
-    const articleDates = articles.map((row) => row.submission_date || row.created_at).filter(Boolean);
-    const userDates = users.map((row) => row.created_at).filter(Boolean);
-    const loginDates = loginEvents.map((row) => row.occurred_at).filter(Boolean);
-    const articleTypes = articlesInRange.map((row) => row.source_type).filter(Boolean);
-    const articleKeywords = [];
-    for (const row of articlesInRange) {
-      const keywords = Array.isArray(row.keywords) ? row.keywords : [];
-      for (const keyword of keywords) {
-        const token = normalizeKeywordToken(keyword);
-        if (token) articleKeywords.push(token);
-      }
-    }
+    const hasLoginEvents = serverStats.loginEvents != null;
 
     return {
       summary: [
-        { label: "adminTotalArticles", value: articles.length },
-        { label: "adminTotalUsers", value: users.length },
-        { label: "adminTotalAdmins", value: totalAdmins },
-        { name: buildAdminMetricLabel(labels || DEFAULT_LABELS, "adminActiveUsersRange", rangeLabel), value: activeUsersInRange },
-        { name: buildAdminMetricLabel(labels || DEFAULT_LABELS, "adminLoginEventsRange", rangeLabel), value: hasLoginEvents ? loginEventsInRange : "-" },
-        { label: "adminPendingRequests", value: pendingRequests }
+        { label: "adminTotalArticles", value: Number(serverStats.totalArticles || 0) },
+        { label: "adminTotalUsers", value: Number(serverStats.totalUsers || 0) },
+        { label: "adminTotalAdmins", value: Number(serverStats.totalAdmins || 0) },
+        { name: buildAdminMetricLabel(labels || DEFAULT_LABELS, "adminActiveUsersRange", rangeLabel), value: Number(serverStats.activeUsers || 0) },
+        { name: buildAdminMetricLabel(labels || DEFAULT_LABELS, "adminLoginEventsRange", rangeLabel), value: hasLoginEvents ? Number(serverStats.loginEvents || 0) : "-" },
+        { label: "adminPendingRequests", value: Number(serverStats.pendingRequests || 0) }
       ],
       hasLoginEvents,
       rangeDays: days,
       rangeLabel,
-      dailyArticles: buildRecentDailyCounts(articleDates, days),
-      dailyUsers: buildRecentDailyCounts(userDates, days),
-      dailyLogins: hasLoginEvents ? buildRecentDailyCounts(loginDates, days) : [],
-      loginLeaderboard: hasLoginEvents ? buildLoginUserLeaderboard(loginEvents, users, days, 10) : [],
-      byType: buildTopCounts(articleTypes, 20),
-      byKeyword: buildTopCounts(articleKeywords, 20)
+      dailyArticles: Array.isArray(serverStats.dailyArticles) ? serverStats.dailyArticles : [],
+      dailyUsers: Array.isArray(serverStats.dailyUsers) ? serverStats.dailyUsers : [],
+      dailyLogins: Array.isArray(serverStats.dailyLogins) ? serverStats.dailyLogins : [],
+      loginLeaderboard: Array.isArray(serverStats.loginLeaderboard) ? serverStats.loginLeaderboard : [],
+      byType: Array.isArray(serverStats.byType) ? serverStats.byType : [],
+      byKeyword: Array.isArray(serverStats.byKeyword) ? serverStats.byKeyword : []
     };
   }
 
@@ -1469,7 +1350,7 @@
       })
       .sort((a, b) => parseDate(b.last_seen_at || b.created_at) - parseDate(a.last_seen_at || a.created_at));
     const deletionLogs = Array.isArray(dashboard.deletionLogs) ? dashboard.deletionLogs : [];
-    const stats = buildAdminStats(dashboard, explicitAdminIds, adminStatsDays, labels);
+    const stats = buildAdminStats(dashboard, adminStatsDays, labels);
 
     root.innerHTML = `
       <section class="oa-admin-shell" data-oa-admin-tabs>
@@ -1788,7 +1669,13 @@
     const ascending = state.sortOrder === "asc";
     const start = Math.max(0, (state.page - 1) * state.pageSize);
     const end = start + state.pageSize - 1;
+    const canonicalKeywordFilter = filters.termType === "keywords" && filters.termValue
+      ? canonicalizeKeyword(filters.termValue, keywordAliasMap)
+      : "";
     if (favoritesOnly && !favoriteList.length) {
+      return { rows: [], total: 0 };
+    }
+    if (filters.termType === "keywords" && filters.termValue && !canonicalKeywordFilter) {
       return { rows: [], total: 0 };
     }
 
@@ -1809,6 +1696,9 @@
       if (filters.termType === "types" && filters.termValue) {
         scopedQuery = scopedQuery.eq("source_type", filters.termValue);
       }
+      if (canonicalKeywordFilter) {
+        scopedQuery = scopedQuery.contains("keywords", [canonicalKeywordFilter]);
+      }
       if (favoritesOnly) {
         scopedQuery = scopedQuery.in("slug", favoriteList);
       }
@@ -1821,31 +1711,6 @@
       }
       return scopedQuery;
     };
-
-    let canonicalKeywordFilter = "";
-    if (filters.termType === "keywords" && filters.termValue) {
-      canonicalKeywordFilter = canonicalizeKeyword(filters.termValue, keywordAliasMap);
-      if (!canonicalKeywordFilter) return { rows: [], total: 0 };
-      const keywordQuery = buildScopedQuery(false)
-        .order(sortField, { ascending, nullsFirst: false })
-        .order("slug", { ascending: true });
-      const { data: keywordRows, error: keywordError } = await keywordQuery;
-      if (keywordError) throw keywordError;
-
-      const matchedRows = [];
-      for (const row of Array.isArray(keywordRows) ? keywordRows : []) {
-        const normalized = normalizeKeywords(row?.keywords, keywordAliasMap);
-        if (!normalized.includes(canonicalKeywordFilter)) continue;
-        matchedRows.push({
-          ...row,
-          keywords: normalized
-        });
-      }
-      return {
-        rows: matchedRows.slice(start, end + 1),
-        total: matchedRows.length
-      };
-    }
 
     let query = buildScopedQuery(true);
 
@@ -2036,7 +1901,7 @@
   }
 
   function rewriteDigestItemLinks(contentHtml) {
-    const html = String(contentHtml || "");
+    const html = window.OASanitize?.sanitizeDigestHtml(contentHtml) || "";
     if (!html) return "";
     const template = document.createElement("template");
     template.innerHTML = html;
@@ -2456,54 +2321,39 @@
       return { row: null, error: null };
     }
 
-    async function upsertCurrentUser(user) {
-      const profile = getUserProfile(user);
-      if (!user?.id || !profile.email) return;
-      const nowIso = new Date().toISOString();
-      await client.from("app_users").upsert({
-        id: user.id,
-        email: profile.email,
-        display_name: profile.displayName || null,
-        avatar_url: profile.avatar || null,
-        last_seen_at: nowIso
-      }, { onConflict: "id" });
-      // Best-effort login event tracking for admin analytics.
-      try {
-        await client.from("login_events").insert({
-          user_id: user.id,
-          occurred_at: nowIso
-        });
-      } catch (_error) {
-        // login_events is optional until schema migration is applied.
-      }
-    }
-
     async function loadAccessContext(user) {
       const profile = getUserProfile(user);
-      await upsertCurrentUser(user);
-
-      const [rolesResult, allowlistResult, requestResult] = await Promise.all([
-        client.from("user_roles").select("role").eq("user_id", user.id),
-        client.from("access_allowlist").select("email").eq("email", profile.email).limit(1),
-        client.from("access_requests").select("id,status,reason,created_at,reviewed_at").eq("requester_user_id", user.id).order("created_at", { ascending: false }).limit(1)
-      ]);
-
-      const roles = (rolesResult.data || []).map((row) => row.role);
-      const latestRequest = (requestResult.data || [])[0] || null;
-      const isBootstrapAdmin = profile.email === BOOTSTRAP_ADMIN_EMAIL;
-      const isAdmin = isBootstrapAdmin || roles.includes("admin");
-      const isAllowlisted = Boolean((allowlistResult.data || []).length);
-      const isApproved = isAdmin || isAllowlisted || latestRequest?.status === "approved";
-
+      const { data, error } = await client.rpc("get_access_context", {
+        profile_display_name: profile.displayName || null,
+        profile_avatar_url: profile.avatar || null
+      });
+      if (error) throw error;
+      const context = data && typeof data === "object" ? data : {};
       return {
-        profile,
-        roles,
-        latestRequest,
-        isBootstrapAdmin,
-        isAdmin,
-        isAllowlisted,
-        isApproved
+        profile: { ...profile, ...(context.profile || {}) },
+        roles: Array.isArray(context.roles) ? context.roles : [],
+        latestRequest: context.latestRequest || null,
+        isBootstrapAdmin: Boolean(context.isBootstrapAdmin),
+        isAdmin: Boolean(context.isAdmin),
+        isAllowlisted: Boolean(context.isAllowlisted),
+        isApproved: Boolean(context.isApproved)
       };
+    }
+
+    async function recordLoginEvent(session) {
+      const userId = String(session?.user?.id || "").trim();
+      if (!userId) return;
+      const storageKey = "oa-login-event-user";
+      try {
+        if (window.sessionStorage.getItem(storageKey) === userId) return;
+        window.sessionStorage.setItem(storageKey, userId);
+      } catch (_error) {
+        // A blocked sessionStorage must not block authentication.
+      }
+      await client.from("login_events").insert({
+        user_id: userId,
+        occurred_at: new Date().toISOString()
+      });
     }
 
     async function loadFavorites(userId) {
@@ -2588,21 +2438,15 @@
     }
 
     async function fetchAdminDashboard() {
-      const [requestsResult, allowlistResult, usersResult, rolesResult, deletionLogsResult, articlesResult, loginEventsResult] = await Promise.all([
+      const [requestsResult, allowlistResult, usersResult, rolesResult, deletionLogsResult, statsResult] = await Promise.all([
         client.from("access_requests").select("id,requester_user_id,email,reason,status,created_at,reviewed_at,reviewer_user_id").order("created_at", { ascending: false }),
         client.from("access_allowlist").select("email,created_at,created_by").order("email", { ascending: true }),
         client.from("app_users").select("id,email,display_name,avatar_url,last_seen_at,created_at").order("last_seen_at", { ascending: false }),
         client.from("user_roles").select("user_id,role,created_at"),
         client.from("article_deletion_logs").select("slug,language,title,deleted_at,deleted_by_account").order("deleted_at", { ascending: false }).limit(200),
-        client.from("articles").select("slug,source_type,submission_date,created_at,keywords"),
-        client
-          .from("login_events")
-          .select("user_id,occurred_at")
-          .gte("occurred_at", new Date(Date.now() - (365 * 24 * 60 * 60 * 1000)).toISOString())
-          .order("occurred_at", { ascending: false })
-          .limit(20000)
+        client.rpc("get_admin_dashboard_stats", { range_days: adminStatsDays })
       ]);
-      const hasLoginEvents = !loginEventsResult.error;
+      if (statsResult.error) throw statsResult.error;
 
       return {
         requests: requestsResult.data || [],
@@ -2610,9 +2454,7 @@
         users: usersResult.data || [],
         roles: rolesResult.data || [],
         deletionLogs: deletionLogsResult.data || [],
-        articles: articlesResult.data || [],
-        loginEvents: hasLoginEvents ? (loginEventsResult.data || []) : [],
-        hasLoginEvents
+        stats: statsResult.data || {}
       };
     }
 
@@ -3025,9 +2867,13 @@
       });
     }
 
-    async function renderViews() {
-      const { data: sessionData } = await client.auth.getSession();
-      const user = sessionData?.session?.user || null;
+    async function renderViews(sessionOverride = undefined) {
+      let session = sessionOverride;
+      if (sessionOverride === undefined) {
+        const { data: sessionData } = await client.auth.getSession();
+        session = sessionData?.session || null;
+      }
+      const user = session?.user || null;
 
       if (!user) {
         favoriteSlugs = new Set();
@@ -3044,7 +2890,16 @@
         return;
       }
 
-      const access = await loadAccessContext(user);
+      let access;
+      try {
+        access = await loadAccessContext(user);
+      } catch (_error) {
+        renderAuthSkeleton(labels.configMissing);
+        for (const root of roots) {
+          root.innerHTML = `<p class="oa-page-subtitle">${escapeHtml(labels.configMissing)}</p>`;
+        }
+        return;
+      }
       renderAuthControls(user, access);
 
       if (!roots.length) {
@@ -3058,10 +2913,16 @@
         const view = collectFilters(root).view;
         return view === "search" || view === "topics_catalog" || view === "terms_catalog" || view === "archive";
       });
-      const articleResult = needsProtectedContent && hasCatalogViews ? await fetchArticles(lang) : { rows: [], error: null };
+      const articlePromise = needsProtectedContent && hasCatalogViews
+        ? fetchArticles(lang)
+        : Promise.resolve({ rows: [], error: null });
+      const favoritesPromise = needsProtectedContent
+        ? loadFavorites(user.id)
+        : Promise.resolve(new Set());
+      const [articleResult, loadedFavorites] = await Promise.all([articlePromise, favoritesPromise]);
       const articles = articleResult.rows;
       const renderOptions = { canDelete: access.isAdmin };
-      favoriteSlugs = needsProtectedContent ? await loadFavorites(user.id) : new Set();
+      favoriteSlugs = loadedFavorites;
 
       let adminDashboard = null;
 
@@ -3173,10 +3034,30 @@
       bindGlobalActions(user, access);
     }
 
-    client.auth.onAuthStateChange(() => {
-      renderViews();
+    let lastRenderedSessionToken = null;
+    client.auth.onAuthStateChange((event, session) => {
+      if (event === "TOKEN_REFRESHED") return;
+      const token = String(session?.access_token || "signed-out");
+      if ((event === "INITIAL_SESSION" || event === "SIGNED_IN") && token === lastRenderedSessionToken) {
+        if (event === "SIGNED_IN") {
+          window.setTimeout(() => recordLoginEvent(session).catch(() => {}), 0);
+        }
+        return;
+      }
+      lastRenderedSessionToken = token;
+      window.setTimeout(() => {
+        if (event === "SIGNED_IN") {
+          recordLoginEvent(session).catch(() => {});
+        }
+        if (event === "SIGNED_OUT") {
+          try {
+            window.sessionStorage.removeItem("oa-login-event-user");
+          } catch (_error) {
+            // Ignore restricted browser storage.
+          }
+        }
+        renderViews(session);
+      }, 0);
     });
-
-    renderViews();
   });
 })();

@@ -31,6 +31,7 @@ Production content comes from the private repository `cclljj/OaboutAI_data`, def
 - Hugo Extended `0.152.2` in CI.
 - Python `>=3.10`, with `pyyaml` for content validation and generation.
 - Node.js for Vercel and `nodemailer`.
+- Pinned, first-party browser bundles for `@supabase/supabase-js` and DOMPurify.
 - Supabase Auth, PostgREST Data API, RLS tables, and service-role sync.
 - Vercel static hosting and serverless functions.
 - Private GitHub data repository access token for production deploy.
@@ -99,4 +100,3 @@ A faithful replica requires both repositories:
 - Private data repository with `obsidian/en/*.md` and `obsidian/zh-tw/*.md` files following the content contract.
 
 Without the private data repository, the public app can still build as a shell, but it cannot populate protected runtime article rows.
-

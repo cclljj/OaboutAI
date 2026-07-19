@@ -22,6 +22,7 @@ The CI validation job SHALL validate code, content metadata, SQL grant policy, a
 - **AND** fails if a SQL file creates a `public.*` table without same-file grant/RLS/policy statements
 - **AND** fails if existing runtime table grants drift from the documented least-privilege baseline
 - **AND** fails if any `public.*` table is granted to `anon`
+- **AND** pinned browser dependency tests and the production dependency audit pass
 
 #### Scenario: Shell-only build validation
 
@@ -100,3 +101,18 @@ The site SHALL optionally enable Vercel Analytics and Speed Insights only in pro
 - **GIVEN** the relevant flag is `0`, `false`, `off`, or `no`
 - **WHEN** the head partial renders
 - **THEN** the matching Vercel script is omitted
+
+### Requirement: Browser Delivery Hardening
+
+The production deployment SHALL send defense-in-depth browser headers and cache fingerprinted assets efficiently.
+
+#### Scenario: Production response headers
+
+- **WHEN** Vercel serves a site response
+- **THEN** CSP, MIME-sniffing, referrer, permissions, and frame-embedding protections are present
+
+#### Scenario: Fingerprinted asset caching
+
+- **WHEN** Vercel serves a JavaScript or CSS asset under the fingerprinted asset paths
+- **THEN** the response is cacheable for one year with `immutable`
+- **AND** HTML remains revalidated

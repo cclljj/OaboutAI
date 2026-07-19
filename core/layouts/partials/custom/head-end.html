@@ -170,7 +170,21 @@
 <script id="oa-labels" type="application/json">{{ $labels | jsonify | safeHTML }}</script>
 <script id="oa-keyword-catalog" type="application/json">{{ site.Data.keywords | jsonify | safeHTML }}</script>
 
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+{{- $supabaseScript := resources.Get "js/vendor/supabase-2.110.7.js" -}}
+{{- if hugo.IsProduction -}}
+  {{- $supabaseScript = $supabaseScript | minify | fingerprint -}}
+{{- end -}}
+<script defer src="{{ $supabaseScript.RelPermalink }}" {{ with $supabaseScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
+{{- if eq .Type "digest" -}}
+  {{- $purifyScript := resources.Get "js/vendor/dompurify-3.4.12.min.js" -}}
+  {{- $sanitizeScript := resources.Get "js/oa-sanitize.js" -}}
+  {{- if hugo.IsProduction -}}
+    {{- $purifyScript = $purifyScript | fingerprint -}}
+    {{- $sanitizeScript = $sanitizeScript | minify | fingerprint -}}
+  {{- end -}}
+<script defer src="{{ $purifyScript.RelPermalink }}" {{ with $purifyScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
+<script defer src="{{ $sanitizeScript.RelPermalink }}" {{ with $sanitizeScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
+{{- end -}}
 {{- $appScript := resources.Get "js/oa-app.js" -}}
 {{- if hugo.IsProduction -}}
   {{- $appScript = $appScript | minify | fingerprint -}}

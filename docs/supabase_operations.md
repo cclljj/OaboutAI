@@ -43,8 +43,11 @@ select to_regclass('public.favorites') as favorites_table,
        to_regclass('public.login_events') as login_events_table,
        to_regclass('public.user_roles') as user_roles_table,
        to_regclass('public.access_allowlist') as access_allowlist_table,
-       to_regclass('public.access_requests') as access_requests_table;
+       to_regclass('public.access_requests') as access_requests_table,
+       to_regclass('public.digests') as digests_table;
 ```
+
+Tracked changes live under `supabase/migrations/`. Apply migrations in timestamp order, then run Supabase security and performance advisors. The canonical `docs/supabase_schema.sql` remains the full reset/bootstrap contract.
 
 Bootstrap admin:
 - `cclljj@gmail.com` is always treated as an admin by policy, even before a `user_roles` row exists.
@@ -137,9 +140,9 @@ order by email;
 
 ### 5.6 Login event tracking
 
-The browser records one best-effort `public.login_events` row when a signed-in session is loaded. Admin dashboard daily login charts require `authenticated` to have `SELECT, INSERT` on `public.login_events`; RLS still limits `SELECT` rows to admins.
+The browser records one best-effort `public.login_events` row for a new browser-session `SIGNED_IN` event. Ordinary view rerenders and token refreshes do not create login events. Admin dashboard daily login charts require `authenticated` to have `SELECT, INSERT` on `public.login_events`; RLS still limits `SELECT` rows to admins.
 
-The admin overview reads recent login events for up to one year, then lets admins switch the displayed range between 7 days, 30 days, 90 days, and 1 year. Daily login charts and the login user leaderboard use the same selected range.
+The admin overview calls `public.get_admin_dashboard_stats(...)` for bounded server-side aggregates and lets admins switch between 7 days, 30 days, 90 days, and 1 year. It does not download raw year-long login events.
 
 ```sql
 select count(*) as login_events_7d
@@ -173,13 +176,13 @@ If these are missing, UI will show:
 
 1. Admin adds the email to `public.access_allowlist`
 2. User logs in with Google
-3. Front-end upserts a row into `public.app_users`
+3. `public.get_access_context(...)` upserts `public.app_users` and returns approval state
 4. RLS immediately treats the user as approved
 
 ### 7.2 Request path
 
 1. User logs in with Google
-2. Front-end upserts a row into `public.app_users`
+2. `public.get_access_context(...)` upserts `public.app_users` and returns approval state
 3. If the email is not allowlisted and the user is not an admin, the UI shows a request form
 4. Submitting the form inserts a `pending` row into `public.access_requests`
 5. Frontend posts notification payload (`requestId`) to `/api/access-request-notify` with `Authorization: Bearer <Supabase access token>` (non-blocking)

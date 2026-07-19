@@ -49,7 +49,7 @@ The browser currently queries `public.digests` with:
 - list: `digest_date`, `title`, `language`
 - detail: `digest_date`, `title`, `content_html`, `language`
 
-The main schema file currently defines article/access tables but does not define `public.digests`. A full replica that enables Digest must create this table and RLS/grants using the same explicit grant policy as other runtime tables.
+The canonical schema defines `public.digests` with explicit grants, approval-aware RLS, and a unique `(digest_date, language)` constraint. Authenticated users receive `SELECT` only; service-role ingestion receives explicit CRUD privileges.
 
 Suggested minimum row shape:
 
@@ -58,11 +58,12 @@ Suggested minimum row shape:
 - `title text`
 - `content_html text`
 - timestamps
-- primary key `(digest_date, language)`
+- UUID primary key plus unique `(digest_date, language)`
+
+Digest detail pages load pinned DOMPurify only on the digest route. `core/assets/js/oa-sanitize.js` applies a strict element/attribute allowlist and fails closed if the sanitizer is unavailable.
 
 ## Known Behavior Boundaries
 
 Search is client-side over rows fetched for the active language. Large article sets may require future server-side search, but the current behavior is browser filtering.
 
-Keyword filtering is partly client-side because keyword aliases are normalized by the browser catalog. Type, topic, favorite, and month filters are pushed into Supabase queries where possible.
-
+Keyword aliases are normalized by the browser catalog, while canonical JSONB containment and pagination are pushed into Supabase. Type, topic, favorite, and month filters are also pushed into Supabase where possible.

@@ -22,6 +22,7 @@
 - checkout
 - setup Python 3.12
 - install `pyyaml`
+- setup Node.js 24, install pinned dependencies, run browser security tests, and audit production dependencies
 - run Supabase grant policy guard
 - compose site
 - sync topic pages
@@ -45,6 +46,7 @@
 - validates and syncs content
 - removes private data before Vercel build
 - builds and deploys production
+- preserves repository headers and rewrites while overriding only the composed Vercel build command
 - runs smoke tests
 
 ## Smoke Test Coverage
@@ -74,3 +76,7 @@ When adding documentation that should trigger CI, include its path in workflow `
 - `authenticated` grants must match the least-privilege table baseline
 - `service_role` grants must be limited to `select`, `insert`, `update`, and `delete`
 - newly created `public.*` tables must include same-file revoke, explicit grants, RLS enablement, and policy creation
+
+## Browser Headers And Asset Caching
+
+`vercel.json` defines CSP, MIME-sniffing, referrer, permissions, and frame-embedding protections. Fingerprinted JavaScript and CSS receive a one-year immutable cache policy, while API responses are private and `no-store`.

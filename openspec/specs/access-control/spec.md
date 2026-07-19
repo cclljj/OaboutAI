@@ -33,7 +33,8 @@ The system SHALL maintain one `public.app_users` row for each signed-in Supabase
 - **GIVEN** a Supabase user session exists
 - **WHEN** protected runtime initialization runs
 - **THEN** the browser app upserts `id`, lowercase `email`, `display_name`, `avatar_url`, and `last_seen_at`
-- **AND** it records a best-effort `public.login_events` row
+- **AND** access context is returned by one least-privilege RPC
+- **AND** a best-effort `public.login_events` row is recorded only for a new browser-session `SIGNED_IN` event, not ordinary rerenders or token refreshes
 
 ### Requirement: Approval Gate
 
@@ -138,6 +139,7 @@ The system SHALL expose `/admin/` only to admins and support access, user, and c
 - **AND** the admin can switch the overview range between 7 days, 30 days, 90 days, and 1 year
 - **AND** a login user leaderboard ranks users by login events within the selected range
 - **AND** non-admin users cannot read login events because RLS requires admin status
+- **AND** charts and leaderboard data are returned as bounded database-side aggregates rather than raw year-long event downloads
 
 ### Requirement: Explicit Supabase Grants
 

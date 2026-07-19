@@ -36,6 +36,7 @@ AUTHENTICATED_TABLE_BASELINE: dict[str, set[str]] = {
     "access_requests": {"select", "insert", "update"},
     "favorites": {"select", "insert", "delete"},
     "article_deletion_logs": {"select"},
+    "digests": {"select"},
 }
 SERVICE_ROLE_TABLE_BASELINE = {"select", "insert", "update", "delete"}
 REQUIRED_REVOKE_ROLES = {"anon", "authenticated", "service_role"}

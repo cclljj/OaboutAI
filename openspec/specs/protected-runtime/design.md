@@ -36,9 +36,11 @@ Detail views additionally select:
 
 ## Runtime Query Strategy
 
-The browser creates a Supabase client with PKCE, persistent sessions, auto-refresh, and URL session detection. It loads access context first, then fetches article data only when `access.isApproved` is true.
+The browser creates a Supabase client with PKCE, persistent sessions, auto-refresh, and URL session detection. The pinned SDK is served as a fingerprinted first-party Hugo asset. `INITIAL_SESSION` is the single initial render path; token refreshes do not trigger a full protected-view reload.
 
-List pagination uses server-side `range(start, end)` for standard filters. Keyword filtering canonicalizes aliases in the browser, so keyword-filtered result counts are computed after fetching the scoped language set.
+The browser calls `public.get_access_context` once to upsert the current profile and return role, allowlist, request, admin, and approval state. Article and favorites reads begin concurrently after approval is known.
+
+List pagination uses server-side `range(start, end)` for standard filters. Keyword aliases are canonicalized before the request, then JSONB containment, exact count, ordering, and pagination are executed by PostgREST.
 
 ## Rendering Safety
 

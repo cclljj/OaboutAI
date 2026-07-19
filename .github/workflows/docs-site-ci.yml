@@ -52,6 +52,21 @@ jobs:
       - name: Install validator dependency
         run: pip install pyyaml
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+          cache: npm
+
+      - name: Install pinned JavaScript dependencies
+        run: npm ci
+
+      - name: Run browser security regression tests
+        run: npm test
+
+      - name: Audit production JavaScript dependencies
+        run: npm audit --omit=dev
+
       - name: Enforce Supabase grant policy in SQL files
         run: python scripts/check_supabase_grant_policy.py
 
@@ -262,71 +277,13 @@ jobs:
 
       - name: Write compose-site Vercel config
         run: |
-          cat > vercel.json <<'JSON'
-          {
-            "$schema": "https://openapi.vercel.sh/vercel.json",
-            "buildCommand": "rm -rf data/obsidian static/obsidian && rm -f data/keyword_proposals.jsonl && hugo --gc --minify",
-            "outputDirectory": "public",
-            "rewrites": [
-              {
-                "source": "/obsidian/:path*",
-                "destination": "/404"
-              },
-              {
-                "source": "/zh-tw/obsidian/:path*",
-                "destination": "/404"
-              },
-              {
-                "source": "/items/:slug",
-                "destination": "/item/?slug=:slug"
-              },
-              {
-                "source": "/items/:slug/",
-                "destination": "/item/?slug=:slug"
-              },
-              {
-                "source": "/zh-tw/items/:slug",
-                "destination": "/zh-tw/item/?slug=:slug"
-              },
-              {
-                "source": "/zh-tw/items/:slug/",
-                "destination": "/zh-tw/item/?slug=:slug"
-              },
-              {
-                "source": "/keywords/:term",
-                "destination": "/items/?term_type=keywords&term_value=:term"
-              },
-              {
-                "source": "/keywords/:term/",
-                "destination": "/items/?term_type=keywords&term_value=:term"
-              },
-              {
-                "source": "/types/:term",
-                "destination": "/items/?term_type=types&term_value=:term"
-              },
-              {
-                "source": "/types/:term/",
-                "destination": "/items/?term_type=types&term_value=:term"
-              },
-              {
-                "source": "/zh-tw/keywords/:term",
-                "destination": "/zh-tw/items/?term_type=keywords&term_value=:term"
-              },
-              {
-                "source": "/zh-tw/keywords/:term/",
-                "destination": "/zh-tw/items/?term_type=keywords&term_value=:term"
-              },
-              {
-                "source": "/zh-tw/types/:term",
-                "destination": "/zh-tw/items/?term_type=types&term_value=:term"
-              },
-              {
-                "source": "/zh-tw/types/:term/",
-                "destination": "/zh-tw/items/?term_type=types&term_value=:term"
-              }
-            ]
-          }
-          JSON
+          node - <<'NODE'
+          const fs = require("node:fs");
+          const config = JSON.parse(fs.readFileSync("vercel.json", "utf8"));
+          config.buildCommand = "rm -rf data/obsidian static/obsidian && rm -f data/keyword_proposals.jsonl && hugo --gc --minify";
+          config.outputDirectory = "public";
+          fs.writeFileSync("vercel.json", `${JSON.stringify(config, null, 2)}\n`);
+          NODE
         working-directory: ${{ env.COMPOSED_SITE }}
 
       - name: Build Vercel artifacts

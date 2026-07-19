@@ -45,14 +45,16 @@ Critical env vars:
 ## 3. Pre-Deploy Smoke Checks
 
 Run locally before push:
-1. `python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean`
-2. `cd /tmp/oaboutai-site`
-3. `python3 scripts/sync_topics.py`
-4. `python3 scripts/auto_resolve_content_issues.py`
-5. `python3 scripts/validate_content.py`
-6. `python3 scripts/sync_obsidian_to_supabase.py --dry-run`
-7. `rm -f data/keyword_proposals.jsonl`
-8. `npx --yes hugo-bin --gc --minify`
+1. `npm ci && npm test && npm audit --omit=dev`
+2. `python3 scripts/check_supabase_grant_policy.py`
+3. `python3 scripts/compose_site.py --app-id "${APP_ID:-oaboutai}" --output /tmp/oaboutai-site --clean`
+4. `cd /tmp/oaboutai-site`
+5. `python3 scripts/sync_topics.py`
+6. `python3 scripts/auto_resolve_content_issues.py`
+7. `python3 scripts/validate_content.py`
+8. `python3 scripts/sync_obsidian_to_supabase.py --dry-run`
+9. `rm -f data/keyword_proposals.jsonl`
+10. `npx --yes hugo-bin --gc --minify`
 
 Expected:
 - build success
@@ -137,6 +139,16 @@ Expected:
 - no focus-jump that blocks tap targets
 - auth actions reachable and functioning
 
+### H. Digest Sanitization
+
+1. Open a digest list and detail page as an approved user.
+2. Confirm headings, lists, code, tables, and safe links render normally.
+3. Run `npm test` to verify scripts, event handlers, iframes, unsafe URLs, and unsupported images are removed.
+
+Expected:
+- digest content remains readable
+- stored HTML cannot inject executable markup
+
 ## 5. Data Integrity Checklist (Supabase)
 
 Run SQL checks:
@@ -164,6 +176,8 @@ After GitHub Actions + Vercel deploy:
 2. Verify sample entry via canonical and legacy URL.
 3. Verify `/keywords/` and `/types/` drill-down no longer 404.
 4. Verify language switch on entry preserves slug.
+5. Verify CSP and other browser security headers are present.
+6. Verify fingerprinted `/js/` and `/css/` responses use `max-age=31536000, immutable`.
 
 Automated in CI:
 - `.github/workflows/docs-site-ci.yml` now runs `scripts/smoke_test_routes.sh` after production deploy.
