@@ -176,7 +176,7 @@
 {{- end -}}
 <script defer src="{{ $supabaseScript.RelPermalink }}" {{ with $supabaseScript.Data.Integrity }}integrity="{{ . }}"{{ end }}></script>
 {{- if eq .Type "digest" -}}
-  {{- $purifyScript := resources.Get "js/vendor/dompurify-3.4.12.min.js" -}}
+  {{- $purifyScript := resources.Get "js/vendor/dompurify-3.4.13.min.js" -}}
   {{- $sanitizeScript := resources.Get "js/oa-sanitize.js" -}}
   {{- if hugo.IsProduction -}}
     {{- $purifyScript = $purifyScript | fingerprint -}}
