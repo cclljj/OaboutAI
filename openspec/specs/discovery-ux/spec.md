@@ -154,6 +154,7 @@ The system SHALL expose protected weekly digest list and detail pages when `publ
 - **WHEN** a matching digest row exists
 - **THEN** the page renders digest title, date, and `content_html`
 - **AND** `content_html` is sanitized with a strict allowlist before DOM insertion
+- **AND** the sanitizer fails closed, returning empty output when the sanitizer library is unavailable
 - **AND** item links inside digest content are rewritten to protected entry links
 - **AND** reference lists following reference headings receive digest-specific styling
 
