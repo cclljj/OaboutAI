@@ -10,10 +10,18 @@ This capability defines local verification, CI validation, production deployment
 
 The CI validation job SHALL validate code, content metadata, SQL grant policy, and static build safety for pull requests and matching pushes.
 
+#### Scenario: Workflow token least privilege
+
+- **WHEN** the docs-site CI workflow runs
+- **THEN** the workflow-level default `GITHUB_TOKEN` permission set is empty
+- **AND** each job opts in to only the scopes it needs, with `validate-and-build` taking `contents: read`
+- **AND** private data access and deployment continue to use their dedicated secrets
+
 #### Scenario: CI path trigger
 
-- **WHEN** changes are pushed or opened in a pull request under core app, app overlay, API, scripts, docs, OpenSpec, root docs, Vercel config, or workflow files
+- **WHEN** changes are pushed or opened in a pull request under core app, app overlay, API, scripts, docs, OpenSpec, root docs, Vercel config, JavaScript dependency manifests, or workflow files
 - **THEN** the docs-site CI workflow runs
+- **AND** `package.json` and `package-lock.json` are covered so dependency-only changes reach the production dependency audit
 
 #### Scenario: SQL grant policy check
 
