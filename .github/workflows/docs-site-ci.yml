@@ -34,8 +34,14 @@ on:
         required: false
         default: "oaboutai"
 
+# Least-privilege GITHUB_TOKEN: no job in this workflow writes to the repo,
+# so the default is empty and each job opts in to the read it needs.
+permissions: {}
+
 jobs:
   validate-and-build:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     env:
       APP_ID: ${{ github.event.inputs.app_id || 'oaboutai' }}
@@ -123,6 +129,8 @@ jobs:
         working-directory: ${{ env.COMPOSED_SITE }}
 
   deploy-vercel:
+    permissions:
+      contents: read
     needs: validate-and-build
     if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
