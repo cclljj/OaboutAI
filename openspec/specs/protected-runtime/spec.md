@@ -16,6 +16,7 @@ The system SHALL treat Supabase `public.articles` as the runtime source of truth
 - **WHEN** the browser app queries `public.articles`
 - **THEN** list views receive article metadata and executive summaries for the active language
 - **AND** results are ordered by selected date fields and slug as a stable tie-breaker
+- **AND** keyword filters are canonicalized before the request, then matched server-side by JSONB containment so filtering, exact counts, ordering, and pagination are all performed by PostgREST
 
 #### Scenario: Unapproved user cannot read articles
 
@@ -30,6 +31,24 @@ The system SHALL treat Supabase `public.articles` as the runtime source of truth
 - **WHEN** any protected runtime view initializes
 - **THEN** the UI renders a sign-in gate
 - **AND** no protected article body is rendered
+
+### Requirement: Session Render Path
+
+The protected runtime SHALL render protected views once per session token and SHALL NOT re-render them on background token refresh.
+
+#### Scenario: Initial session render
+
+- **GIVEN** a Supabase session is established
+- **WHEN** the auth listener receives `INITIAL_SESSION` or `SIGNED_IN`
+- **THEN** protected views render once for that session token
+- **AND** a later event carrying the same token does not trigger another protected-view render
+
+#### Scenario: Access context precedes article reads
+
+- **GIVEN** an authenticated user
+- **WHEN** the protected runtime initializes
+- **THEN** access context is resolved first
+- **AND** article and favorites reads are issued concurrently only after approval is known
 
 ### Requirement: Article Detail Rendering
 
@@ -70,6 +89,16 @@ The system SHALL prevent private Obsidian sources and generated public article J
 - **WHEN** the deploy job builds Vercel artifacts
 - **THEN** private Obsidian data is removed before build
 - **AND** `.vercel/output/static/obsidian/articles.en.json` and `.vercel/output/static/obsidian/articles.zh-tw.json` are absent
+
+### Requirement: Pinned First-Party Runtime Assets
+
+The site SHALL serve its browser runtime dependencies as pinned first-party assets rather than from third-party origins at request time.
+
+#### Scenario: Runtime dependency delivery
+
+- **WHEN** a protected page loads its client runtime
+- **THEN** the Supabase SDK and the HTML sanitizer are served from repository-vendored files at pinned versions
+- **AND** each is emitted as a fingerprinted Hugo asset
 
 ### Requirement: Safe Client Rendering
 
