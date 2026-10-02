@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.110.7",
-    "dompurify": "3.4.13",
+    "dompurify": "3.4.16",
     "nodemailer": "10.0.12"
   },
   "devDependencies": {
